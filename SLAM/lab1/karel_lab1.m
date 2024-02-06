@@ -21,12 +21,13 @@ global config;
 config.step_by_step = 0;
 
 %number of robot motions for each local map
-config.steps_per_map = 500;
+config.steps_per_map = 250;
+
 
 % figure counter (to always plot a new figure)
 config.fig = 0;
 
-config.total_maps = 2;
+config.total_maps = 4;
 %-------------------------------------------------------------------------
 
 %-------------------------------------------------------------------------
@@ -154,7 +155,6 @@ function[map] = Kalman_filter_slam (map, steps)
     map.stats.error_x = [];
     map.stats.sigma_x = [];
     map.stats.cost_t = [];
-    
     
     for k = 0:steps
         
@@ -343,13 +343,15 @@ function [global_map] = join_maps(global_map, map)
     global_map.n = global_map.n + map.n;
     
     global_map.true_ids = [global_map.true_ids; map.true_ids(2:end)];
-    global_map.true_x = [world.true_robot_location; global_map.true_x(2:end); m - 1 - sensor.range_max + map.true_x(2:end)];
+    global_map.true_x = [world.true_robot_location; global_map.true_x(2:end); global_map.true_x(end) + 0.5 - sensor.range_max + map.true_x(2:end)];
 
     % record statistics
-      global_map.stats.error_x = [global_map.stats.error_x; global_map.stats.error_x(end) + map.stats.error_x];
-      global_map.stats.sigma_x = [global_map.stats.sigma_x; global_map.stats.sigma_x(end) + map.stats.sigma_x];
+    global_map.stats.error_x = [global_map.stats.error_x; global_map.stats.error_x(end) + map.stats.error_x];
+    
+    global_map.stats.sigma_x = [global_map.stats.sigma_x; sqrt(global_map.stats.sigma_x(end)^2 + map.stats.sigma_x.^2 )];
     global_map.stats.cost_t = [global_map.stats.cost_t; map.stats.cost_t];
-    global_map.stats.true_x = [global_map.stats.true_x; config.steps_per_map + map.stats.true_x];
+    global_map.stats.true_x = [global_map.stats.true_x; global_map.stats.true_x(end) + 1 + map.stats.true_x];
+    
 end
 
 %-------------------------------------------------------------------------
