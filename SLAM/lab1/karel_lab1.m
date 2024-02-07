@@ -21,13 +21,12 @@ global config;
 config.step_by_step = 0;
 
 %number of robot motions for each local map
-config.steps_per_map = 250;
-
+config.steps_per_map = 100;
 
 % figure counter (to always plot a new figure)
 config.fig = 0;
 
-config.total_maps = 4;
+config.total_maps = 10;
 %-------------------------------------------------------------------------
 
 %-------------------------------------------------------------------------
@@ -111,7 +110,9 @@ for k = 1:config.total_maps
     fprintf("Computing map %d... \n", k);
     [map] = Kalman_filter_slam (map, config.steps_per_map);
     if (k > 1)
+        tjoin = tic;
         [global_map] = join_maps(global_map, map);
+        global_map.stats.cost_t(end) = global_map.stats.cost_t(end) + toc(tjoin);
     else
         global_map = map;
     end
@@ -347,7 +348,6 @@ function [global_map] = join_maps(global_map, map)
 
     % record statistics
     global_map.stats.error_x = [global_map.stats.error_x; global_map.stats.error_x(end) + map.stats.error_x];
-    
     global_map.stats.sigma_x = [global_map.stats.sigma_x; sqrt(global_map.stats.sigma_x(end)^2 + map.stats.sigma_x.^2 )];
     global_map.stats.cost_t = [global_map.stats.cost_t; map.stats.cost_t];
     global_map.stats.true_x = [global_map.stats.true_x; global_map.stats.true_x(end) + 1 + map.stats.true_x];
