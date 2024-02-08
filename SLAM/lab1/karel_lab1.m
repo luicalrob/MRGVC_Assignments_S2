@@ -21,12 +21,12 @@ global config;
 config.step_by_step = 0;
 
 %number of robot motions for each local map
-config.steps_per_map = 100;
+config.steps_per_map = 500;
 
 % figure counter (to always plot a new figure)
 config.fig = 0;
 
-config.total_maps = 10;
+config.total_maps = 2;
 %-------------------------------------------------------------------------
 
 %-------------------------------------------------------------------------
@@ -112,6 +112,8 @@ for k = 1:config.total_maps
     if (k > 1)
         tjoin = tic;
         [global_map] = join_maps(global_map, map);
+        % matching and fusion
+        [global_map] = match_and_fuse(global_map);
         global_map.stats.cost_t(end) = global_map.stats.cost_t(end) + toc(tjoin);
     else
         global_map = map;
@@ -352,6 +354,59 @@ function [global_map] = join_maps(global_map, map)
     global_map.stats.cost_t = [global_map.stats.cost_t; map.stats.cost_t];
     global_map.stats.true_x = [global_map.stats.true_x; global_map.stats.true_x(end) + 1 + map.stats.true_x];
     
+end
+
+function [global_map] = match_and_fuse(global_map)
+
+    % pedir diego
+    [unique_ids, ~, idx] = unique(global_map.true_ids, 'stable');
+    repeated_indices = histcounts(idx) > 1;
+    repeated_ids = unique_ids(repeated_indices);
+    positions = arrayfun(@(x) find(global_map.true_ids == x), repeated_ids, 'UniformOutput', false);
+    %
+    disp(repeated_ids);
+    disp('Positions of repeated IDs:');
+    disp(positions);
+
+    H_k = sparse(length(repeated_ids),length(global_map.hat_x));
+    for i = 1:length(repeated_ids)
+        H_k(i,positions{i}(1)) = 1;
+        H_k(i,positions{i}(2)) = -1;
+    end
+    
+    y_k = - H_k * global_map.hat_x;
+    S_k = H_k * global_map.hat_P * H_k';
+    K_k = global_map.hat_P * H_k' / S_k;
+    
+    global_map.hat_x = global_map.hat_x - K_k * y_k;
+    global_map.hat_P = (eye(length(global_map.hat_x)) - K_k * H_k) * global_map.hat_P;
+    global_map.n = global_map.n - length(repeated_ids);
+
+    for i = 1:length(repeated_ids)
+        % no se puede actualizar, lo pasado se ha hecho lo mejor posible
+        % lo unico que hat_x y hat_P son lo mejror posible para el proximo
+        % mapa
+        
+        % update
+        % global_map.stats.error_x(positions{i}(1)) = global_map.stats.true_x(positions{i}(1)) - global_map.hat_x(positions{i}(1));
+        % sigma_1 = global_map.stats.sigma_x(positions{i}(1));
+        % sigma_2 = global_map.stats.sigma_x(positions{i}(2)-(i-1));
+        % global_map.stats.sigma_x(positions{i}(1)) = sqrt(sigma_1^2 + sigma_2^2 );
+        % global_map.stats.cost_t(positions{i}(1)) = global_map.stats.cost_t(positions{i}(1)) + global_map.stats.cost_t(positions{i}(2)-(i-1));
+
+        % remove
+        global_map.hat_x(positions{i}(2)-(i-1), :) = [];
+        global_map.hat_P(positions{i}(2)-(i-1), :) = [];
+        global_map.hat_P(:, positions{i}(2)-(i-1)) = [];
+
+        global_map.true_ids(positions{i}(2)-(i-1), :) = [];
+        global_map.true_x(positions{i}(2)-(i-1), :) = [];
+
+        % global_map.stats.error_x(positions{i}(2)-(i-1), :) = [];
+        % global_map.stats.sigma_x(positions{i}(2)-(i-1), :) = [];
+        % global_map.stats.cost_t(positions{i}(2)-(i-1), :) = [];
+    end
+
 end
 
 %-------------------------------------------------------------------------
