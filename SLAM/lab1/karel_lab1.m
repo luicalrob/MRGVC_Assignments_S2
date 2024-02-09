@@ -21,12 +21,12 @@ global config;
 config.step_by_step = 0;
 
 %number of robot motions for each local map
-config.steps_per_map = 500;
+config.steps_per_map = 125;
 
 % figure counter (to always plot a new figure)
 config.fig = 0;
 
-config.total_maps = 2;
+config.total_maps = 8;
 %-------------------------------------------------------------------------
 
 %-------------------------------------------------------------------------
@@ -112,9 +112,11 @@ for k = 1:config.total_maps
     if (k > 1)
         tjoin = tic;
         [global_map] = join_maps(global_map, map);
-        % matching and fusion
-        [global_map] = match_and_fuse(global_map);
         global_map.stats.cost_t(end) = global_map.stats.cost_t(end) + toc(tjoin);
+        % matching and fusion (exercise 11)
+        % tjoin = tic;
+        [global_map] = match_and_fuse(global_map);
+        % global_map.stats.cost_t(end) = global_map.stats.cost_t(end) + toc(tjoin);
     else
         global_map = map;
     end
@@ -358,53 +360,50 @@ end
 
 function [global_map] = match_and_fuse(global_map)
 
-    % pedir diego
-    [unique_ids, ~, idx] = unique(global_map.true_ids, 'stable');
-    repeated_indices = histcounts(idx) > 1;
-    repeated_ids = unique_ids(repeated_indices);
-    positions = arrayfun(@(x) find(global_map.true_ids == x), repeated_ids, 'UniformOutput', false);
-    %
-    disp(repeated_ids);
-    disp('Positions of repeated IDs:');
-    disp(positions);
+    % Find unique values and their counts
+    [unique_vals, ~, idx] = unique(global_map.true_ids);
+    counts = histcounts(idx, numel(unique_vals));
 
-    H_k = sparse(length(repeated_ids),length(global_map.hat_x));
-    for i = 1:length(repeated_ids)
-        H_k(i,positions{i}(1)) = 1;
-        H_k(i,positions{i}(2)) = -1;
-    end
+    % Find indices of duplicated values
+    duplicated_elements = find(counts > 1);
+
+    % Initialize array to store pairs of indices
+    positions = zeros(length(duplicated_elements), 2);
     
+    % Iterate over duplicated values to find their indices
+    for i = 1:length(duplicated_elements)
+        id = unique_vals(duplicated_elements(i));
+        indices = find(global_map.true_ids == id);
+        positions(i, :) = indices(1:2);
+    end
+
+    H_k = sparse(1:numel(duplicated_elements), positions(:, 1), 1, numel(duplicated_elements), numel(global_map.true_ids));
+    H_k = H_k - sparse(1:numel(duplicated_elements), positions(:, 2), 1, numel(duplicated_elements), numel(global_map.true_ids));
+
     y_k = - H_k * global_map.hat_x;
     S_k = H_k * global_map.hat_P * H_k';
     K_k = global_map.hat_P * H_k' / S_k;
     
     global_map.hat_x = global_map.hat_x - K_k * y_k;
     global_map.hat_P = (eye(length(global_map.hat_x)) - K_k * H_k) * global_map.hat_P;
-    global_map.n = global_map.n - length(repeated_ids);
+    global_map.n = global_map.n - length(duplicated_elements);
 
-    for i = 1:length(repeated_ids)
-        % no se puede actualizar, lo pasado se ha hecho lo mejor posible
-        % lo unico que hat_x y hat_P son lo mejror posible para el proximo
-        % mapa
-        
-        % update
-        % global_map.stats.error_x(positions{i}(1)) = global_map.stats.true_x(positions{i}(1)) - global_map.hat_x(positions{i}(1));
-        % sigma_1 = global_map.stats.sigma_x(positions{i}(1));
-        % sigma_2 = global_map.stats.sigma_x(positions{i}(2)-(i-1));
-        % global_map.stats.sigma_x(positions{i}(1)) = sqrt(sigma_1^2 + sigma_2^2 );
-        % global_map.stats.cost_t(positions{i}(1)) = global_map.stats.cost_t(positions{i}(1)) + global_map.stats.cost_t(positions{i}(2)-(i-1));
-
+    for i = 1:length(duplicated_elements)    
         % remove
-        global_map.hat_x(positions{i}(2)-(i-1), :) = [];
-        global_map.hat_P(positions{i}(2)-(i-1), :) = [];
-        global_map.hat_P(:, positions{i}(2)-(i-1)) = [];
+        global_map.hat_x(positions(i,2)-(i-1), :) = [];
+        global_map.hat_P(positions(i,2)-(i-1), :) = [];
+        global_map.hat_P(:, positions(i,2)-(i-1)) = [];
 
-        global_map.true_ids(positions{i}(2)-(i-1), :) = [];
-        global_map.true_x(positions{i}(2)-(i-1), :) = [];
-
-        % global_map.stats.error_x(positions{i}(2)-(i-1), :) = [];
-        % global_map.stats.sigma_x(positions{i}(2)-(i-1), :) = [];
-        % global_map.stats.cost_t(positions{i}(2)-(i-1), :) = [];
+        global_map.true_ids(positions(i,2)-(i-1), :) = [];
+        global_map.true_x(positions(i,2)-(i-1), :) = [];
+           
+        % global_map.hat_x(positions(i,1)-(i-1), :) = [];
+        % global_map.hat_P(positions(i,1)-(i-1), :) = [];
+        % global_map.hat_P(:, positions(i,1)-(i-1)) = [];
+        % 
+        % global_map.true_ids(positions(i,1)-(i-1), :) = [];
+        % global_map.true_x(positions(i,1)-(i-1), :) = [];
+    
     end
 
 end
