@@ -112,11 +112,9 @@ for k = 1:config.total_maps
     if (k > 1)
         tjoin = tic;
         [global_map] = join_maps(global_map, map);
-        global_map.stats.cost_t(end) = global_map.stats.cost_t(end) + toc(tjoin);
         % matching and fusion (exercise 11)
-        % tjoin = tic;
         [global_map] = match_and_fuse(global_map);
-        % global_map.stats.cost_t(end) = global_map.stats.cost_t(end) + toc(tjoin);
+        global_map.stats.cost_t(end) = global_map.stats.cost_t(end) + toc(tjoin);
     else
         global_map = map;
     end
@@ -328,7 +326,6 @@ function [map] = add_new_features (map, measurements)
 end
 
 function [global_map] = join_maps(global_map, map)
-    global config;
     global world;
     global sensor;
 
