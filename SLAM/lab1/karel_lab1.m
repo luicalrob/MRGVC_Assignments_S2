@@ -381,7 +381,7 @@ function [global_map] = match_and_fuse(global_map)
     S_k = H_k * global_map.hat_P * H_k';
     K_k = global_map.hat_P * H_k' / S_k;
     
-    global_map.hat_x = global_map.hat_x - K_k * y_k;
+    global_map.hat_x = global_map.hat_x + K_k * y_k;
     global_map.hat_P = (eye(length(global_map.hat_x)) - K_k * H_k) * global_map.hat_P;
     global_map.n = global_map.n - length(duplicated_elements);
 
@@ -393,13 +393,6 @@ function [global_map] = match_and_fuse(global_map)
 
         global_map.true_ids(positions(i,2)-(i-1), :) = [];
         global_map.true_x(positions(i,2)-(i-1), :) = [];
-           
-        % global_map.hat_x(positions(i,1)-(i-1), :) = [];
-        % global_map.hat_P(positions(i,1)-(i-1), :) = [];
-        % global_map.hat_P(:, positions(i,1)-(i-1)) = [];
-        % 
-        % global_map.true_ids(positions(i,1)-(i-1), :) = [];
-        % global_map.true_x(positions(i,1)-(i-1), :) = [];
     
     end
 
