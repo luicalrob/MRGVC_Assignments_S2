@@ -24,6 +24,8 @@ w_T_b = trotz(60 ,'deg') * troty(0,'deg') * trotz(0,'deg');
 figure(3); clf; grid; hold on; 
 trplot(eye(4), 'frame', 'w', 'color' ,'r'); trplot(w_T_a, 'frame', 'A', 'color', 'b'); trplot(w_T_b, 'frame', 'B', 'color', 'g');
 % w_T_a == w_T_b
+%sin(a+b) = sin(a)cos(b) + cos(a)sin(b)
+%cos(a+b) = cos(a)cos(b) - sin(a)sin(b) ---> a=45, b=15
 rpy_a = tr2rpy(w_T_a);
 rpy_b = tr2rpy(w_T_b);
 
