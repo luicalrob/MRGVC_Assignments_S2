@@ -32,7 +32,7 @@ rpy_b = tr2rpy(w_T_b);
 %% Exercise 4
 
 % a
-w_T_a = troty(90,'deg') * transl(0,0,-3) * transl(2,0,0);
+w_T_a = troty(90,'deg') * transl(0,0,2) * transl(3,0,0);
 %b
 w_T_b = transl(0,0,-3) * transl(2,0,0) * troty(90, 'deg');
 figure(4); clf; grid; hold on; 
@@ -54,4 +54,4 @@ new_b_T_o = transl(10,0,0) * b_T_o * trotz(90, 'deg');
 new_c_T_o = inv(new_b_T_c) * new_b_T_o;
 figure(7); clf; grid; hold on; 
 trplot(eye(4), 'frame', 'B', 'color' ,'r'); trplot(b_T_o, 'frame', 'O'); trplot(inv(c_T_b), 'frame', 'C');
-trplot(new_b_T_o, 'frame', 'Onew', 'color', 'g');trplot(new_b_T_c, 'frame', 'Cnew', 'color','g');
+trplot(new_b_T_o, 'frame', 'Onew', 'color', 'g'); trplot(new_b_T_c, 'frame', 'Cnew', 'color','g');
