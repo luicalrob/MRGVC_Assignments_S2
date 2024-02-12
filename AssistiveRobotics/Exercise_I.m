@@ -4,18 +4,14 @@
 % a
 w_T_a = transl(10,0,0) * troty(90,'deg');
 
-%b
-w_T_b = transl(10,0,0) * troty(90,'deg');
+%b T = Rot(R) * transl(R't) where t and R are translations w/respect to original
+%frame
 
-w_T_b_2 = troty(90, 'deg') * transl(10,0,0);
-
-% To obstain same solution as w_T_a using a premultiplication of a rotation
-% matrix:
-% w_T_b = troty(90, 'deg') * transl(0,0,-10);
-
+t = roty(90, 'deg')'*[10;0;0];
+w_T_b = troty(90, 'deg') * transl(t(1),t(2),t(3));
 
 figure(1); clf; grid; hold on;
-trplot(eye(4), 'frame', 'w', 'color' ,'k'); trplot(w_T_a, 'frame', 'A'); trplot(w_T_b, 'frame', 'B_1','color' ,'g'); trplot(w_T_b_2, 'frame', 'B_2', 'color' ,'r');
+trplot(eye(4), 'frame', 'w', 'color' ,'k'); trplot(w_T_a, 'frame', 'A'); trplot(w_T_b, 'frame', 'B','color' ,'g');
 
 %% Exercise 2
 
@@ -40,7 +36,9 @@ rpy_b = tr2rpy(w_T_b);
 %% Exercise 4
 
 % a
-w_T_a = troty(90,'deg') * transl(0,0,2) * transl(3,0,0);
+t = roty(90,'deg')'*[2;0;-3];
+w_T_a = troty(90,'deg') * transl(t(1),t(2),t(3));
+
 %b
 w_T_b = transl(0,0,-3) * transl(2,0,0) * troty(90, 'deg');
 figure(4); clf; grid; hold on; 
