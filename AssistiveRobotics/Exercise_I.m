@@ -3,11 +3,19 @@
 
 % a
 w_T_a = transl(10,0,0) * troty(90,'deg');
-%b
-w_T_b = troty(90, 'deg') * transl(10,0,0);
 
-figure(1); clf; grid; hold on; 
-trplot(eye(4), 'frame', 'w', 'color' ,'r'); trplot(w_T_a, 'frame', 'A'); trplot(w_T_b, 'frame', 'B');
+%b
+w_T_b = transl(10,0,0) * troty(90,'deg');
+
+w_T_b_2 = troty(90, 'deg') * transl(10,0,0);
+
+% To obstain same solution as w_T_a using a premultiplication of a rotation
+% matrix:
+% w_T_b = troty(90, 'deg') * transl(0,0,-10);
+
+
+figure(1); clf; grid; hold on;
+trplot(eye(4), 'frame', 'w', 'color' ,'k'); trplot(w_T_a, 'frame', 'A'); trplot(w_T_b, 'frame', 'B_1','color' ,'g'); trplot(w_T_b_2, 'frame', 'B_2', 'color' ,'r');
 
 %% Exercise 2
 
