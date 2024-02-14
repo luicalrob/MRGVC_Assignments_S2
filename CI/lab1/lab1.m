@@ -74,13 +74,13 @@ I_demosaic_b(:,:,1) = bilinear_img_red;
 I_demosaic_b(:,:,2) = bilinear_img_green;
 I_demosaic_b(:,:,3) = bilinear_img_blue;
 
-figure(5);
-imshow(I_demosaic_nn);
-title('Nearest neighbour Interpolation (Manual)');
+% figure(5);
+% imshow(I_demosaic_nn);
+% title('Nearest neighbour Interpolation (Manual)');
 
-figure(6);
-imshow(I_demosaic_b);
-title('Bilinear Interpolation (Manual)');
+% figure(6);
+% imshow(I_demosaic_b);
+% title('Bilinear Interpolation (Manual)');
 
 I_demosaic = I_demosaic_b; % choose the demosaic method
 %% 2.4 White balancing %%
@@ -102,9 +102,9 @@ grey_world_img(:,:,1) = balanced_red;
 grey_world_img(:,:,2) = balanced_green;
 grey_world_img(:,:,3) = balanced_blue;
 
-figure(7);
-imshow(grey_world_img);
-title('White balancing: Grey World Assumption');
+% figure(7);
+% imshow(grey_world_img);
+% title('White balancing: Grey World Assumption');
 
 % White world assumption
 
@@ -123,15 +123,16 @@ white_world_img(:,:,1) = balanced_red;
 white_world_img(:,:,2) = balanced_green;
 white_world_img(:,:,3) = balanced_blue;
 
-figure(8);
-imshow(white_world_img);
-title('White balancing: White World Assumption');
+% figure(8);
+% imshow(white_world_img);
+% title('White balancing: White World Assumption');
 
 % Manual white balancing
 
 % Point that looks grey in the raw image (2917, 769)
 % Point that looks white in the raw image (5501, 302)
 
+%RGB_pixel = I_demosaic(769,2917,:);
 RGB_pixel = I_demosaic(3446,2350,:);
 
 k_r = 0.5 ./ RGB_pixel(:,:,1);
@@ -149,3 +150,17 @@ manual_balancing_img(:,:,3) = balanced_blue;
 figure(9);
 imshow(manual_balancing_img);
 title('White balancing: Manual Balancing');
+
+%% 2.5 Denoising %%
+
+% Mean filter
+
+filter_size = 3;
+
+mean_filter_gwi = mean_filter(grey_world_img, filter_size);
+mean_filter_wwi = mean_filter(white_world_img, filter_size);
+mean_filter_mbi = mean_filter(manual_balancing_img, filter_size);
+
+figure(10);
+imshow(mean_filter_mbi);
+title('Mean filter:');
