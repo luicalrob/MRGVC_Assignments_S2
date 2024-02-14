@@ -1,4 +1,7 @@
-%%%% READING THE IMAGE %%%%
+%% 2.1 READING THE IMAGE %%
+
+clear all;
+close all;
 
 img = imread('IMG_0691.tiff');
 
@@ -24,22 +27,18 @@ img_double_01 = im2double(img);
 %title('Intermediate Image (Brightened)');
 
 
-%%%% LINEARIZATION %%%%
+%%  2.2. LINEARIZATION %%
 
 offset = 1023;
 scale = 1 / (15600 - 1023);
 linear_img = (img_double - offset) * scale;
+linear_img = max(0, min(1, linear_img));
 
+% figure(3);
+% imshow(linear_img);
+% title('Linearized Image');
 
-linear_img(linear_img < 0) = 0;
-linear_img(linear_img > 1) = 1;
-
-%figure(3);
-%imshow(linear_img);
-%title('Linearized Image');
-
-
-%%%% DEMOSAIC %%%%
+%% 2.3 DEMOSAIC %%
 pattern = 'rggb';
 demosaiced_img = demosaic(img, pattern);
 
@@ -47,32 +46,25 @@ demosaiced_img = demosaic(img, pattern);
 % imshow(demosaiced_img);
 % title('Demosaiced Image');
 
-% Separate into color channels
-red_channel = img_double(1:2:end, 1:2:end);
-green_channel_1 = img_double(1:2:end, 2:2:end);
-green_channel_2 = img_double(2:2:end, 1:2:end);
-green_channel = (green_channel_1 + green_channel_2) / 2; % Average of two green pixels
-blue_channel = img_double(2:2:end, 2:2:end);
+% create masks
+bayer_red = repmat([1 0; 0 0], ceil(height/2),ceil(width/2));
+bayer_green = repmat([0 1; 1 0], ceil(height/2),ceil(width/2));
+bayer_blue = repmat([0 0; 0 1], ceil(height/2),ceil(width/2));
 
-expanded_red_channel = zeros(size(img_double));
-expanded_green_channel = zeros(size(img_double));
-expanded_blue_channel = zeros(size(img_double));
+% Extracting the red, green, and blue components of the image using the mask
+red_channel = linear_img .* bayer_red;
+blue_channel = linear_img .* bayer_blue;
+green_channel = linear_img .* bayer_green;
 
-expanded_red_channel(1:2:end, 1:2:end) = red_channel;
-expanded_green_channel(1:2:end, 2:2:end) = green_channel;
-expanded_green_channel(2:2:end, 1:2:end) = green_channel;
-expanded_blue_channel(2:2:end, 2:2:end) = blue_channel;
-
-bilinear_img_red = interpolate_bilinear(expanded_red_channel);
-bilinear_img_blue = interpolate_bilinear(expanded_blue_channel);
-bilinear_img_green = interpolate_bilinear(expanded_green_channel);
+bilinear_img_red = interpolate_bilinear(red_channel);
+bilinear_img_blue = interpolate_bilinear(blue_channel);
+bilinear_img_green = interpolate_bilinear(green_channel);
 bilinear_img = cat(3, bilinear_img_red, bilinear_img_green, bilinear_img_blue);
 
-nn_linear_img = (bilinear_img - offset) * scale;
-
-nn_linear_img(nn_linear_img < 0) = 0;
-nn_linear_img(nn_linear_img > 1) = 1;
+I_demosaic(:,:,1) = bilinear_img_red;
+I_demosaic(:,:,2) = bilinear_img_green;
+I_demosaic(:,:,3) = bilinear_img_blue;
 
 figure(5);
-imshow(nn_linear_img);
+imshow(I_demosaic);
 title('Bilinear Interpolation (Manual)');
