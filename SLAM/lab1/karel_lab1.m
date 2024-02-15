@@ -21,12 +21,12 @@ global config;
 config.step_by_step = 0;
 
 %number of robot motions for each local map
-config.steps_per_map = 500;
+config.steps_per_map = 125;
 
 % figure counter (to always plot a new figure)
 config.fig = 0;
 
-config.total_maps = 2;
+config.total_maps = 8;
 %-------------------------------------------------------------------------
 
 %-------------------------------------------------------------------------
@@ -110,7 +110,11 @@ for k = 1:config.total_maps
     fprintf("Computing map %d... \n", k);
     [map] = Kalman_filter_slam (map, config.steps_per_map);
     if (k > 1)
+        tjoin = tic;
         [global_map] = join_maps(global_map, map);
+        % matching and fusion (exercise 11)
+        [global_map] = match_and_fuse(global_map);
+        global_map.stats.cost_t(end) = global_map.stats.cost_t(end) + toc(tjoin);
     else
         global_map = map;
     end
@@ -154,7 +158,6 @@ function[map] = Kalman_filter_slam (map, steps)
     map.stats.error_x = [];
     map.stats.sigma_x = [];
     map.stats.cost_t = [];
-    
     
     for k = 0:steps
         
@@ -323,7 +326,6 @@ function [map] = add_new_features (map, measurements)
 end
 
 function [global_map] = join_maps(global_map, map)
-    global config;
     global world;
     global sensor;
 
@@ -343,13 +345,57 @@ function [global_map] = join_maps(global_map, map)
     global_map.n = global_map.n + map.n;
     
     global_map.true_ids = [global_map.true_ids; map.true_ids(2:end)];
-    global_map.true_x = [world.true_robot_location; global_map.true_x(2:end); m - 1 - sensor.range_max + map.true_x(2:end)];
+    global_map.true_x = [world.true_robot_location; global_map.true_x(2:end); global_map.true_x(end) + 0.5 - sensor.range_max + map.true_x(2:end)];
 
     % record statistics
-      global_map.stats.error_x = [global_map.stats.error_x; global_map.stats.error_x(end) + map.stats.error_x];
-      global_map.stats.sigma_x = [global_map.stats.sigma_x; global_map.stats.sigma_x(end) + map.stats.sigma_x];
+    global_map.stats.error_x = [global_map.stats.error_x; global_map.stats.error_x(end) + map.stats.error_x];
+    global_map.stats.sigma_x = [global_map.stats.sigma_x; sqrt(global_map.stats.sigma_x(end)^2 + map.stats.sigma_x.^2 )];
     global_map.stats.cost_t = [global_map.stats.cost_t; map.stats.cost_t];
-    global_map.stats.true_x = [global_map.stats.true_x; config.steps_per_map + map.stats.true_x];
+    global_map.stats.true_x = [global_map.stats.true_x; global_map.stats.true_x(end) + 1 + map.stats.true_x];
+    
+end
+
+function [global_map] = match_and_fuse(global_map)
+
+    % Find unique values and their counts
+    [unique_vals, ~, idx] = unique(global_map.true_ids);
+    counts = histcounts(idx, numel(unique_vals));
+
+    % Find indices of duplicated values
+    duplicated_elements = find(counts > 1);
+
+    % Initialize array to store pairs of indices
+    positions = zeros(length(duplicated_elements), 2);
+    
+    % Iterate over duplicated values to find their indices
+    for i = 1:length(duplicated_elements)
+        id = unique_vals(duplicated_elements(i));
+        indices = find(global_map.true_ids == id);
+        positions(i, :) = indices(1:2);
+    end
+
+    H_k = sparse(1:numel(duplicated_elements), positions(:, 1), 1, numel(duplicated_elements), numel(global_map.true_ids));
+    H_k = H_k - sparse(1:numel(duplicated_elements), positions(:, 2), 1, numel(duplicated_elements), numel(global_map.true_ids));
+
+    y_k = - H_k * global_map.hat_x;
+    S_k = H_k * global_map.hat_P * H_k';
+    K_k = global_map.hat_P * H_k' / S_k;
+    
+    global_map.hat_x = global_map.hat_x + K_k * y_k;
+    global_map.hat_P = (eye(length(global_map.hat_x)) - K_k * H_k) * global_map.hat_P;
+    global_map.n = global_map.n - length(duplicated_elements);
+
+    for i = 1:length(duplicated_elements)    
+        % remove
+        global_map.hat_x(positions(i,2)-(i-1), :) = [];
+        global_map.hat_P(positions(i,2)-(i-1), :) = [];
+        global_map.hat_P(:, positions(i,2)-(i-1)) = [];
+
+        global_map.true_ids(positions(i,2)-(i-1), :) = [];
+        global_map.true_x(positions(i,2)-(i-1), :) = [];
+    
+    end
+
 end
 
 %-------------------------------------------------------------------------
