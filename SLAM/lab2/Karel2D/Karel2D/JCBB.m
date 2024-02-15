@@ -25,6 +25,14 @@ if i > observations.m % leaf node?
     end
 else
     % complete JCBB here
+    for j = 1:prediction.n,
+        if compatibility.ic(i, j) && jointly_compatible(prediction, observations, [H j])
+            JCBB_R (prediction, observations, compatibility, [H j], i + 1);
+        end
+    end
+    if pairings(H) + observations.m - i > pairings(Best.H) % did better?
+        JCBB_R (prediction, observations, compatibility, [H 0], i + 1);
+    end
 end
 
 %-------------------------------------------------------
