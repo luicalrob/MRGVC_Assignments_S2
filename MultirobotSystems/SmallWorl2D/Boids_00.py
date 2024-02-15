@@ -1,6 +1,6 @@
 ## A solution to the Boids exercise
-## Version: YYYYMMDD
-## Author: YOU
+## Version: 20240215
+## Author: Luis Calderon, Andres Martinez
 ## License: CC-BY-SA
 
 from time import time, localtime, strftime
@@ -26,14 +26,17 @@ class Boid(Soul):
             s=b.space
             # YOUR BOID UPDATE CODE
 
+    # actualizar todo lo que haga falta, distancias y todo para ver el comportamiento que tiene que tener cada uno
+
 def init():
 
     ## Create Data Structures
     name='Boids_'+strftime("%Y%m%d%H%M", localtime())
-    global s, N
+    global s, N, R
     dd=1 # or whatever
-    s=Space(name,...)
-    KPIdataset(name,s,...)
+    R=2
+    s=Space(name,R=R,limits='hv',visual=True,showconn=True)
+    KPIdataset(name,s,[1,1,0],[(0,'.y'),(1,'.k'),(2,'.g')])
         # 0 simulation time scale -- recommended "default" KPI
         # 1 Fraction remaining
         # 2 Fraction in largest group
@@ -45,11 +48,13 @@ def init():
     N=25
     i=0
     while i<N:
-        new=Mobot(s,'m'+str(i),...)
-        if s.fits(new,...):
+        new=Mobot(s,'m'+str(i),pos=(uniform(-s.W,s.W),uniform(-s.H,s.H)),th=uniform(-np.pi,np.pi),fc=(0.8,0.8,1),v=1,v_max=s.vN/2,w_max=s.wN) 
+        # en vez de posicionar aleatoriamente, poner todos juntitos y con velocidad nula, ya pondremos command vel en el boid
+        if s.fits(new,s.room,safe=s.R):
             s.bodies.append(new)
             # YOUR BOID PARAMETRIZATION, DIFFERENT KINDS?
-            Boid(new,...)
+            Boid(new, 0, dd)
+            # creamos un comportamiento "alma" para cada robot
             i += 1
 
     # and several Obstacles, or Killers, or whatever
@@ -70,9 +75,17 @@ while not end: # THE loop
     ko=[]
     # YOUR COLLISION DETECTION CODE 
     s.remobodies(ko,'collision')
+    # si se chocan quitarlos
 
     # KPIs
-    KPI=[s.time/(time()-s.t0),...]
+    KPI=[s.time/(time()-s.t0),0,0]
+    for b in s.bodies:
+        if b.on:
+            if isinstance(b,Mobot):
+                KPI[1] += 1
+    KPI[1]/=N
+    KPI[2]/=N
+    # la idea es actualizar el mapa y toda la informacion, los comportamientos y todo a parte de la visualizacion
     # YOUR KPI COMPUTATIONS
     s.KPIds.update(KPI)
 
