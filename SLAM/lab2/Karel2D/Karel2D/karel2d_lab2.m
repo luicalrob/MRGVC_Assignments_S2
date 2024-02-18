@@ -16,11 +16,11 @@ global configuration;
 configuration.ellipses = 1;
 configuration.samples = 0;
 configuration.tags = 0;
-configuration.odometry = 1;
+configuration.odometry = 0;
 configuration.noise = 1;
 configuration.alpha = 0.99; % only useful is chi2inv is available
 configuration.step_by_step = 0;
-configuration.people = 0;
+configuration.people = 1;
 
 configuration.ekf_iterations = 4;
 configuration.maintenance = 1;
@@ -177,9 +177,14 @@ for step = 2 : steps,
     % map.first(i): step in which feature i was first observed
     %
     % unreliable: features seen only once, more than two steps ago
-
+    % unreliable = [];
+    for i=1:map.n,
+        if map.hits(i) == 1 && (step-map.first(i)) > 2,
+            unreliable = [unreliable, i];
+        end
+    end
     % unreliable = ; 
-    % map = erase_features(map, unreliable);
+    map = erase_features(map, unreliable);
     
     draw_map (map, ground, step);
     results = store_results(results, observations, GT, H);

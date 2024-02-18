@@ -22,15 +22,14 @@ H = zeros(1, observations.m);
 % compatibility.ic(i,j) = 1 if observation i is a neighbour of
 % feature j.
 positions = [];
-for i = 1:observations.m,
+for i = 1:observations.m, %for every observation
     neighbours = 0;
-    for j = 1:prediction.n,
-        is_neighbour = compatibility.ic (i, j);
-        if is_neighbour
+    for j = 1:prediction.n, %for every feature
+        if compatibility.ic (i, j), % if observation i is neighbour of feature j
             neighbours = neighbours + 1;
             if neighbours == 1
-                position = j;
-            elseif neighbours > 1
+                position = j; %save id of feature j neighbor to observation i
+            elseif neighbours > 1 
                 break;
             end
         end
