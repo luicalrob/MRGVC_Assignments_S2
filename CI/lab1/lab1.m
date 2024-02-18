@@ -15,17 +15,15 @@ fprintf("width: %d \n",width);
 fprintf("height: %d \n",height);
 
 img_double = double(img);
-img_double_01 = im2double(img);
 % Display original image
-%figure(1);
-%imshow(img_double_01);
-%title('Original Image');
+figure(1);
+imshow(img);
+title('Original Image');
 
 % Display intermediate image (brightened for better visibility)
-%figure(2);
-%imshow(min(1, img_double_01 * 5));
-%title('Intermediate Image (Brightened)');
-
+% figure(2);
+% imshow(min(1, im2double(img) * 5));
+% title('Intermediate Image (Brightened)');
 
 %%  2.2. LINEARIZATION %%
 
@@ -34,11 +32,11 @@ scale = 1 / (15600 - 1023);
 linear_img = (img_double - offset) * scale;
 linear_img = max(0, min(1, linear_img));
 
-% figure(3);
-% imshow(linear_img);
-% title('Linearized Image');
+figure(3);
+imshow(linear_img);
+title('Linearized Image');
 
-%% 2.3 DEMOSAIC %%
+%% 3. DEMOSAIC %%
 pattern = 'rggb';
 demosaiced_img = demosaic(img, pattern);
 
@@ -78,12 +76,12 @@ I_demosaic_b(:,:,3) = bilinear_img_blue;
 % imshow(I_demosaic_nn);
 % title('Nearest neighbour Interpolation (Manual)');
 
-% figure(6);
-% imshow(I_demosaic_b);
-% title('Bilinear Interpolation (Manual)');
+figure(6);
+imshow(I_demosaic_b);
+title('Bilinear Interpolation (Manual)');
 
 I_demosaic = I_demosaic_b; % choose the demosaic method
-%% 2.4 White balancing %%
+%% 4. White balancing %%
 
 % Grey world assumption
 
@@ -98,6 +96,7 @@ balanced_red = G_avg./R_avg * I_demosaic(:,:,1);
 balanced_green = I_demosaic(:,:,2);
 balanced_blue = G_avg./B_avg * I_demosaic(:,:,3);
 
+grey_world_img = zeros(size(I_demosaic));
 grey_world_img(:,:,1) = balanced_red;
 grey_world_img(:,:,2) = balanced_green;
 grey_world_img(:,:,3) = balanced_blue;
@@ -119,6 +118,7 @@ balanced_red = G_max./R_max * I_demosaic(:,:,1);
 balanced_green = I_demosaic(:,:,2);
 balanced_blue = G_max./B_max * I_demosaic(:,:,3);
 
+white_world_img = zeros(size(I_demosaic));
 white_world_img(:,:,1) = balanced_red;
 white_world_img(:,:,2) = balanced_green;
 white_world_img(:,:,3) = balanced_blue;
@@ -143,6 +143,7 @@ balanced_red = k_r * I_demosaic(:,:,1);
 balanced_green = k_g * I_demosaic(:,:,2);
 balanced_blue = k_b * I_demosaic(:,:,3);
 
+manual_balancing_img = zeros(size(I_demosaic));
 manual_balancing_img(:,:,1) = balanced_red;
 manual_balancing_img(:,:,2) = balanced_green;
 manual_balancing_img(:,:,3) = balanced_blue;
@@ -151,16 +152,72 @@ figure(9);
 imshow(manual_balancing_img);
 title('White balancing: Manual Balancing');
 
-%% 2.5 Denoising %%
+% Choose the best for rest of pipeline
+white_balanced_img = manual_balancing_img;
 
-% Mean filter
+%% 5. Denoising %%
 
+% % Mean filter
+%
 filter_size = 3;
+mean_filter_img = zeros(size(white_balanced_img));
+for i=1:3
+    mean_filter_img(:,:,i) = conv2(white_balanced_img(:,:,i), ones(filter_size)/(filter_size^2), 'same');
+end
+% figure(10);
+% imshow(mean_filter_img);
+% title('Mean filter:');
 
-mean_filter_gwi = mean_filter(grey_world_img, filter_size);
-mean_filter_wwi = mean_filter(white_world_img, filter_size);
-mean_filter_mbi = mean_filter(manual_balancing_img, filter_size);
+% % Median filter
+% 
+median_filter_img = medfilt3(white_balanced_img, [filter_size filter_size filter_size]);
+figure(11);
+imshow(median_filter_img);
+title('Median filter:');
 
-figure(10);
-imshow(mean_filter_mbi);
-title('Mean filter:');
+% % Gaussian filter
+%
+sigma = 0.5;
+gaussian_filter_img = imgaussfilt3(white_balanced_img, sigma);
+% figure(12);
+% imshow(gaussian_filter_img);
+% title('Gaussian filter:');
+
+denoised_img = median_filter_img;
+
+%% 6. Color balance
+HSV_img = rgb2hsv(denoised_img);
+color_balanced_img = hsv2rgb(HSV_img);
+figure(13);
+imshow(color_balanced_img);
+title('Color balanced image:');
+
+%% 7. Tone reproduction
+
+% brighten the image if necessary
+scale_factor = 0.75 * max(max(rgb2gray(color_balanced_img)));
+brightened_img = color_balanced_img * scale_factor;
+figure(14);
+imshow(brightened_img);
+title('Brightened image:');
+
+gamma_corrected_img = zeros(size(brightened_img));
+% gamma correction
+gamma = 2.4;
+threshold = 0.0031308;
+% Linear transformation for values below threshold
+linear_transform = 12.92 * brightened_img;
+% Non-linear transformation for values above threshold
+non_linear_transform = (1.0 + 0.055) * (brightened_img .^ (1./gamma)) - 0.055;
+% Apply threshold condition using logical indexing
+below_threshold = brightened_img <= threshold;
+gamma_corrected_img(below_threshold) = linear_transform(below_threshold);
+gamma_corrected_img(~below_threshold) = non_linear_transform(~below_threshold);
+
+figure(15);
+imshow(gamma_corrected_img);
+title('Gamma corrected image:');
+
+%% 8. Compression
+imwrite(gamma_corrected_img, 'IMG_0691.png');
+imwrite(gamma_corrected_img, 'IMG_0691.jpg', "Quality", 95);
