@@ -21,7 +21,54 @@ disp(['GROUND  TRUTH: ' sprintf('%2d  ', GT)]);
 
 %H = NN (prediction, observations, compatibility);
 %H = SINGLES (prediction, observations, compatibility);
-H = JCBB (prediction, observations, compatibility);
+
+% 1 idea simple: 
+% bucle
+% obetner random subsets de 1 predictions and observations, es decir, uno
+% Individually compatible
+% sacar una H con eso usando JCBB, mi hipotesis
+% obtener votos para esa H, usando mahalanobis y chiX2, medidas respecto a features
+% end
+
+[i_ic, j_ic] = find(compatibility.ic == 1);
+best_H = zeros(1, observations.m);
+global chi2;
+
+n_hyp = 1000;
+p = 0.99;
+iteration = 0;
+max_voted = 0;
+
+while iteration < n_hyp
+    votes = 0;
+    rnd_index = randi(length(i_ic));
+    i_rnd = i_ic(rnd_index);
+    j_rnd = j_ic(rnd_index);
+
+    H_hyp = JCBB_RANSAC (prediction, observations, compatibility, j_rnd);
+
+    compatible = find(H_hyp == 1);
+    for i = compatible
+        j = H_hyp(i);
+        Dij2 = compatibility.d2 (i, j);
+        if Dij2 < chi2(2)
+           votes = votes + 1;
+        end
+    end
+
+    if max_voted < votes
+        max_voted = votes;
+        best_H = H_hyp;
+
+        epsilon = 1 - max_voted / length(i_ic);
+        n_hyp = log(1-p) / log(1-(1-epsilon));
+    end
+
+    iteration = iteration + 1;
+end
+
+H = best_H;
+% H = JCBB (prediction, observations, compatibility);
 
 disp(['MY HYPOTHESIS: ' sprintf('%2d  ', H)]);
 disp(['Correct (1/0)? ' sprintf('%2d  ', GT == H)]);
