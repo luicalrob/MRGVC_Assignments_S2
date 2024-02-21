@@ -4,6 +4,8 @@ clear all;
 close all;
 
 img = imread('IMG_0691.tiff');
+real_image = imread('IMG_0691.CR2');
+real_image_double = double(real_image);
 
 info = imfinfo('IMG_0691.tiff');
 bits_per_pixel = info.BitDepth;
@@ -16,9 +18,9 @@ fprintf("height: %d \n",height);
 
 img_double = double(img);
 % Display original image
-figure(1);
-imshow(img);
-title('Original Image');
+% figure(1);
+% imshow(img);
+% title('Original Image');
 
 % Display intermediate image (brightened for better visibility)
 % figure(2);
@@ -32,9 +34,9 @@ scale = 1 / (15600 - 1023);
 linear_img = (img_double - offset) * scale;
 linear_img = max(0, min(1, linear_img));
 
-figure(3);
-imshow(linear_img);
-title('Linearized Image');
+% figure(3);
+% imshow(linear_img);
+% title('Linearized Image');
 
 %% 3. DEMOSAIC %%
 pattern = 'rggb';
@@ -75,10 +77,10 @@ I_demosaic_b(:,:,3) = bilinear_img_blue;
 % figure(5);
 % imshow(I_demosaic_nn);
 % title('Nearest neighbour Interpolation (Manual)');
-
-figure(6);
-imshow(I_demosaic_b);
-title('Bilinear Interpolation (Manual)');
+% 
+% figure(6);
+% imshow(I_demosaic_b);
+% title('Bilinear Interpolation (Manual)');
 
 I_demosaic = I_demosaic_b; % choose the demosaic method
 %% 4. White balancing %%
@@ -128,30 +130,46 @@ white_world_img(:,:,3) = balanced_blue;
 % title('White balancing: White World Assumption');
 
 % Manual white balancing
+done = 0;
+while(~done)
+    figure(9);
+    imshow(real_image);
+    title('Manual Balancing: Click on the image to select points. Press Enter when done.');
+    % Allow user to click points on the image
+    [x, y] = ginput;
+    x = round(x);
+    y = round(y);
+    % Perform computation (example: display selected points)
+    disp('Selected pixel coordinates:');
+    disp([x, y]);
 
-% Point that looks grey in the raw image (2917, 769)
-% Point that looks white in the raw image (5501, 302)
 
-%RGB_pixel = I_demosaic(769,2917,:);
-RGB_pixel = I_demosaic(3446,2350,:);
+    RGB_pixel = I_demosaic(y,x,:);
+    disp('Selected pixel values:');
+    disp([I_demosaic(y,x,1), I_demosaic(y,x,2), I_demosaic(y,x,3)]);
 
-k_r = 0.5 ./ RGB_pixel(:,:,1);
-k_g = 0.5 ./ RGB_pixel(:,:,2);
-k_b = 0.5 ./ RGB_pixel(:,:,3);
-
-balanced_red = k_r * I_demosaic(:,:,1);
-balanced_green = k_g * I_demosaic(:,:,2);
-balanced_blue = k_b * I_demosaic(:,:,3);
-
-manual_balancing_img = zeros(size(I_demosaic));
-manual_balancing_img(:,:,1) = balanced_red;
-manual_balancing_img(:,:,2) = balanced_green;
-manual_balancing_img(:,:,3) = balanced_blue;
-
-figure(9);
-imshow(manual_balancing_img);
-title('White balancing: Manual Balancing');
-
+    %RGB_pixel = I_demosaic(3446,2350,:);
+    %RGB_pixel = I_demosaic(3746,2002,:);
+    
+    mean_value = mean(RGB_pixel);
+    k_r = mean_value ./ RGB_pixel(:,:,1);
+    k_g = mean_value ./ RGB_pixel(:,:,2);
+    k_b = mean_value ./ RGB_pixel(:,:,3);
+    
+    balanced_red = k_r * I_demosaic(:,:,1);
+    balanced_green = k_g * I_demosaic(:,:,2);
+    balanced_blue = k_b * I_demosaic(:,:,3);
+    
+    manual_balancing_img = zeros(size(I_demosaic));
+    manual_balancing_img(:,:,1) = balanced_red;
+    manual_balancing_img(:,:,2) = balanced_green;
+    manual_balancing_img(:,:,3) = balanced_blue;
+    
+    figure(9);
+    imshow(manual_balancing_img);
+    title('White balancing: Manual Balancing');
+    done = input("Write 1 to continue with selected settings. 0 to try again\n");
+end
 % Choose the best for rest of pipeline
 white_balanced_img = manual_balancing_img;
 
@@ -170,14 +188,23 @@ end
 
 % % Median filter
 % 
+medianFilterKernel = ones(windowSize) / windowSize^2;
+median_filter_img = zeros(size(white_balanced_img));
+for i=1:3
+    median_filter_img(:,:,i) = conv2(white_balanced_img(:,:,i), ones(filter_size)/(filter_size^2), 'same');
+end
 median_filter_img = medfilt3(white_balanced_img, [filter_size filter_size filter_size]);
-figure(11);
-imshow(median_filter_img);
-title('Median filter:');
+% figure(11);
+% imshow(median_filter_img);
+% title('Median filter:');
 
 % % Gaussian filter
 %
+gaussian_filter_img = zeros(size(white_balanced_img));
 sigma = 0.5;
+for i=1:3
+    gaussian_filter_img(:,:,i) = conv2(white_balanced_img(:,:,i), ones(filter_size)/(filter_size^2), 'same');
+end
 gaussian_filter_img = imgaussfilt3(white_balanced_img, sigma);
 % figure(12);
 % imshow(gaussian_filter_img);
@@ -186,7 +213,12 @@ gaussian_filter_img = imgaussfilt3(white_balanced_img, sigma);
 denoised_img = median_filter_img;
 
 %% 6. Color balance
+figure(12);
+imshow(denoised_img);
+title('denoised_img:');
+
 HSV_img = rgb2hsv(denoised_img);
+HSV_img(:,:,2) = min(1, HSV_img(:,:,2) * 1.5);
 color_balanced_img = hsv2rgb(HSV_img);
 figure(13);
 imshow(color_balanced_img);
@@ -195,7 +227,7 @@ title('Color balanced image:');
 %% 7. Tone reproduction
 
 % brighten the image if necessary
-scale_factor = 0.75 * max(max(rgb2gray(color_balanced_img)));
+scale_factor = 1.5 * max(max(rgb2gray(color_balanced_img)));
 brightened_img = color_balanced_img * scale_factor;
 figure(14);
 imshow(brightened_img);
@@ -203,7 +235,7 @@ title('Brightened image:');
 
 gamma_corrected_img = zeros(size(brightened_img));
 % gamma correction
-gamma = 2.4;
+gamma = 0.8;
 threshold = 0.0031308;
 % Linear transformation for values below threshold
 linear_transform = 12.92 * brightened_img;
