@@ -20,28 +20,44 @@ class Boid(Soul):
         self.epsilon=1.5
         self.noise=0.1
         self.K=[0.5, 0.06, 0.25]
+        self.u_min = 0.1
+        #self.K=[0.01, 0.002, 0.25]
+
         # YOUR BOID INIT CODE
         super().__init__(body,T)
 
-    def magnitude(self, d):
+    def magnitude_p(self, d):
         p = -4*self.alpha*self.epsilon / d
         p = p * (2*pow(self.noise/d, 2*self.alpha) - pow(self.noise/d, self.alpha))
         return p
 
     def proximal_control(self, b):
         p = 0
-        nearby = b.space.RnB(b.index(),(type(b),Mobot), b.space.R)
+        #nearby = b.space.RnB(b.index(),(type(b),Mobot), b.space.R)
         for measurement in b.space.RnB(b.index(),(type(b),Mobot), b.space.R):
-            p += self.magnitude(measurement[0])*np.exp(1j * measurement[1])
+            p += self.magnitude_p(measurement[0])*np.exp(1j * measurement[1])
         return p
     
     def allignment_control(self, b):
-        a = 0
+        a = b.vth
+        for measurement in b.space.RnB(b.index(),(type(b),Mobot), b.space.R):
+            a += np.exp(1j * measurement[1])
+        if(a!=0): a = a / abs(a)
         return a
     
-    def mdmc(self, b, f):
-        u=self.K[0]*f[0] + b.v
-        w=self.K[1]*f[1]
+    def mdmc(self, f):
+        u=self.K[0]*f.real + self.u_min
+        w=self.K[1]*f.imag
+        return u,w
+    
+    def mimc(self, b, f):
+        # o = 
+        # orientation_error = o * abs(f)
+        # if orientation_error > 0:
+        #     u = orientation_error * b.v
+        # else:
+        #     u = 0
+        # w=b.K[2]*(dif_angulos)
         return u,w
         
     def update(self):
@@ -56,20 +72,25 @@ class Boid(Soul):
             f=p+a+g
             
             if self.control == "MDMC":
-                u, w = self.mdmc(b, f)
-            # else:
-            #     o = 
-            #     orientation_error = o * modulo(f)
-            #     if orientation_error > 0:
-            #         u = orientation_error * b.v
-            #     else:
-            #         u = 0
-            #     w=b.K[2]*(dif_angulos)
+                v, w = self.mdmc(f)
+                
+            else:
+                v, w = self.mimc(b,f)
+            
             # YOUR BOID UPDATE CODE
+            if(v > 0): v_sign = '+'
+            elif(v < 0): v_sign = '-'
+            else: v_sign = '='
+            
+            if(w > 0): w_sign = '+'
+            elif(w < 0): w_sign = '-'
+            else: w_sign = '='
 
+            b.cmd_vel(v = v_sign, w = w_sign, vth = f.imag)
+            
     # actualizar todo lo que haga falta, distancias y todo para ver el comportamiento que tiene que tener cada uno
 
-def set_mobot_formation(i, s, center, large, th=np.pi/2, fc=(0.2, 0.2, 0), v=0, v_max=None, w_max=None):
+def set_mobot_formation(i, s, center, large, th=np.pi/2, fc=(0.2, 0.2, 0), v=0.1, v_max=None, w_max=None):
     if v_max is None:
         v_max = s.vN / 2
     if w_max is None:
@@ -84,7 +105,7 @@ def init():
     name='Boids_'+strftime("%Y%m%d%H%M", localtime())
     global s, N, R
     dd=0.75 # or whatever
-    R=1.5
+    R=2
     s=Space(name,R=R,limits='hv',visual=True,showconn=False)
     KPIdataset(name,s,[1,1,0],[(0,'.y'),(1,'.k'),(2,'.g')])
         # 0 simulation time scale -- recommended "default" KPI
