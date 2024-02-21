@@ -8,7 +8,8 @@ from random import uniform
 import numpy as np
 from point2d import Point2D 
 # YOU MIGHT FIND USEFUL FUNCTIONS IN shapely, Point2D, AND gadgETs
-from SmallWorl2D import Space, KPIdataset, Obstacle, MoBody, Mobot, Soul
+from SmallWorl2D import Space, KPIdataset, Obstacle, MoBody, Mobot, Soul, Food, AniBody
+from math import pi
 
 class Boid(Soul):
 
@@ -69,6 +70,7 @@ class Boid(Soul):
             p=self.proximal_control(b)
             a=self.allignment_control(b)
             g=0
+
             f=p+a+g
             
             if self.control == "MDMC":
@@ -77,20 +79,20 @@ class Boid(Soul):
             else:
                 v, w = self.mimc(b,f)
             
-            # YOUR BOID UPDATE CODE
-            if(v > 0): v_sign = '+'
-            elif(v < 0): v_sign = '-'
-            else: v_sign = '='
+            # # YOUR BOID UPDATE CODE
+            # if(v > 0): v_sign = '+'
+            # elif(v < 0): v_sign = '-'
+            # else: v_sign = '='
             
-            if(w > 0): w_sign = '+'
-            elif(w < 0): w_sign = '-'
-            else: w_sign = '='
+            # if(w > 0): w_sign = '+'
+            # elif(w < 0): w_sign = '-'
+            # else: w_sign = '='
 
-            b.cmd_vel(v = v_sign, w = w_sign, vth = f.imag)
+            b.cmd_vel(v = v, w = w, vth = f.imag)
             
     # actualizar todo lo que haga falta, distancias y todo para ver el comportamiento que tiene que tener cada uno
 
-def set_mobot_formation(i, s, center, large, th=np.pi/2, fc=(0.2, 0.2, 0), v=0.1, v_max=None, w_max=None):
+def set_mobot_formation(i, s, center, large, th=np.pi/2, fc=(0.2, 0.2, 0), v=0, v_max=None, w_max=None):
     if v_max is None:
         v_max = s.vN / 2
     if w_max is None:
@@ -136,6 +138,14 @@ def init():
             i += 1
 
     # and several Obstacles, or Killers, or whatever
+            
+    # Five Obstacles
+    i=0
+    while i<5:
+        new=Obstacle(s,'O'+str(i),pos=(uniform(-s.W,s.W),uniform(-s.H,s.H)),th=uniform(-pi,pi))
+        if s.fits(new,s.room,safe=1):
+            s.bodies.append(new)
+            i += 1
 
     # init distances matrix and connections graph
     s.dist=np.zeros((len(s.bodies),len(s.bodies))) # distances between centroids in a np.matrix
@@ -152,6 +162,13 @@ while not end: # THE loop
     # COLLISION MANAGEMENT
     ko=[]
     # YOUR COLLISION DETECTION CODE 
+    for b in s.bodies:
+        i = b.index()
+        if(i>=0):
+            if isinstance(b,Obstacle):
+                    ko+=s.incontact(i,AniBody)
+            elif isinstance(b,Mobot):
+                    ko+=s.incontact(i,(Food,Mobot))
     s.remobodies(ko,'collision')
     # si se chocan quitarlos
 
