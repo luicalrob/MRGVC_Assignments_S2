@@ -40,7 +40,7 @@ class Boid(Soul):
         return p
     
     def allignment_control(self, b):
-        a = b.vth
+        a = b.th
         for measurement in b.space.RnB(b.index(),(type(b),Mobot), b.space.R):
             a += np.exp(1j * measurement[1])
         if(a!=0): a = a / abs(a)
@@ -75,20 +75,12 @@ class Boid(Soul):
             
             if self.control == "MDMC":
                 v, w = self.mdmc(f)
-                
             else:
                 v, w = self.mimc(b,f)
             
             # # YOUR BOID UPDATE CODE
-            # if(v > 0): v_sign = '+'
-            # elif(v < 0): v_sign = '-'
-            # else: v_sign = '='
-            
-            # if(w > 0): w_sign = '+'
-            # elif(w < 0): w_sign = '-'
-            # else: w_sign = '='
 
-            b.cmd_vel(v = v, w = w, vth = f.imag)
+            b.cmd_vel(v = v, w = w, vth = 0)
             
     # actualizar todo lo que haga falta, distancias y todo para ver el comportamiento que tiene que tener cada uno
 
@@ -140,12 +132,12 @@ def init():
     # and several Obstacles, or Killers, or whatever
             
     # Five Obstacles
-    i=0
-    while i<5:
-        new=Obstacle(s,'O'+str(i),pos=(uniform(-s.W,s.W),uniform(-s.H,s.H)),th=uniform(-pi,pi))
-        if s.fits(new,s.room,safe=1):
-            s.bodies.append(new)
-            i += 1
+    # i=0
+    # while i<5:
+    #     new=Obstacle(s,'O'+str(i),pos=(uniform(-s.W,s.W),uniform(-s.H,s.H)),th=uniform(-pi,pi))
+    #     if s.fits(new,s.room,safe=1):
+    #         s.bodies.append(new)
+    #         i += 1
 
     # init distances matrix and connections graph
     s.dist=np.zeros((len(s.bodies),len(s.bodies))) # distances between centroids in a np.matrix
