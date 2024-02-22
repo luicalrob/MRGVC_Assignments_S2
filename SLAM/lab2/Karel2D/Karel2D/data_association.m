@@ -31,43 +31,45 @@ disp(['GROUND  TRUTH: ' sprintf('%2d  ', GT)]);
 % end
 
 [i_ic, j_ic] = find(compatibility.ic == 1);
-best_H = zeros(1, observations.m);
+best_prediction = prediction;
+best_compatibility = compatibility;
 global chi2;
 
 n_hyp = 1000;
-p = 0.99;
+w = 0.99; % probability of a measure to be good
+z = 0.01; % probability of failure
+t = ceil(log(z) / log(1-w)); % number of iterations
 iteration = 0;
 max_voted = 0;
 
-while iteration < n_hyp
-    votes = 0;
-    rnd_index = randi(length(i_ic));
-    i_rnd = i_ic(rnd_index);
+while iteration < t
+    rnd_index = randi(length(j_ic)); % select a random feature with 1 or more compatibilities
     j_rnd = j_ic(rnd_index);
+    obsv_compatible = find(compatibility.ic(:,j_rnd) == 1);
 
-    H_hyp = JCBB_RANSAC (prediction, observations, compatibility, j_rnd);
+    %H_hyp = JCBB_RANSAC (prediction, observations, compatibility, j_rnd);
 
-    compatible = find(H_hyp == 1);
-    for i = compatible
-        j = H_hyp(i);
-        Dij2 = compatibility.d2 (i, j);
-        if Dij2 < chi2(2)
-           votes = votes + 1;
+    for i = 1:length(obsv_compatible)
+        H_hyp = zeros(1, observations.m);
+        H_hyp(obsv_compatible(i)) = j_rnd;
+        map_hyp = EKF_update (map, observations, H_hyp);
+
+        prediction_hyp = predict_observations (map_hyp);
+        compatibility_hyp = compute_compatibility_distance (prediction_hyp, observations);
+
+        columns_with_only_ceros = find(all(compatibility_hyp.ic == 0));
+        votes = size(compatibility_hyp.ic,2) - length(columns_with_only_ceros) - 1;
+        if max_voted < votes
+            max_voted = votes;
+            best_prediction = prediction_hyp;
+            best_compatibility = compatibility_hyp;
         end
     end
-
-    if max_voted < votes
-        max_voted = votes;
-        best_H = H_hyp;
-
-        epsilon = 1 - max_voted / length(i_ic);
-        n_hyp = log(1-p) / log(1-(1-epsilon));
-    end
-
+    
     iteration = iteration + 1;
 end
 
-H = best_H;
+H = NN(best_prediction, observations, best_compatibility);
 % H = JCBB (prediction, observations, compatibility);
 
 disp(['MY HYPOTHESIS: ' sprintf('%2d  ', H)]);
