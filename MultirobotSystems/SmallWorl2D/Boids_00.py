@@ -20,7 +20,7 @@ class Boid(Soul):
         self.alpha=2
         self.epsilon=1.5
         self.noise=0.1
-        self.K=[0.5, 0.06, 0.25]
+        self.K=[0.35, 0.005, 0.25]
         self.u_min = 0.1
         #self.K=[0.01, 0.002, 0.25]
 
@@ -35,13 +35,16 @@ class Boid(Soul):
     def proximal_control(self, b):
         p = 0
         #nearby = b.space.RnB(b.index(),(type(b),Mobot), b.space.R)
-        for measurement in b.space.RnB(b.index(),(type(b),Mobot), b.space.R):
-            p += self.magnitude_p(measurement[0])*np.exp(1j * measurement[1])
+        for measurement in b.space.RnB(b.index(),(type(b),Mobot), min(b.space.R, self.dd * 1.8)): 
+            if(1.5 < self.magnitude_p(measurement[0])):
+                p += 1.5*np.exp(1j * measurement[1])
+            else:
+                p += self.magnitude_p(measurement[0])*np.exp(1j * measurement[1])
         return p
     
     def allignment_control(self, b):
         a = b.th
-        for measurement in b.space.RnB(b.index(),(type(b),Mobot), b.space.R):
+        for measurement in b.space.RnB(b.index(),(type(b),Mobot), min(b.space.R, 2)):
             a += np.exp(1j * measurement[1])
         if(a!=0): a = a / abs(a)
         return a
@@ -98,7 +101,7 @@ def init():
     ## Create Data Structures
     name='Boids_'+strftime("%Y%m%d%H%M", localtime())
     global s, N, R
-    dd=0.75 # or whatever
+    dd=1 # or whatever
     R=2
     s=Space(name,R=R,limits='hv',visual=True,showconn=False)
     KPIdataset(name,s,[1,1,0],[(0,'.y'),(1,'.k'),(2,'.g')])
@@ -118,9 +121,9 @@ def init():
     posX = 6
     posY = -3
     large = 3.5
-
-    while i<N:
-        new=set_mobot_formation(i, s, center=(posX, posY), large=large)
+    iterations = 0
+    while i<N and iterations<250:
+        new=set_mobot_formation(i, s, center=(posX, posY), large=large, v_max=0.8, w_max=np.pi/2)
         # en vez de posicionar aleatoriamente, poner todos juntitos y con velocidad nula, ya pondremos command vel en el boid
         if s.fits(new,s.room,safe=0.3):
             s.bodies.append(new)
@@ -128,6 +131,7 @@ def init():
             Boid(new, 0, dd)
             # creamos un comportamiento "alma" para cada robot
             i += 1
+        iterations += 1
 
     # and several Obstacles, or Killers, or whatever
             
