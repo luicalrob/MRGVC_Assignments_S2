@@ -128,7 +128,7 @@ end
 %-------------------------------------------------------
 % ok, here we go
 %-------------------------------------------------------
-
+tstart = tic;
 step = 1;
 observations = get_observations(ground, sensor, step);
 draw_observations (observations, ground, step);
@@ -191,5 +191,10 @@ for step = 2 : steps,
     draw_map (map, ground, step);
     results = store_results(results, observations, GT, H);
 end
-
+elapsed = toc(tstart);
+disp(['Elapsed time ' sprintf('%f  ', elapsed)]);
 show_results(map, ground, results);
+disp(['Average TP ' sprintf('%f  ', mean(results.true.positives./results.total))])
+disp(['Average TN ' sprintf('%f  ', mean(results.true.negatives./results.total))])
+disp(['Average FP ' sprintf('%f  ', mean(results.false.positives./results.total))])
+disp(['Average FN ' sprintf('%f  ', mean(results.false.negatives./results.total))])
