@@ -7,6 +7,7 @@ z = 0.05; % probability of failure
 t = ceil(log(z) / log(1-w)); % number of iterations
 iteration = 0;
 max_votes = 0;
+best_compatibility = compatibility;
 
 while iteration < t
     rnd_index = randi(length(j_ic)); % select a random feature with 1 or more compatibilities
@@ -26,12 +27,12 @@ while iteration < t
         if max_votes < votes
             max_votes = votes;
             prediction = prediction_hyp;
-            compatibility = compatibility_hyp;
+            best_compatibility = compatibility_hyp;
         end
     end
     
     iteration = iteration + 1;
 end
-H = NN(prediction, observations, compatibility);
+H = NN(prediction, observations, best_compatibility);
 
 end
