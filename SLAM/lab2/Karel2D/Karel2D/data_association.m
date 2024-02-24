@@ -36,8 +36,8 @@ best_compatibility = compatibility;
 global chi2;
 
 n_hyp = 1000;
-w = 0.99; % probability of a measure to be good
-z = 0.01; % probability of failure
+w = 0.9; % probability of a measure to be good
+z = 0.05; % probability of failure
 t = ceil(log(z) / log(1-w)); % number of iterations
 iteration = 0;
 max_voted = 0;
@@ -55,7 +55,7 @@ while iteration < t
         map_hyp = EKF_update (map, observations, H_hyp);
 
         prediction_hyp = predict_observations (map_hyp);
-        compatibility_hyp = compute_compatibility_distance (prediction_hyp, observations);
+        compatibility_hyp = compute_compatibility (prediction_hyp, observations);
 
         columns_with_only_ceros = find(all(compatibility_hyp.ic == 0));
         votes = size(compatibility_hyp.ic,2) - length(columns_with_only_ceros) - 1;
@@ -69,6 +69,7 @@ while iteration < t
     iteration = iteration + 1;
 end
 
+%best_compatibility = compute_compatibility (best_prediction, observations);
 H = NN(best_prediction, observations, best_compatibility);
 % H = JCBB (prediction, observations, compatibility);
 
