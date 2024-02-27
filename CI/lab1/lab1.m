@@ -18,9 +18,9 @@ fprintf("height: %d \n",height);
 
 img_double = double(img);
 % Display original image
-% figure(1);
-% imshow(img);
-% title('Original Image');
+figure(1);
+imshow(img);
+title('Original Image');
 
 % Display intermediate image (brightened for better visibility)
 % figure(2);
@@ -34,9 +34,9 @@ scale = 1 / (15600 - 1023);
 linear_img = (img_double - offset) * scale;
 linear_img = max(0, min(1, linear_img));
 
-% figure(3);
-% imshow(linear_img);
-% title('Linearized Image');
+figure(3);
+imshow(linear_img);
+title('Linearized Image');
 
 %% 3. DEMOSAIC %%
 pattern = 'rggb';
@@ -74,13 +74,13 @@ I_demosaic_b(:,:,1) = bilinear_img_red;
 I_demosaic_b(:,:,2) = bilinear_img_green;
 I_demosaic_b(:,:,3) = bilinear_img_blue;
 
-% figure(5);
-% imshow(I_demosaic_nn);
-% title('Nearest neighbour Interpolation (Manual)');
-% 
-% figure(6);
-% imshow(I_demosaic_b);
-% title('Bilinear Interpolation (Manual)');
+figure(5);
+imshow(I_demosaic_nn);
+title('Nearest neighbour Interpolation (Manual)');
+ 
+figure(6);
+imshow(I_demosaic_b);
+title('Bilinear Interpolation (Manual)');
 
 I_demosaic = I_demosaic_b; % choose the demosaic method
 %% 4. White balancing %%
@@ -103,9 +103,9 @@ grey_world_img(:,:,1) = balanced_red;
 grey_world_img(:,:,2) = balanced_green;
 grey_world_img(:,:,3) = balanced_blue;
 
-% figure(7);
-% imshow(grey_world_img);
-% title('White balancing: Grey World Assumption');
+figure(7);
+imshow(grey_world_img);
+title('White balancing: Grey World Assumption');
 
 % White world assumption
 
@@ -125,9 +125,9 @@ white_world_img(:,:,1) = balanced_red;
 white_world_img(:,:,2) = balanced_green;
 white_world_img(:,:,3) = balanced_blue;
 
-% figure(8);
-% imshow(white_world_img);
-% title('White balancing: White World Assumption');
+figure(8);
+imshow(white_world_img);
+title('White balancing: White World Assumption');
 
 % Manual white balancing
 auto = input('Manual balancing: Use preset? (Y/N): ', 's');
@@ -168,9 +168,10 @@ while(strcmpi(done, 'N'))
     manual_balancing_img(:,:,2) = balanced_green;
     manual_balancing_img(:,:,3) = balanced_blue;
     
-    % figure(9);
-    % imshow(manual_balancing_img);
-    % title('White balancing: Manual Balancing');
+    figure(9);
+    % imshow(min(1,manual_balancing_img*5)); %brightened intermediate result
+    imshow(manual_balancing_img);
+    title('White balancing: Manual Balancing');
     if(strcmpi(auto, 'N'))
         done = input('Proceed? N to try again (Y/N): ', 's');
     end
@@ -187,48 +188,40 @@ mean_filter_img = zeros(size(white_balanced_img));
 for i=1:3
     mean_filter_img(:,:,i) = conv2(white_balanced_img(:,:,i), ones(filter_size)/(filter_size^2), 'same');
 end
-% figure(10);
-% imshow(mean_filter_img);
-% title('Mean filter:');
+figure(10);
+% imshow(min(1,mean_filter_img*5)); brightened intermediate result
+imshow(mean_filter_img);
+title('Mean filter:');
 
-% % Median filter
-% 
-%medianFilterKernel = ones(filter_size) / windowSize^2;
-median_filter_img = zeros(size(white_balanced_img));
-for i=1:3
-    median_filter_img(:,:,i) = conv2(white_balanced_img(:,:,i), ones(filter_size)/(filter_size^2), 'same');
-end
+% % Median filter 
+
 median_filter_img = medfilt3(white_balanced_img, [filter_size filter_size filter_size]);
-% figure(11);
-% imshow(median_filter_img);
-% title('Median filter:');
+figure(11);
+%imshow(min(1,median_filter_img*5)); brightened intermediate result
+imshow(median_filter_img);
+title('Median filter:');
 
 % % Gaussian filter
 %
-gaussian_filter_img = zeros(size(white_balanced_img));
+% gaussian_filter_img = zeros(size(white_balanced_img));
 sigma = 0.5;
-for i=1:3
-    gaussian_filter_img(:,:,i) = conv2(white_balanced_img(:,:,i), ones(filter_size)/(filter_size^2), 'same');
-end
 gaussian_filter_img = imgaussfilt3(white_balanced_img, sigma);
-% figure(12);
-% imshow(gaussian_filter_img);
-% title('Gaussian filter:');
+figure(12);
+%imshow(min(1,gaussian_filter_img*5)); brightened intermediate result
+imshow(gaussian_filter_img);
+title('Gaussian filter:');
 
 denoised_img = median_filter_img;
 
 %% 6. Color balance
-% figure(12);
-% imshow(denoised_img);
-% title('denoised_img:');
 
 HSV_img = rgb2hsv(denoised_img);
 HSV_img(:,:,2) = min(1, HSV_img(:,:,2) * 1.3);
 global color_balanced_img;
 color_balanced_img = hsv2rgb(HSV_img);
-% figure(13);
-% imshow(color_balanced_img);
-% title('Color balanced image:');
+figure(13);
+imshow(color_balanced_img);
+title('Color balanced image:');
 
 %% 7. Tone reproduction
 global brightnessValue gammaValue;
@@ -250,12 +243,12 @@ gammaLabel = uicontrol('Style', 'text', 'String', ['Gamma: ', num2str(gammaValue
 
 % Callback function for brightness slider
 brightnessCallback = @(hObject, ~) updateBrightness(hObject, brightnessLabel);
-brightnessSlider = uicontrol('Style', 'slider', 'Min', 0.0, 'Max', 4.0, 'Value', 1.0, ...
+brightnessSlider = uicontrol('Style', 'slider', 'Min', 0.0, 'Max', 4.0, 'Value', 1.8, ...
     'SliderStep', [0.1 0.1], 'Position', [20, 20, 200, 20], 'Callback', brightnessCallback);
 
 % Callback function for gamma slider
 gammaCallback = @(hObject, ~) updateGamma(hObject, gammaLabel);
-gammaSlider = uicontrol('Style', 'slider', 'Min', 1./2.4, 'Max', 2.4, 'Value', 2.0, ...
+gammaSlider = uicontrol('Style', 'slider', 'Min', 1./2.4, 'Max', 2.4, 'Value', 0.8, ...
     'SliderStep', [0.1 0.1], 'Position', [20, 50, 200, 20], 'Callback', gammaCallback);
 
 % Ask user for confirmation
@@ -286,8 +279,7 @@ end
 
 %% 8. Compression
 imwrite(gamma_corrected_img, 'IMG_0691.png');
-imwrite(gamma_corrected_img, 'IMG_0691.jpg', "Quality", 95);
-
+imwrite(gamma_corrected_img, 'IMG_0691.jpg', "Quality", 60);
 
 
 % Update brightness value and label
