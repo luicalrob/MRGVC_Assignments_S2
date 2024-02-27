@@ -134,8 +134,8 @@ auto = input("Manual Balancing: 1 to use preset, 0 adjust manually\n");
 done = 0;
 while(~done)
     if(auto)
-        x = 2350;
-        y = 3446;
+        x = 5776;
+        y = 3920;
         RGB_pixel = I_demosaic(y,x,:);
         done = 1;
     else
