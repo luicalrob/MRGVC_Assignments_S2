@@ -103,9 +103,9 @@ grey_world_img(:,:,1) = balanced_red;
 grey_world_img(:,:,2) = balanced_green;
 grey_world_img(:,:,3) = balanced_blue;
 
-figure(7);
-imshow(grey_world_img);
-title('White balancing: Grey World Assumption');
+% figure(7);
+% imshow(grey_world_img);
+% title('White balancing: Grey World Assumption');
 
 % White world assumption
 
@@ -125,15 +125,15 @@ white_world_img(:,:,1) = balanced_red;
 white_world_img(:,:,2) = balanced_green;
 white_world_img(:,:,3) = balanced_blue;
 
-figure(8);
-imshow(white_world_img);
-title('White balancing: White World Assumption');
+% figure(8);
+% imshow(white_world_img);
+% title('White balancing: White World Assumption');
 
 % Manual white balancing
-auto = input("Manual Balancing: 1 to use preset, 0 adjust manually\n");
-done = 0;
-while(~done)
-    if(auto)
+auto = input('Manual balancing: Use preset? (Y/N): ', 's');
+done = 'N';
+while(strcmpi(done, 'N'))
+    if(strcmpi(auto, 'Y'))
         x = 5776;
         y = 3920;
         RGB_pixel = I_demosaic(y,x,:);
@@ -168,11 +168,11 @@ while(~done)
     manual_balancing_img(:,:,2) = balanced_green;
     manual_balancing_img(:,:,3) = balanced_blue;
     
-    figure(9);
-    imshow(manual_balancing_img);
-    title('White balancing: Manual Balancing');
-    if(~auto)
-        done = input("Write 1 to continue with selected settings. 0 to try again\n");
+    % figure(9);
+    % imshow(manual_balancing_img);
+    % title('White balancing: Manual Balancing');
+    if(strcmpi(auto, 'N'))
+        done = input('Proceed? N to try again (Y/N): ', 's');
     end
 end
 % Choose the best for rest of pipeline
@@ -218,43 +218,88 @@ gaussian_filter_img = imgaussfilt3(white_balanced_img, sigma);
 denoised_img = median_filter_img;
 
 %% 6. Color balance
-figure(12);
-imshow(denoised_img);
-title('denoised_img:');
+% figure(12);
+% imshow(denoised_img);
+% title('denoised_img:');
 
 HSV_img = rgb2hsv(denoised_img);
-HSV_img(:,:,2) = min(1, HSV_img(:,:,2) * 1.5);
+HSV_img(:,:,2) = min(1, HSV_img(:,:,2) * 1.3);
+global color_balanced_img;
 color_balanced_img = hsv2rgb(HSV_img);
-figure(13);
-imshow(color_balanced_img);
-title('Color balanced image:');
+% figure(13);
+% imshow(color_balanced_img);
+% title('Color balanced image:');
 
 %% 7. Tone reproduction
+global brightnessValue gammaValue;
+% Initialize variables to store slider values
+done = 0;
+brightnessValue = 1;
+gammaValue = 1.5;
+exposureValue = 1;
 
-% brighten the image if necessary
-scale_factor = 1.5 * max(max(rgb2gray(color_balanced_img)));
-brightened_img = color_balanced_img * scale_factor;
 figure(14);
-imshow(brightened_img);
-title('Brightened image:');
+imshow(color_balanced_img);
+title('Tone reproduction: select values for brightness and gamma:');
 
-gamma_corrected_img = zeros(size(brightened_img));
-% gamma correction
-gamma = 0.8;
-threshold = 0.0031308;
-% Linear transformation for values below threshold
-linear_transform = 12.92 * brightened_img;
-% Non-linear transformation for values above threshold
-non_linear_transform = (1.0 + 0.055) * (brightened_img .^ (1./gamma)) - 0.055;
-% Apply threshold condition using logical indexing
-below_threshold = brightened_img <= threshold;
-gamma_corrected_img(below_threshold) = linear_transform(below_threshold);
-gamma_corrected_img(~below_threshold) = non_linear_transform(~below_threshold);
+% Create text labels for sliders and initialize value labels
+brightnessLabel = uicontrol('Style', 'text', 'String', ['Brightness: ', num2str(brightnessValue)], ...
+    'Position', [240, 20, 100, 20], 'HorizontalAlignment', 'left');
+gammaLabel = uicontrol('Style', 'text', 'String', ['Gamma: ', num2str(gammaValue)], ...
+    'Position', [240, 50, 100, 20], 'HorizontalAlignment', 'left');
 
-figure(15);
-imshow(gamma_corrected_img);
-title('Gamma corrected image:');
+% Callback function for brightness slider
+brightnessCallback = @(hObject, ~) updateBrightness(hObject, brightnessLabel);
+brightnessSlider = uicontrol('Style', 'slider', 'Min', 0.0, 'Max', 4.0, 'Value', 1.0, ...
+    'SliderStep', [0.1 0.1], 'Position', [20, 20, 200, 20], 'Callback', brightnessCallback);
+
+% Callback function for gamma slider
+gammaCallback = @(hObject, ~) updateGamma(hObject, gammaLabel);
+gammaSlider = uicontrol('Style', 'slider', 'Min', 1./2.4, 'Max', 2.4, 'Value', 2.0, ...
+    'SliderStep', [0.1 0.1], 'Position', [20, 50, 200, 20], 'Callback', gammaCallback);
+
+% Ask user for confirmation
+confirmation = input('Proceed? (Y/N): ', 's');
+while(strcmpi(confirmation, 'Y'))
+    % Brighten the image if necessary
+    scale_factor = brightnessValue * max(max(rgb2gray(color_balanced_img)));
+    brightened_img = color_balanced_img * scale_factor;
+    brightened_img = brightened_img * 2.^exposureValue;
+    gamma_corrected_img = zeros(size(brightened_img));
+    % Gamma correction
+    threshold = 0.0031308;
+    % Linear transformation for values below threshold
+    linear_transform = 12.92 * brightened_img;
+    % Non-linear transformation for values above threshold
+    non_linear_transform = (1.0 + 0.055) * (brightened_img .^ (1./gammaValue)) - 0.055;
+    % Apply threshold condition using logical indexing
+    below_threshold = brightened_img <= threshold;
+    gamma_corrected_img(below_threshold) = linear_transform(below_threshold);
+    gamma_corrected_img(~below_threshold) = non_linear_transform(~below_threshold);
+
+    % Plot the result
+    figure(15);
+    imshow(gamma_corrected_img);
+    title('Gamma corrected image');
+    confirmation = input('Try again? (Y/N): ', 's');
+end
 
 %% 8. Compression
 imwrite(gamma_corrected_img, 'IMG_0691.png');
 imwrite(gamma_corrected_img, 'IMG_0691.jpg', "Quality", 95);
+
+
+
+% Update brightness value and label
+function updateBrightness(hObject, brightnessLabel)
+    global brightnessValue;
+    brightnessValue = get(hObject, 'Value');
+    set(brightnessLabel, 'String', ['Brightness: ', num2str(brightnessValue)]);
+end
+
+% Update gamma value and label
+function updateGamma(hObject, gammaLabel)
+    global gammaValue;
+    gammaValue = get(hObject, 'Value');
+    set(gammaLabel, 'String', ['Gamma: ', num2str(gammaValue)]);
+end
