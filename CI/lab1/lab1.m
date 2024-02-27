@@ -103,9 +103,9 @@ grey_world_img(:,:,1) = balanced_red;
 grey_world_img(:,:,2) = balanced_green;
 grey_world_img(:,:,3) = balanced_blue;
 
-% figure(7);
-% imshow(grey_world_img);
-% title('White balancing: Grey World Assumption');
+figure(7);
+imshow(grey_world_img);
+title('White balancing: Grey World Assumption');
 
 % White world assumption
 
@@ -125,31 +125,34 @@ white_world_img(:,:,1) = balanced_red;
 white_world_img(:,:,2) = balanced_green;
 white_world_img(:,:,3) = balanced_blue;
 
-% figure(8);
-% imshow(white_world_img);
-% title('White balancing: White World Assumption');
+figure(8);
+imshow(white_world_img);
+title('White balancing: White World Assumption');
 
 % Manual white balancing
+auto = input("Manual Balancing: 1 to use preset, 0 adjust manually\n");
 done = 0;
 while(~done)
-    figure(9);
-    imshow(real_image);
-    title('Manual Balancing: Click on the image to select points. Press Enter when done.');
-    % Allow user to click points on the image
-    [x, y] = ginput;
-    x = round(x);
-    y = round(y);
-    % Perform computation (example: display selected points)
-    disp('Selected pixel coordinates:');
-    disp([x, y]);
-
-
-    RGB_pixel = I_demosaic(y,x,:);
+    if(auto)
+        x = 2350;
+        y = 3446;
+        RGB_pixel = I_demosaic(y,x,:);
+        done = 1;
+    else
+        figure(9);
+        imshow(real_image);
+        title('Manual Balancing: Click on the image to select points. Press Enter when done.');
+        % Allow user to click points on the image
+        [x, y] = ginput;
+        x = round(x);
+        y = round(y);
+        % Perform computation (example: display selected points)
+        disp('Selected pixel coordinates:');
+        disp([x, y]);   
+        RGB_pixel = I_demosaic(y,x,:);
+    end
     disp('Selected pixel values:');
     disp([I_demosaic(y,x,1), I_demosaic(y,x,2), I_demosaic(y,x,3)]);
-
-    %RGB_pixel = I_demosaic(3446,2350,:);
-    %RGB_pixel = I_demosaic(3746,2002,:);
     
     mean_value = mean(RGB_pixel);
     k_r = mean_value ./ RGB_pixel(:,:,1);
@@ -168,7 +171,9 @@ while(~done)
     figure(9);
     imshow(manual_balancing_img);
     title('White balancing: Manual Balancing');
-    done = input("Write 1 to continue with selected settings. 0 to try again\n");
+    if(~auto)
+        done = input("Write 1 to continue with selected settings. 0 to try again\n");
+    end
 end
 % Choose the best for rest of pipeline
 white_balanced_img = manual_balancing_img;
@@ -188,7 +193,7 @@ end
 
 % % Median filter
 % 
-medianFilterKernel = ones(windowSize) / windowSize^2;
+%medianFilterKernel = ones(filter_size) / windowSize^2;
 median_filter_img = zeros(size(white_balanced_img));
 for i=1:3
     median_filter_img(:,:,i) = conv2(white_balanced_img(:,:,i), ones(filter_size)/(filter_size^2), 'same');
