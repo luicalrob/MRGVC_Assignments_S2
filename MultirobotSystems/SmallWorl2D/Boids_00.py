@@ -22,6 +22,8 @@ class Boid(Soul):
         self.noise=0.1
         self.K=[0.35, 0.005, 0.25]
         self.u_min = 0.1
+        self.saturation_top = 5
+        self.saturation_bottom = -5
         #self.K=[0.01, 0.002, 0.25]
 
         # YOUR BOID INIT CODE
@@ -31,19 +33,33 @@ class Boid(Soul):
         p = -4*self.alpha*self.epsilon / d
         p = p * (2*pow(self.noise/d, 2*self.alpha) - pow(self.noise/d, self.alpha))
         return p
+    
+    def magnitude_cubic_p(self, d):
+        p = 12 / (self.dd * (self.noise * 10))
+        p = p * pow(d-self.dd, 3) 
+        return p
 
     def proximal_control(self, b):
         p = 0
         #nearby = b.space.RnB(b.index(),(type(b),Mobot), b.space.R)
-        for measurement in b.space.RnB(b.index(),(type(b),Mobot), min(b.space.R, self.dd * 1.8)): 
-            if(1.5 < self.magnitude_p(measurement[0])):
-                p += 1.5*np.exp(1j * measurement[1])
+        measurements = b.space.RnB(b.index(),(type(b),Mobot), min(b.space.R, self.dd * 1.8))
+        neighbours_number = len(measurements)
+
+        for measurement in measurements: 
+            if(self.saturation_top < self.magnitude_cubic_p(measurement[0])):
+                p += self.saturation_top*np.exp(1j * measurement[1])
+            elif(self.saturation_bottom > self.magnitude_cubic_p(measurement[0])):
+                p += self.saturation_bottom*np.exp(1j * measurement[1])
             else:
-                p += self.magnitude_p(measurement[0])*np.exp(1j * measurement[1])
+                p += self.magnitude_cubic_p(measurement[0])*np.exp(1j * measurement[1])
         return p
+        # if neighbours_number == 0:
+        #     return 0
+        # else:
+        #     return p/neighbours_number
     
     def allignment_control(self, b):
-        a = b.th
+        a = np.exp(1j * b.th)
         for measurement in b.space.RnB(b.index(),(type(b),Mobot), min(b.space.R, 2)):
             a += np.exp(1j * measurement[1])
         if(a!=0): a = a / abs(a)
@@ -55,13 +71,13 @@ class Boid(Soul):
         return u,w
     
     def mimc(self, b, f):
-        # o = 
-        # orientation_error = o * abs(f)
-        # if orientation_error > 0:
-        #     u = orientation_error * b.v
-        # else:
-        #     u = 0
-        # w=b.K[2]*(dif_angulos)
+        o = np.cos(b.th) + 1j * np.sin(b.th)
+        orientation_error = np.dot(o, f / abs(f))
+        if orientation_error >= 0:
+            u = orientation_error * b.v_max
+        else:
+            u = 0
+        w=self.K[2]*(o.imag - f.imag)
         return u,w
         
     def update(self):
@@ -102,7 +118,7 @@ def init():
     name='Boids_'+strftime("%Y%m%d%H%M", localtime())
     global s, N, R
     dd=1 # or whatever
-    R=2
+    R=2.5
     s=Space(name,R=R,limits='hv',visual=True,showconn=False)
     KPIdataset(name,s,[1,1,0],[(0,'.y'),(1,'.k'),(2,'.g')])
         # 0 simulation time scale -- recommended "default" KPI
@@ -114,7 +130,7 @@ def init():
 
     # N Mobots
     #N=25
-    N=25
+    N=40
     i=0
 
     # limits in X = +-16, limits in Y = +-9
