@@ -23,9 +23,9 @@ imshow(img);
 title('Original Image');
 
 % Display intermediate image (brightened for better visibility)
-% figure(2);
-% imshow(min(1, im2double(img) * 5));
-% title('Intermediate Image (Brightened)');
+figure(2);
+imshow(min(1, im2double(img) * 5));
+title('Intermediate Image (Brightened)');
 
 %%  2.2. LINEARIZATION %%
 
@@ -42,9 +42,9 @@ title('Linearized Image');
 pattern = 'rggb';
 demosaiced_img = demosaic(img, pattern);
 
-% figure(4);
-% imshow(demosaiced_img);
-% title('Demosaiced Image');
+figure(4);
+imshow(demosaiced_img);
+title('Demosaiced Image');
 
 % create masks
 bayer_red = repmat([1 0; 0 0], ceil(height/2),ceil(width/2));
@@ -227,8 +227,8 @@ title('Color balanced image:');
 global brightnessValue gammaValue;
 % Initialize variables to store slider values
 done = 0;
-brightnessValue = 1;
-gammaValue = 1.5;
+brightnessValue = 1.8;
+gammaValue = 0.8;
 exposureValue = 1;
 
 figure(14);
@@ -253,6 +253,7 @@ gammaSlider = uicontrol('Style', 'slider', 'Min', 1./2.4, 'Max', 2.4, 'Value', 0
 
 % Ask user for confirmation
 confirmation = input('Proceed? (Y/N): ', 's');
+
 while(strcmpi(confirmation, 'Y'))
     % Brighten the image if necessary
     scale_factor = brightnessValue * max(max(rgb2gray(color_balanced_img)));
@@ -274,6 +275,9 @@ while(strcmpi(confirmation, 'Y'))
     figure(15);
     imshow(gamma_corrected_img);
     title('Gamma corrected image');
+    if(strcmpi(auto, 'Y'))
+        break
+    end
     confirmation = input('Try again? (Y/N): ', 's');
 end
 
