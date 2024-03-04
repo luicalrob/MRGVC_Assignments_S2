@@ -17,6 +17,8 @@ class Boid(Soul):
     def __init__(self,body,T,dd):  # ADD YOUR ARGUMENTS
         self.control="MDMC"
         self.dd=dd
+        self.D_p = self.dd*1.8
+        self.D_a = 2*self.D_p
         self.alpha=2
         self.epsilon=1.5
         self.noise=0.1
@@ -42,7 +44,7 @@ class Boid(Soul):
     def proximal_control(self, b):
         p = 0
         #nearby = b.space.RnB(b.index(),(type(b),Mobot), b.space.R)
-        measurements = b.space.RnB(b.index(),(type(b),Mobot), min(b.space.R, self.dd * 1.8))
+        measurements = b.space.RnB(b.index(),(type(b),Mobot), self.D_p)
         neighbours_number = len(measurements)
 
         for measurement in measurements: 
@@ -60,7 +62,7 @@ class Boid(Soul):
     
     def allignment_control(self, b):
         a = np.exp(1j * b.th)
-        for measurement in b.space.RnB(b.index(),(type(b),Mobot), min(b.space.R, 2)):
+        for measurement in b.space.RnB(b.index(),(type(b),Mobot), self.D_a):
             a += np.exp(1j * measurement[1])
         if(a!=0): a = a / abs(a)
         return a
@@ -117,8 +119,8 @@ def init():
     ## Create Data Structures
     name='Boids_'+strftime("%Y%m%d%H%M", localtime())
     global s, N, R
-    dd=1 # or whatever
-    R=2.5
+    dd=1.0 # or whatever
+    R=2.0
     s=Space(name,R=R,limits='hv',visual=True,showconn=False)
     KPIdataset(name,s,[1,1,0],[(0,'.y'),(1,'.k'),(2,'.g')])
         # 0 simulation time scale -- recommended "default" KPI
