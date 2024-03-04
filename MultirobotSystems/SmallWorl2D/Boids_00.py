@@ -21,7 +21,7 @@ class Boid(Soul):
         self.alpha=2
         self.epsilon=1.5
         self.noise=0.1
-        self.K=[0.35, 0.01, 0.25]
+        self.K=[0.25, 0.01, 0.25]
         self.u_min = 0.1
         self.saturation = 8.0 # force saturation
         #self.K=[0.01, 0.002, 0.25]
@@ -46,11 +46,16 @@ class Boid(Soul):
         neighbours_number = len(measurements)
 
         for measurement in measurements: 
+            
+            #Do not contribute with any force is the neighbour is already moreless at desired distance
+            if(abs(measurement[0]-self.dd) < 0.1): continue
+
             if(self.potential == "Lennard"):
                 magnitude = self.magnitude_p(measurement[0])
             elif(self.potential == "cubic"):
                 magnitude = self.magnitude_cubic_p(measurement[0])
             
+            #Saturate the magnitude of repulsive and attractive forces
             if(magnitude > self.saturation):
                 magnitude = self.saturation
             elif(magnitude < -self.saturation):
@@ -129,9 +134,9 @@ def init():
     ## Create Data Structures
     name='Boids_'+strftime("%Y%m%d%H%M", localtime())
     global s, N, R
-    dd=1.5 # or whatever
+    dd=1.0 # or whatever
     R=1.8*dd
-    s=Space(name,R=R,limits='hv',visual=True,showconn=False)
+    s=Space(name,R=R,limits='',visual=True,showconn=False)
     KPIdataset(name,s,[1,1,0],[(0,'.y'),(1,'.k'),(2,'.g')])
         # 0 simulation time scale -- recommended "default" KPI
         # 1 Fraction remaining
@@ -153,7 +158,7 @@ def init():
     while i<N and iterations<250:
         new=set_mobot_formation(i, s, center=(posX, posY), large=large, v_max=0.8, w_max=np.pi/2)
         # en vez de posicionar aleatoriamente, poner todos juntitos y con velocidad nula, ya pondremos command vel en el boid
-        if s.fits(new,s.room,safe=dd/2):
+        if s.fits(new,s.room,safe=0.5):
             s.bodies.append(new)
             # YOUR BOID PARAMETRIZATION, DIFFERENT KINDS?
             Boid(new, 0, dd)
