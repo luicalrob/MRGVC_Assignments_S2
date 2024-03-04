@@ -15,11 +15,9 @@ class Boid(Soul):
 
     # YOUR AUXILIARY FUNCTIONS
     def __init__(self,body,T,dd):  # ADD YOUR ARGUMENTS
-        self.control="MIMC"
-        self.potential = "cubic" # set "Lennard" for Ferrante potential, "cubic" for own version
+        self.control="MDMC"
+        self.potential = "Lennard" # set "Lennard" for Ferrante potential, "cubic" for own version
         self.dd=dd
-        self.D_p = self.dd*1.8
-        self.D_a = 2.0*self.D_p
         self.alpha=2
         self.epsilon=1.5
         self.noise=0.1
@@ -44,7 +42,7 @@ class Boid(Soul):
     def proximal_control(self, b):
         p = 0
         #nearby = b.space.RnB(b.index(),(type(b),Mobot), b.space.R)
-        measurements = b.space.RnB(b.index(),(type(b),Mobot), self.D_p)
+        measurements = b.space.RnB(b.index(),(type(b),Mobot), b.space.R)
         neighbours_number = len(measurements)
 
         for measurement in measurements: 
@@ -68,7 +66,7 @@ class Boid(Soul):
     
     def allignment_control(self, b):
         a = np.exp(1j * b.th)
-        for measurement in b.space.RnB(b.index(),(type(b),Mobot), self.D_a):
+        for measurement in b.space.RnB(b.index(),(type(b),Mobot), 2*b.space.R):
             a += np.exp(1j * measurement[1])
         if(a!=0): a = a / abs(a)
         return a
@@ -132,7 +130,7 @@ def init():
     name='Boids_'+strftime("%Y%m%d%H%M", localtime())
     global s, N, R
     dd=1.5 # or whatever
-    R=2.0
+    R=1.8*dd
     s=Space(name,R=R,limits='hv',visual=True,showconn=False)
     KPIdataset(name,s,[1,1,0],[(0,'.y'),(1,'.k'),(2,'.g')])
         # 0 simulation time scale -- recommended "default" KPI
@@ -144,18 +142,18 @@ def init():
 
     # N Mobots
     #N=25
-    N=40
+    N=25
     i=0
 
     # limits in X = +-16, limits in Y = +-9
     posX = 6
     posY = -3
-    large = 3.5
+    large = 6.5
     iterations = 0
     while i<N and iterations<250:
         new=set_mobot_formation(i, s, center=(posX, posY), large=large, v_max=0.8, w_max=np.pi/2)
         # en vez de posicionar aleatoriamente, poner todos juntitos y con velocidad nula, ya pondremos command vel en el boid
-        if s.fits(new,s.room,safe=0.3):
+        if s.fits(new,s.room,safe=dd/2):
             s.bodies.append(new)
             # YOUR BOID PARAMETRIZATION, DIFFERENT KINDS?
             Boid(new, 0, dd)
