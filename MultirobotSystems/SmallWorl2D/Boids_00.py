@@ -93,7 +93,7 @@ class Boid(Soul):
         
         ## Method in slides
         s = f / abs(f)
-        u = max(0, s.real)*b.v_max
+        u = max(0.0, s.real)*b.v_max
         w = self.K[2]*np.arctan2(s.imag, s.real)
         return u,w
         
@@ -136,7 +136,7 @@ def init():
     global s, N, R
     dd=1.0 # or whatever
     R=1.8*dd
-    s=Space(name,R=R,limits='',visual=True,showconn=False)
+    s=Space(name,R=R,limits='',visual=True, showconn=False, ConnCtrl=0)
     KPIdataset(name,s,[1,1,0],[(0,'.y'),(1,'.k'),(2,'.g')])
         # 0 simulation time scale -- recommended "default" KPI
         # 1 Fraction remaining
@@ -158,7 +158,7 @@ def init():
     while i<N and iterations<250:
         new=set_mobot_formation(i, s, center=(posX, posY), large=large, v_max=0.8, w_max=np.pi/2)
         # en vez de posicionar aleatoriamente, poner todos juntitos y con velocidad nula, ya pondremos command vel en el boid
-        if s.fits(new,s.room,safe=0.5):
+        if s.fits(new,s.room,safe=0.35):
             s.bodies.append(new)
             # YOUR BOID PARAMETRIZATION, DIFFERENT KINDS?
             Boid(new, 0, dd)
@@ -203,10 +203,18 @@ while not end: # THE loop
 
     # KPIs
     KPI=[s.time/(time()-s.t0),0,0]
+    KPI[2] = 0
+    graph = s.conn_subgraph(Mobot)
     for b in s.bodies:
         if b.on:
             if isinstance(b,Mobot):
+                #remaining robots
                 KPI[1] += 1
+                #members in largest group
+                group = 1 + len(graph[b.index()])
+                if group > KPI[2]:
+                    KPI[2] = group
+                
     KPI[1]/=N
     KPI[2]/=N
     # la idea es actualizar el mapa y toda la informacion, los comportamientos y todo a parte de la visualizacion
