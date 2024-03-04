@@ -73,13 +73,19 @@ class Boid(Soul):
         return u,w
     
     def mimc(self, b, f):
-        o = np.cos(b.th) + 1j * np.sin(b.th)
-        orientation_error = np.dot(o, f / abs(f))
-        if orientation_error >= 0:
-            u = orientation_error * b.v_max
-        else:
-            u = 0
-        w=self.K[2]*(o.imag - f.imag)
+        ## Method in paper
+        # o = np.cos(b.th) + 1j * np.sin(b.th)
+        # orientation_error = np.dot(o, f / abs(f))
+        # if orientation_error >= 0:
+        #     u = orientation_error * b.v_max
+        # else:
+        #     u = 0
+        # w=self.K[2]*(o.imag - f.imag)
+        
+        ## Method in slides
+        s = f / abs(f)
+        u = max(0, s.real)*b.v_max
+        w = self.K[2]*np.arctan2(s.imag, s.real)
         return u,w
         
     def update(self):
