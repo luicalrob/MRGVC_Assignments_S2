@@ -16,15 +16,18 @@ class Boid(Soul):
     # YOUR AUXILIARY FUNCTIONS
     def __init__(self,body,T,dd):  # ADD YOUR ARGUMENTS
         self.control="MDMC"
-        self.potential = "Lennard" # set "Lennard" for Ferrante potential, "cubic" for own version
+        self.potential = "cubic" # set "Lennard" for Ferrante potential, "cubic" for own version
         self.dd=dd
+        self.noise=0.1
+        self.K=[0.25, 0.001, 0.25]
+        self.u_min = 0.1
+        self.saturation = 10 # force saturation
+
+        # Ferrante
         self.alpha=2
         self.epsilon=1.5
-        self.noise=0.1
-        self.K=[0.25, 0.01, 0.25]
-        self.u_min = 0.1
-        self.saturation = 8.0 # force saturation
-        #self.K=[0.01, 0.002, 0.25]
+        # Custom
+        self.slope=3.5
 
         # YOUR BOID INIT CODE
         super().__init__(body,T)
@@ -35,7 +38,7 @@ class Boid(Soul):
         return p
     
     def magnitude_cubic_p(self, d):
-        p = 12.0 / (self.dd * (self.noise * 10.0))
+        p = self.slope / (self.dd * (self.noise * 10.0))
         p = p * pow(d-self.dd, 3) 
         return p
 
@@ -120,7 +123,7 @@ class Boid(Soul):
             
     # actualizar todo lo que haga falta, distancias y todo para ver el comportamiento que tiene que tener cada uno
 
-def set_mobot_formation(i, s, center, large, th=np.pi/2, fc=(0.2, 0.2, 0), v=0, v_max=None, w_max=None):
+def set_mobot_formation(i, s, center, large, th=0, fc=(0.2, 0.2, 0), v=0, v_max=None, w_max=None):
     if v_max is None:
         v_max = s.vN / 2
     if w_max is None:
@@ -134,7 +137,7 @@ def init():
     ## Create Data Structures
     name='Boids_'+strftime("%Y%m%d%H%M", localtime())
     global s, N, R
-    dd=1.0 # or whatever
+    dd=2 # or whatever
     R=1.8*dd
     s=Space(name,R=R,limits='',visual=True, showconn=False, ConnCtrl=0)
     KPIdataset(name,s,[1,1,0],[(0,'.y'),(1,'.k'),(2,'.g')])
@@ -147,13 +150,13 @@ def init():
 
     # N Mobots
     #N=25
-    N=25
+    N=40
     i=0
 
     # limits in X = +-16, limits in Y = +-9
-    posX = 6
-    posY = -3
-    large = 6.5
+    posX = -6
+    posY = 0
+    large = 5
     iterations = 0
     while i<N and iterations<250:
         new=set_mobot_formation(i, s, center=(posX, posY), large=large, v_max=0.8, w_max=np.pi/2)
