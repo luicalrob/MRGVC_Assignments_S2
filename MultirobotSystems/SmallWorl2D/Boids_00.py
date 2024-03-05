@@ -5,6 +5,7 @@
 
 from time import time, localtime, strftime
 from random import uniform
+import random
 import numpy as np
 from point2d import Point2D 
 # YOU MIGHT FIND USEFUL FUNCTIONS IN shapely, Point2D, AND gadgETs
@@ -16,10 +17,11 @@ class Boid(Soul):
     # YOUR AUXILIARY FUNCTIONS
     def __init__(self,body,T,dd):  # ADD YOUR ARGUMENTS
         self.control="MDMC"
-        self.potential = "cubic" # set "Lennard" for Ferrante potential, "cubic" for own version
+        self.potential = "Lennard" # set "Lennard" for Ferrante potential, "cubic" for own version
         self.dd=dd
+        self.type = T
         self.noise=0.1
-        self.K=[0.25, 0.001, 0.25]
+        self.K=[0.25, 0.01, 0.25]
         self.u_min = 0.1
         self.saturation = 10 # force saturation
 
@@ -108,7 +110,16 @@ class Boid(Soul):
 
             p=self.proximal_control(b)
             a=self.allignment_control(b)
-            g=0
+            if self.type: #this robot is informed
+                goal = [3.0, 7.0]
+                xg_robot = (goal[0] - b.pos.x)*np.cos(b.th) + (goal[1] - b.pos.y)*np.sin(b.th)
+                yg_robot = -(goal[0] - b.pos.x)*np.sin(b.th) + (goal[1] - b.pos.y)*np.cos(b.th)
+                magnitude = np.sqrt(pow(xg_robot,2) + pow(yg_robot,2))
+                theta = np.arctan2(yg_robot, xg_robot)
+                g = magnitude*np.exp(1j*theta)
+                #g = g / abs(g)
+            else: 
+                g=0.0
 
             f=p+a+g
             
@@ -164,7 +175,8 @@ def init():
         if s.fits(new,s.room,safe=0.35):
             s.bodies.append(new)
             # YOUR BOID PARAMETRIZATION, DIFFERENT KINDS?
-            Boid(new, 0, dd)
+            mobot_type = random.random() < 0.35
+            Boid(new, mobot_type, dd)
             # creamos un comportamiento "alma" para cada robot
             i += 1
         iterations += 1
