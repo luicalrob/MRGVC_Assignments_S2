@@ -151,7 +151,7 @@ def init():
     dd=2 # or whatever
     R=1.8*dd
     s=Space(name,R=R,limits='',visual=True, showconn=False, ConnCtrl=0)
-    KPIdataset(name,s,[1,1,0],[(0,'.y'),(1,'.k'),(2,'.g')])
+    KPIdataset(name,s,[1,1,0,0],[(0,'.y'),(1,'.k'),(2,'.g'),(3, '.c')])
         # 0 simulation time scale -- recommended "default" KPI
         # 1 Fraction remaining
         # 2 Fraction in largest group
@@ -217,9 +217,10 @@ while not end: # THE loop
     # si se chocan quitarlos
 
     # KPIs
-    KPI=[s.time/(time()-s.t0),0,0]
+    KPI=[s.time/(time()-s.t0),0,0,0]
     KPI[2] = 0
     graph = s.conn_subgraph(Mobot)
+    order = 0.0
     for b in s.bodies:
         if b.on:
             if isinstance(b,Mobot):
@@ -229,9 +230,13 @@ while not end: # THE loop
                 group = 1 + len(graph[b.index()])
                 if group > KPI[2]:
                     KPI[2] = group
+                order += np.exp(1j*b.th)
                 
     KPI[1]/=N
     KPI[2]/=N
+    KPI[3]=np.sqrt(pow(order.real,2) + pow(order.imag,2))
+    KPI[3]/=N
+    print(KPI[3])
     # la idea es actualizar el mapa y toda la informacion, los comportamientos y todo a parte de la visualizacion
     # YOUR KPI COMPUTATIONS
     s.KPIds.update(KPI)
