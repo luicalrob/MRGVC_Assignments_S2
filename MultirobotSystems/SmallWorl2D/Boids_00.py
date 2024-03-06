@@ -17,19 +17,19 @@ class Boid(Soul):
     # YOUR AUXILIARY FUNCTIONS
     def __init__(self,body,T,dd):  # ADD YOUR ARGUMENTS
         self.control="MDMC"
-        self.potential = "Lennard" # set "Lennard" for Ferrante potential, "cubic" for own version
+        self.potential = "cubic" # set "Lennard" for Ferrante potential, "cubic" for own version
         self.dd=dd
         self.type = T
         self.noise=0.1
-        self.K=[0.25, 0.01, 0.25]
-        self.u_min = 0.1
-        self.saturation = 10 # force saturation
+        self.K=[1.5, 0.03, 0.25]
+        self.u_min = 0.01
+        self.saturation = 50 # force saturation
 
         # Ferrante
         self.alpha=2
         self.epsilon=1.5
         # Custom
-        self.slope=3.5
+        self.slope=25
 
         # YOUR BOID INIT CODE
         super().__init__(body,T)
@@ -60,6 +60,9 @@ class Boid(Soul):
             elif(self.potential == "cubic"):
                 magnitude = self.magnitude_cubic_p(measurement[0])
             
+            #angle_force = np.exp(1j * measurement[1])
+            #lineal_force = 10*magnitude
+
             #Saturate the magnitude of repulsive and attractive forces
             if(magnitude > self.saturation):
                 magnitude = self.saturation
@@ -148,9 +151,9 @@ def init():
     ## Create Data Structures
     name='Boids_'+strftime("%Y%m%d%H%M", localtime())
     global s, N, R
-    dd=2 # or whatever
+    dd=1.5 # or whatever
     R=1.8*dd
-    s=Space(name,R=R,limits='',visual=True, showconn=False, ConnCtrl=0)
+    s=Space(name,R=R,limits='',visual=True, showconn=True, ConnCtrl=0)
     KPIdataset(name,s,[1,1,0,0],[(0,'.y'),(1,'.k'),(2,'.g'),(3, '.c')])
         # 0 simulation time scale -- recommended "default" KPI
         # 1 Fraction remaining
@@ -160,7 +163,7 @@ def init():
     ## Populate the world
 
     # N Mobots
-    N=25
+    N=30
     i=0
 
     # limits in X = +-16, limits in Y = +-9
@@ -174,7 +177,8 @@ def init():
         if s.fits(new,s.room,safe=0.35):
             s.bodies.append(new)
             # YOUR BOID PARAMETRIZATION, DIFFERENT KINDS?
-            mobot_type = random.random() < 0.35
+            mobot_type = random.random() < 0.15
+            print(mobot_type)
             Boid(new, mobot_type, dd)
             # creamos un comportamiento "alma" para cada robot
             i += 1
@@ -235,7 +239,6 @@ while not end: # THE loop
     KPI[2]/=N
     KPI[3]=np.sqrt(pow(order.real,2) + pow(order.imag,2))
     KPI[3]/=N
-    print(KPI[3])
     # la idea es actualizar el mapa y toda la informacion, los comportamientos y todo a parte de la visualizacion
     # YOUR KPI COMPUTATIONS
     s.KPIds.update(KPI)
