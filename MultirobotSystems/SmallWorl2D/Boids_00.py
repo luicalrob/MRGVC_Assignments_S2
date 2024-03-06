@@ -160,8 +160,7 @@ def init():
     ## Populate the world
 
     # N Mobots
-    #N=25
-    N=40
+    N=25
     i=0
 
     # limits in X = +-16, limits in Y = +-9
