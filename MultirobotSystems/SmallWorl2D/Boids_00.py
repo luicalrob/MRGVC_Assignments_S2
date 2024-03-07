@@ -21,7 +21,7 @@ class Boid(Soul):
         self.dd=dd
         self.type = T
         self.noise=0.1
-        self.K=[1.5, 0.03, 0.25]
+        self.K=[1.5, 0.01, 0.25]
         self.u_min = 0.01
         self.saturation = 50 # force saturation
 
@@ -29,7 +29,7 @@ class Boid(Soul):
         self.alpha=2
         self.epsilon=1.5
         # Custom
-        self.slope=25
+        self.slope=15
 
         # YOUR BOID INIT CODE
         super().__init__(body,T)
@@ -58,7 +58,10 @@ class Boid(Soul):
             if(self.potential == "Lennard"):
                 magnitude = self.magnitude_p(measurement[0])
             elif(self.potential == "cubic"):
-                magnitude = self.magnitude_cubic_p(measurement[0])
+                if np.pi/2 > measurement[1] > -np.pi/2:
+                    magnitude = self.magnitude_cubic_p(measurement[0])
+                else:
+                    magnitude = -self.magnitude_cubic_p(measurement[0])
             
             #angle_force = np.exp(1j * measurement[1])
             #lineal_force = 10*magnitude
@@ -66,7 +69,7 @@ class Boid(Soul):
             #Saturate the magnitude of repulsive and attractive forces
             if(magnitude > self.saturation):
                 magnitude = self.saturation
-            elif(magnitude < -self.saturation):
+            elif(magnitude < self.saturation):
                 magnitude = -self.saturation
             
             p += magnitude*np.exp(1j * measurement[1])
@@ -137,21 +140,26 @@ class Boid(Soul):
             
     # actualizar todo lo que haga falta, distancias y todo para ver el comportamiento que tiene que tener cada uno
 
-def set_mobot_formation(i, s, center, large, th=0, fc=(0.2, 0.2, 0), v=0, v_max=None, w_max=None):
+def set_mobot_formation(i, s, center, large, th=None, fc=(0.2, 0.2, 0), v=0, v_max=None, w_max=None):
     if v_max is None:
         v_max = s.vN / 2
     if w_max is None:
         w_max = s.wN
 
+    if th is None:
+        th_robot = uniform(-np.pi,np.pi)
+    else:
+        th_robot = th
+
     pos = (uniform(-large/2,large/2) + center[0], uniform(-large/2,large/2) + center[1])
-    return Mobot(s, 'm' + str(i), pos=pos, th=th, fc=fc, v=v, v_max=v_max, w_max=w_max)
+    return Mobot(s, 'm' + str(i), pos=pos, th=th_robot, fc=fc, v=v, v_max=v_max, w_max=w_max)
 
 def init():
 
     ## Create Data Structures
     name='Boids_'+strftime("%Y%m%d%H%M", localtime())
     global s, N, R
-    dd=1.5 # or whatever
+    dd=2 # or whatever
     R=1.8*dd
     s=Space(name,R=R,limits='',visual=True, showconn=True, ConnCtrl=0)
     KPIdataset(name,s,[1,1,0,0],[(0,'.y'),(1,'.k'),(2,'.g'),(3, '.c')])
@@ -163,7 +171,7 @@ def init():
     ## Populate the world
 
     # N Mobots
-    N=30
+    N=25
     i=0
 
     # limits in X = +-16, limits in Y = +-9
@@ -172,7 +180,7 @@ def init():
     large = 5
     iterations = 0
     while i<N and iterations<250:
-        new=set_mobot_formation(i, s, center=(posX, posY), large=large, v_max=0.8, w_max=np.pi/2)
+        new=set_mobot_formation(i, s, center=(posX, posY), large=large, th=0, v_max=0.8, w_max=np.pi)
         # en vez de posicionar aleatoriamente, poner todos juntitos y con velocidad nula, ya pondremos command vel en el boid
         if s.fits(new,s.room,safe=0.35):
             s.bodies.append(new)
