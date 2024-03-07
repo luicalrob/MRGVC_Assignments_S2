@@ -35,23 +35,17 @@ class Boid(Soul):
         super().__init__(body,T)
 
     def magnitude_p(self, d):
-        p = -4*self.alpha*self.epsilon / d
-        p = p * (2*pow(self.noise/d, 2*self.alpha) - pow(self.noise/d, self.alpha))
+        p = (-4*self.alpha*self.epsilon / d) * (2*pow(self.noise/d, 2*self.alpha) - pow(self.noise/d, self.alpha)) 
         return p
     
     def magnitude_cubic_p(self, d):
-        p = self.slope / (self.dd * (self.noise * 10.0))
-        p = p * pow(d-self.dd, 3) 
+        p = self.slope / (self.dd * (self.noise * 10.0)) * pow(d-self.dd, 3) 
         return p
 
-    def proximal_control(self, b):
+    def proximal_control(self, measurements):
         p = 0
-        #nearby = b.space.RnB(b.index(),(type(b),Mobot), b.space.R)
-        measurements = b.space.RnB(b.index(),(type(b),Mobot), b.space.R)
-        neighbours_number = len(measurements)
 
         for measurement in measurements: 
-            
             #Do not contribute with any force is the neighbour is already moreless at desired distance
             if(abs(measurement[0]-self.dd) < 0.1): continue
 
@@ -80,9 +74,9 @@ class Boid(Soul):
         # else:
         #     return p/neighbours_number
     
-    def allignment_control(self, b):
-        a = np.exp(1j * b.th)
-        for measurement in b.space.RnB(b.index(),(type(b),Mobot), 2*b.space.R):
+    def allignment_control(self, measurements):
+        a = np.exp(1j * self.body.th)
+        for measurement in measurements:
             a += np.exp(1j * measurement[1])
         if(a!=0): a = a / abs(a)
         return a
@@ -92,7 +86,7 @@ class Boid(Soul):
         w=self.K[1]*f.imag
         return u,w
     
-    def mimc(self, b, f):
+    def mimc(self, f):
         ## Method in paper
         # o = np.cos(b.th) + 1j * np.sin(b.th)
         # orientation_error = np.dot(o, f / abs(f))
@@ -104,22 +98,20 @@ class Boid(Soul):
         
         ## Method in slides
         s = f / abs(f)
-        u = max(0.0, s.real)*b.v_max
+        u = max(0.0, s.real)*self.body.v_max
         w = self.K[2]*np.arctan2(s.imag, s.real)
         return u,w
         
     def update(self):
         if super().update():
-            b=self.body
-            i=b.index()
-            s=b.space
+            measurements = self.body.space.RnB(self.body.index(),(type(self.body),Mobot), self.body.space.R)
 
-            p=self.proximal_control(b)
-            a=self.allignment_control(b)
+            p=self.proximal_control(measurements)
+            a=self.allignment_control(measurements)
             if self.type: #this robot is informed
                 goal = [3.0, 7.0]
-                xg_robot = (goal[0] - b.pos.x)*np.cos(b.th) + (goal[1] - b.pos.y)*np.sin(b.th)
-                yg_robot = -(goal[0] - b.pos.x)*np.sin(b.th) + (goal[1] - b.pos.y)*np.cos(b.th)
+                xg_robot = (goal[0] - self.body.pos.x)*np.cos(self.body.th) + (goal[1] - self.body.pos.y)*np.sin(self.body.th)
+                yg_robot = -(goal[0] - self.body.pos.x)*np.sin(self.body.th) + (goal[1] - self.body.pos.y)*np.cos(self.body.th)
                 magnitude = np.sqrt(pow(xg_robot,2) + pow(yg_robot,2))
                 theta = np.arctan2(yg_robot, xg_robot)
                 g = magnitude*np.exp(1j*theta)
@@ -132,11 +124,11 @@ class Boid(Soul):
             if self.control == "MDMC":
                 v, w = self.mdmc(f)
             else:
-                v, w = self.mimc(b,f)
+                v, w = self.mimc(f)
             
             # # YOUR BOID UPDATE CODE
 
-            b.cmd_vel(v = v, w = w, vth = 0)
+            self.body.cmd_vel(v = v, w = w, vth = 0)
             
     # actualizar todo lo que haga falta, distancias y todo para ver el comportamiento que tiene que tener cada uno
 
@@ -159,7 +151,7 @@ def init():
     ## Create Data Structures
     name='Boids_'+strftime("%Y%m%d%H%M", localtime())
     global s, N, R
-    dd=2 # or whatever
+    dd=1.5 # or whatever
     R=1.8*dd
     s=Space(name,R=R,limits='',visual=True, showconn=True, ConnCtrl=0)
     KPIdataset(name,s,[1,1,0,0],[(0,'.y'),(1,'.k'),(2,'.g'),(3, '.c')])
@@ -171,13 +163,13 @@ def init():
     ## Populate the world
 
     # N Mobots
-    N=25
+    N=3
     i=0
 
     # limits in X = +-16, limits in Y = +-9
     posX = -6
     posY = 0
-    large = 5
+    large = 2
     iterations = 0
     while i<N and iterations<250:
         new=set_mobot_formation(i, s, center=(posX, posY), large=large, th=0, v_max=0.8, w_max=np.pi)
