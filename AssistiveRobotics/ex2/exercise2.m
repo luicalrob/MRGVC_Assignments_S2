@@ -6,8 +6,8 @@ l_2 = 5;
 % Elements that define a link: DH parameters, sigma (==0 rotat., == 1
 % transl.), offset: if we want to include an initial offset for the joint 
 %[theta,D,A,alpha,sigma,offset]
-L1 = Link([0,0,0, -pi/2,0,30*pi/180]); % DH parameters for 0T1
-%L1 = Link([0,0,0, -pi/2,0,-60*pi/180]); % DH parameters for 0T1
+%L1 = Link([0,0,0, -pi/2,0,30*pi/180]); % DH parameters for 0T1
+L1 = Link([0,0,0, -pi/2,0,-60*pi/180]); % DH parameters for 0T1
 L2 = Link([0,l_1+l_2,0,0,1,0]); %  DH parameters for 1T2
 % Set limits for the joint
 L2.qlim = [0 15];
