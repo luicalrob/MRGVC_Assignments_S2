@@ -84,7 +84,7 @@ public:
         pCamera->project(p3Dc.cast<float>(), projected);
 
         // Compute the reprojection error
-        _error = projected.cast<double>() - obs;
+        _error = obs - projected.cast<double>();
     }
 
     bool isDepthPositive() {
@@ -123,7 +123,7 @@ public:
         pCamera->project(p3Dc.cast<float>(), projected);
 
         // Compute the reprojection error
-        _error = projected.cast<double>() - obs;
+        _error = obs  - projected.cast<double>();
     }
 
     bool isDepthPositive() {
