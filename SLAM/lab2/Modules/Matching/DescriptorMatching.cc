@@ -222,6 +222,39 @@ int searchWithProjection(Frame& currFrame, int th, std::vector<std::shared_ptr<M
         /*
          * Your matching code for Lab 3 - Task 4 goes here
          */
+
+        //Get candidates whose coordinates are close to the current point
+        currFrame.getFeaturesInArea(uv.x,uv.y,radius,predictedOctave-1,predictedOctave+1,vIndicesToCheck);
+        
+        if(vIndicesToCheck.empty()){
+            continue;
+        }
+
+        cv::Mat desc = pMP->getDescriptor();
+
+        //Match with the one with the smallest Hamming distance
+        int bestDist = 255, secondBestDist = 255;
+        size_t bestIdx = -1;
+        for(auto j : vIndicesToCheck){
+            if(currFrame.getMapPoint(j)){
+                continue;
+            }
+
+            int dist = HammingDistance(desc,currFrame.getDescriptors().row(j));
+
+            if(dist < bestDist){
+                secondBestDist = bestDist;
+                bestDist = dist;
+                bestIdx = j;
+            }
+            else if(dist < secondBestDist){
+                secondBestDist = dist;
+            }
+        }
+        if(bestDist <= th && (float)bestDist < (float(secondBestDist)*0.9)){
+            currFrame.setMapPoint(bestIdx,pMP);
+            nMatches++;
+        }
     }
 
     return nMatches;
