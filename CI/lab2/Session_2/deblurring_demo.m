@@ -1,6 +1,8 @@
+close all;
+clear all;
 % Read data
-aperture = imread('apertures/circular.bmp');
-image = imread('images/penguins.jpg');
+aperture = imread('apertures/Levin.bmp');
+image = imread('images/burano.jpg');
 image = image(:, :, 1);
 
 % Noise level (Gaussian noise)
@@ -32,9 +34,13 @@ k1 = k1 * (flow / max(k1(:)));
 f1 = zDefocused(f0, k1, sigma, 0);
 
 % Recover
-f0_hat = zDeconvWNR(f1, k1, C);
+f0_hat_wnr = zDeconvWNR(f1, k1, C);
+f0_hat_lucy = deconvlucy(f1,k1);
+f0_hat_wnr_noprior = deconvwnr(f1,k1);
 
 % Display results
+
+%% WNR prior
 figure;
 
 subplot_tight(1, 3, 1, 0.0, false)
@@ -46,5 +52,35 @@ imshow(f1);
 title('Defocused');
 
 subplot_tight(1, 3, 3, 0.0, false)
-imshow(f0_hat);
-title('Recovered');
+imshow(f0_hat_wnr);
+title('Recovered Wiener');
+
+%% Lucy
+figure;
+
+subplot_tight(1, 3, 1, 0.0, false)
+imshow(f0);
+title('Focused');
+
+subplot_tight(1, 3, 2, 0.0, false)
+imshow(f1);
+title('Defocused');
+
+subplot_tight(1, 3, 3, 0.0, false)
+imshow(f0_hat_lucy);
+title('Recovered Lucy');
+
+%% Wnr no priors
+figure;
+
+subplot_tight(1, 3, 1, 0.0, false)
+imshow(f0);
+title('Focused');
+
+subplot_tight(1, 3, 2, 0.0, false)
+imshow(f1);
+title('Defocused');
+
+subplot_tight(1, 3, 3, 0.0, false)
+imshow(f0_hat_wnr_noprior);
+title('Recovered Wiener (no prior)');

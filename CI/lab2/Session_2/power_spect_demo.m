@@ -1,6 +1,8 @@
+close all;
+clear all;
 % Read data
-aperture = imread('apertures/circular.bmp');
-image = imread('images/penguins.jpg');
+aperture = imread('apertures/Levin.bmp');
+image = imread('images/burano.jpg');
 image = image(:, :, 1);
 
 % Noise level (gaussian noise)
