@@ -51,6 +51,12 @@ xlabel('Blur Size');
 ylabel('Noise Level');
 title('PSNR');
 
+% Set custom tick labels for x-axis and y-axis
+xticks(1:numel(blurSize_values));
+xticklabels(string(blurSize_values));
+yticks(1:numel(sigma_values));
+yticklabels(string(sigma_values));
+
 % Structural Similarity Index
 
 % SSIM measures the similarity between the deblurred image and the original 
@@ -62,6 +68,12 @@ colorbar;
 xlabel('Blur Size');
 ylabel('Noise Level');
 title('SSIM');
+
+% Set custom tick labels for x-axis and y-axis
+xticks(1:numel(blurSize_values));
+xticklabels(string(blurSize_values));
+yticks(1:numel(sigma_values));
+yticklabels(string(sigma_values));
 
 
 % Interpretation of Results:
