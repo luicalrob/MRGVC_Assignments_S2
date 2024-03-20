@@ -2,7 +2,7 @@ close all;
 clear all;
 
 % Read data
-aperture = imread('apertures/Levin.bmp');
+aperture = imread('apertures/circular.bmp');
 image = imread('images/burano.jpg');
 image = image(:, :, 1);
 
@@ -15,6 +15,9 @@ blurSize_values = [3, 7, 11]; % Different blur sizes
 % Initialize arrays to store quality metrics
 psnr_values = zeros(numel(sigma_values), numel(blurSize_values));
 ssim_values = zeros(numel(sigma_values), numel(blurSize_values));
+
+% Initialize cell array to store reconstructed images
+reconstructed_images = cell(numel(sigma_values), numel(blurSize_values));
 
 % Iterate over parameter combinations
 for i = 1:numel(sigma_values)
@@ -29,6 +32,9 @@ for i = 1:numel(sigma_values)
         
         % Perform deblurring using Wiener deconvolution
         f0_hat_wnr = zDeconvWNR(f1, k1, calculate_prior(height, width, sigma));
+
+        % Store reconstructed image
+        reconstructed_images{i, j} = f0_hat_wnr;
         
         % Compute PSNR and SSIM
         psnr_values(i, j) = psnr(f0, f0_hat_wnr);
@@ -75,6 +81,27 @@ xticklabels(string(blurSize_values));
 yticks(1:numel(sigma_values));
 yticklabels(string(sigma_values));
 
+% Create figure for reconstructed images
+fig = figure('Position', [100, 100, 800, 600]);
+
+% Plot reconstructed images
+for i = 1:numel(sigma_values)
+    for j = 1:numel(blurSize_values)
+        % Calculate position for current image
+        position = (i - 1) * numel(blurSize_values) + j;
+        
+        % Plot reconstructed image at corresponding position
+        subplot(numel(sigma_values), numel(blurSize_values), position);
+        imshow(reconstructed_images{i, j});
+        title(sprintf('Noise: %.3f, Blur Size: %d', sigma_values(i), blurSize_values(j)));
+    end
+end
+
+% Set x-axis and y-axis tick labels
+xticks(1:numel(blurSize_values));
+xticklabels(string(blurSize_values));
+yticks(1:numel(sigma_values));
+yticklabels(string(sigma_values));
 
 % Interpretation of Results:
 
