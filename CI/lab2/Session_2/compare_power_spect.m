@@ -91,6 +91,7 @@ for i = 1:numel(aperture_names)
     ax.XLim = [240 270]; % Adjust according to your data dimensions
     ax.YLim = [240 270]; % Adjust according to your data dimensions
     set(ax, 'YTick', [], 'YTickLabel', [])
+    set(ax, 'XTick', [], 'XTickLabel', [])
 
 
     subplot(4, 4, (i-1)*4 + 2)
