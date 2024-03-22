@@ -48,26 +48,39 @@ end
 figure();
 
 for i = 1:numApertures
-    % Wiener with prior
-    subplot_tight(numApertures, numDeconv, (i-1)*numDeconv + 1, 0.025, false);
-    imshow(f0_hat_wnr_cell{i});
+
+     % Focused image
+    subplot_tight(numApertures, numDeconv+2, (i-1)*(numDeconv+2) + 1 , 0.025, false);
+    imshow(f0);
     h = ylabel(aperture_names{i});
     set(h, 'FontSize', 10, 'FontWeight', 'bold');
     if(i == 1) 
-        title([deconv_names{1}]);
+        title('Focused Image');
     end
     
+    % Defocused image
+    subplot_tight(numApertures, numDeconv+2, (i-1)*(numDeconv+2) + 2, 0.025, false);
+    imshow(f1);
+    if(i == 1) 
+        title('Defocused Image');
+    end
+    % Wiener with prior
+    subplot_tight(numApertures, numDeconv+2, (i-1)*(numDeconv + 2) + 3, 0.025, false);
+    imshow(f0_hat_wnr_cell{i});
+   
+    if(i == 1) 
+        title([deconv_names{1}]);
+    end    
     
     % Lucy
-    subplot_tight(numApertures, numDeconv, (i-1)*numDeconv + 2, 0.025, false);
+    subplot_tight(numApertures, numDeconv+2, (i-1)*(numDeconv + 2) + 4, 0.025, false);
     imshow(f0_hat_lucy_cell{i});
     if(i == 1) 
         title([deconv_names{2}]);
     end
     
-    
     % Wiener with no prior
-    subplot_tight(numApertures, numDeconv, (i-1)*numDeconv + 3, 0.025, false);
+    subplot_tight(numApertures, numDeconv + 2, (i-1)*(numDeconv + 2) + 5, 0.025, false);
     imshow(f0_hat_wnr_noprior_cell{i});
     if(i == 1) 
         title([deconv_names{3}]);
