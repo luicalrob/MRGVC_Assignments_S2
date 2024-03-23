@@ -1,7 +1,7 @@
 close all;
 clear all;
 % Read data
-aperture = imread('apertures/Levin.bmp');
+aperture = imread('apertures/circular.bmp');
 image = imread('images/burano.jpg');
 image = image(:, :, 1);
 
