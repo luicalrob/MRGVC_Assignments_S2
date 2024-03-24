@@ -54,6 +54,19 @@ void LocalMapping::mapPointCulling() {
     /*
      * Your code for Lab 4 - Task 4 here!
      */
+    int max_old = 10;
+    int min_obs = 6;
+
+    //auto vKFcovisible = pMap_->getCovisibleKeyFrames(currKeyFrame_->getId());
+    auto mapPoints = pMap_->getMapPoints();
+
+    for( auto mapPoint : mapPoints){
+        if (((int)currKeyFrame_->getId() - (int)mapPoint.second->getId()) >= max_old && pMap_->getNumberOfObservations(mapPoint.first) <= min_obs){
+            pMap_->removeMapPoint(mapPoint.second->getId());
+        }
+
+
+    }
 }
 
 void LocalMapping::triangulateNewMapPoints() {
