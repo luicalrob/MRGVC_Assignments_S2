@@ -367,6 +367,59 @@ int fuse(std::shared_ptr<KeyFrame> pKF, int th, std::vector<std::shared_ptr<MapP
         /*
          * Your code for Lab 4 - Task 3 here!
          */
+
+        //Project MapPoint into the Frame
+        Eigen::Vector3f p3Dc = Tcw*pMP->getWorldPosition();
+        cv::Point2f uv = calibration->project(p3Dc);
+
+        //Get last octave in which the point was seen
+        int nLastOctave = pKF->getKeyPoint(i).octave;
+
+        //Search radius depends on the size of the point in the image
+        float radius = 15 * pKF->getScaleFactor(nLastOctave);
+
+        //Get candidates whose coordinates are close to the current point
+        pKF->getFeaturesInArea(uv.x, uv.y, radius, nLastOctave - 1, nLastOctave + 1, vIndicesToCheck);
+
+        //Stop if there is nothing to compare
+        if(vIndicesToCheck.empty()){
+            continue;
+        }
+
+        //Match with the one with the smallest Hamming distance
+        int bestDist = 255, secondBestDist = 255;
+        size_t bestIdx = -1;
+        for(auto j : vIndicesToCheck){
+            
+            int dist = HammingDistance(pMP->getDescriptor(),descMat.row(j));
+
+            if(dist < bestDist){
+                secondBestDist = bestDist;
+                bestDist = dist;
+                bestIdx = j;
+            }
+            else if(dist < secondBestDist){
+                secondBestDist = dist;
+            }
+        }
+        //Use second best distance also to avoid incorrect pairings
+        if(bestDist <= th && (float)bestDist < (float(secondBestDist)*0.9)){
+            // No previous match
+            auto added_MapPoint = pKF->getMapPoints()[bestIdx];
+            
+            //Fuse
+            if(added_MapPoint){
+                pMap->fuseMapPoints(pMP->getId(), added_MapPoint->getId());
+            }      
+            //Add observation
+            else{
+                pMap->addObservation(pKF->getId(), pMP->getId(), bestIdx);
+                pKF->setMapPoint(bestIdx, pMP);
+            }
+            
+            nFused++;
+        }
+
     }
 
     return nFused;
