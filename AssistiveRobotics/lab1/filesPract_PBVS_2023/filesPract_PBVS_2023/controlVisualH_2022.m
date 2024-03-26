@@ -12,14 +12,16 @@ addpath('./funciones_auxiliares');
 
 
 %Camera calibration
-k=[640     0     0
-     0   480     0
+k=[640     0     0;
+     0   480     0;
      0     0     1];
 
 %Target position of the camera (Do not modify):
 ct= [500 -600 0 0 0 0]; %[x y z rx ry rz] (units en mm and degrees)
 
 %Initial position of the camera:
+%c= [500 -600 -100 0 0 0]; %[x y z rx ry rz] (units en mm and degrees)
+% c = ct;
 c= [500 600 -100 -10 15 20]; %[x y z rx ry rz] (units en mm and degrees)
 
 
@@ -79,19 +81,8 @@ for it=1:tamTiempo,
     %Compute rotation and translation (t1, t2, R1, R2) from H:
     %
     % FILL IN
-
-    [U, ~, V] = svd(H);
-    R = U * [1, 0, 0; 0, 1, 0; 0, 0, det(U*V')] * V';
-    t = H(:, 3) / norm(H(:, 1));
+    [R1, R2, t1, t2] = decomposeH(k, H, d);
     
-    % Now, decompose R to obtain R1 and R2
-    [U_R, ~, V_R] = svd(R);
-    R1 = U_R * V_R';
-    R2 = U_R * [0, 1, 0; 1, 0, 0; 0, 0, -1] * V_R';
-    
-    % Define t1 and t2
-    t1 = t;
-    t2 = -t;
     %--------------------------------------------------------------------
     
     % %Just to put something:
@@ -111,10 +102,29 @@ for it=1:tamTiempo,
     %
     %From R_est and c_est compute the linear velocities v=(vx, vy, vz)
     %and angular velocities w=(wx, wy, wz)
-    v= [0 0 0];%At the moment we are not moving; Just to put something
-    w= [0 0 0];%At the moment we are not moving; Just to put something
+    % v= [0 0 0];%At the moment we are not moving; Just to put something
+    % w= [0 0 0];%At the moment we are not moving; Just to put something
     
+    r11 = R_est(1,1);
+    r21 = R_est(2,1);
+    r31 = R_est(3,1);
+    r32 = R_est(3,2);
+    r33 = R_est(3,3);
+
+    % Calculate yaw (heading)
+    yaw = atan2(r21, r11);
     
+    % Calculate pitch (attitude)
+    pitch = asin(-r31);
+    
+    % Calculate roll (bank)
+    roll = atan2(r32, r33);
+
+    K_v = 0.05;
+    K_w = 5;
+    w = -K_w * [roll pitch yaw];
+    v = -K_v * c_est;
+    v = v';
 
     v_correccionesvw(it,:)=[v w]; %save simulation data for plots
     
