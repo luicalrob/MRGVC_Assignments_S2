@@ -8,10 +8,10 @@ n = size(puntos2Dt, 1);
 % Construct the matrix A
 A = zeros(2 * n, 9);
 for i = 1:n
-    x = puntos2Dt(i, 1);
-    y = puntos2Dt(i, 2);
-    xp = puntos2D(i, 1);
-    yp = puntos2D(i, 2);
+    xp = puntos2Dt(i, 1);
+    yp = puntos2Dt(i, 2);
+    x = puntos2D(i, 1);
+    y = puntos2D(i, 2);
     A(2*i-1, :) = [x, y, 1, 0, 0, 0, -xp*x, -xp*y, -xp];
     A(2*i, :) = [0, 0, 0, x, y, 1, -yp*x, -yp*y, -yp];
 end
