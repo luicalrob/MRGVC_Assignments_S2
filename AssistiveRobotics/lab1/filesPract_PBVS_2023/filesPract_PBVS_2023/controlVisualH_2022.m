@@ -121,7 +121,7 @@ for it=1:tamTiempo,
     roll = atan2(r32, r33);
 
     K_v = 0.05;
-    K_w = 5;
+    K_w = 5.0;
     w = -K_w * [roll pitch yaw];
     v = -K_v * c_est;
     v = v';

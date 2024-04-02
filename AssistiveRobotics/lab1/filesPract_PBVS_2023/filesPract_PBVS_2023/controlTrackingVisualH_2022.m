@@ -57,7 +57,8 @@ c_est=Rt'*( c(1:3)-ct(1:3) )';
 % FILL IN
 %Initialize the integrator
 
-
+e_v = [0.0;0.0;0.0];
+e_w = [0.0 0.0 0.0];
 
 %MAIN LOOP
 for it=1:tamTiempo,
@@ -73,8 +74,7 @@ for it=1:tamTiempo,
     %
     %TARGET IMAGE
     %Generate the image from the target position
-    
-    
+    [Puntos2Dt, Puntos2Dtk, d] = generaImagen(k, ct, Puntos3D);
     
     %CURRENT IMAGE
     %Generate the image from the current position
@@ -88,8 +88,8 @@ for it=1:tamTiempo,
     %
     % FILL IN
     %
-%     H=funcionCalcularH([Puntos2Dt Puntos2D]);
-    H=eye(3);%Remove this when you have the function implemented
+    H=funcionCalcularH(Puntos2Dt, Puntos2D);
+    %H=eye(3);%Remove this when you have the function implemented
 
 
     %Normalize H
@@ -101,12 +101,13 @@ for it=1:tamTiempo,
     %
     % FILL IN
     %--------------------------------------------------------------------
- 
-    %Just to put something:
-    R1=eye(3);
-    R2=R1;
-    t1=[0 0 0]';
-    t2=t1;
+    [R1, R2, t1, t2] = decomposeH(k, H, d);
+
+    % %Just to put something:
+    % R1=eye(3);
+    % R2=R1;
+    % t1=[0 0 0]';
+    % t2=t1;
     %--------------------------------------------------------------------
         
     %The correct motion solution is chosen: 
@@ -119,12 +120,35 @@ for it=1:tamTiempo,
     %
     %From R_est and c_est compute the linear velocities v=(vx, vy, vz)
     %and angular velocities w=(wx, wy, wz)
-    v= [0 0 0];%At the moment we are not moving; Just to put something
-    w= [0 0 0];%At the moment we are not moving; Just to put something
+    % v= [0 0 0];%At the moment we are not moving; Just to put something
+    % w= [0 0 0];%At the moment we are not moving; Just to put something
+       
+    r11 = R_est(1,1);
+    r21 = R_est(2,1);
+    r31 = R_est(3,1);
+    r32 = R_est(3,2);
+    r33 = R_est(3,3);
+
+    % Calculate yaw (heading)
+    yaw = atan2(r21, r11);
     
-        
+    % Calculate pitch (attitude)
+    pitch = asin(-r31);
+    
+    % Calculate roll (bank)
+    roll = atan2(r32, r33);
 
-
+    Kp_v = 0.05;
+    Kp_w = 5.0;
+    Ki_v = 2e-3;
+    Ki_w = 0.5;
+    w = - Kp_w * [roll pitch yaw] - Ki_w * e_w;
+    v = - Kp_v * c_est - Ki_v * e_v;
+    v = v';
+    
+    %Update integrator
+    e_v = e_v + c_est * Tciclo;
+    e_w = e_w + [roll pitch yaw] * Tciclo;
 
     v_correccionesvw(it,:)=[v w]; %save simulation data for plots
     
