@@ -32,12 +32,14 @@ class Plotter():
             plt.clf()
             plt.xlim(-100,100)
             plt.ylim(-100,100)
-            for i in range(0,n_robots):
-                plt.plot(self.v_robot_x[i],self.v_robot_y[i],'bo')
-            plt.draw()
-            plt.show(block=False)
-            plt.pause(0.01)
-            rospy.sleep(0.5) # twice per second. You can increase this rate
+            if np.any(self.v_robot_x != 0) or np.any(self.v_robot_y != 0):
+                for i in range(0,n_robots):
+                    plt.plot(self.v_robot_x[i],self.v_robot_y[i],'bo')
+                    plt.draw()
+                    plt.show(block=False)
+                    plt.pause(0.01)
+            
+            rospy.sleep(0.25) # twice per second. You can increase this rate
     def callback_position_received(self, new_position):
         #print(rospy.get_caller_id() + "I heard:")
         #print('robot_id: ', new_position.robot_id)
