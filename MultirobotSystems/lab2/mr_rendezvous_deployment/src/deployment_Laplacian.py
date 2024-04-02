@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-
+import ast
 import rospy
 from std_msgs.msg import String
-from mr_rendezvous_deployment.msg import queue_position_plot
+from mr_rendezvous_deployment.msg import queue_position_plot, GoToGoal_goal
 from mr_rendezvous_deployment.srv import gossip
 import sys
 from math import radians, copysign, sqrt, pow, pi, atan2
@@ -21,10 +21,7 @@ class LaplacianGraph:
 		self.plot_graph()
 		self.obtain_weights()
 		# Read params. Currently: t_local and inter_distance_x/y.
-		self.inter_distance_x = 1
-		self.inter_distance_y = 0
-
-		self.t_local = 0.01
+		self.read_parameters()
 
 		# Obtain robot positions
 		self.tf_listener = tf.TransformListener()
@@ -42,7 +39,7 @@ class LaplacianGraph:
 					self.x[i,0] = trans[0]
 					self.y[i,0] = trans[1]
 					connected = True
-					#print("Robot {} located: {} {}".format(i, self.x, self.y))
+					print("Robot {} located: {} {}".format(i, self.x, self.y))
 				except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
 					print("Looking for {} robot position".format(i))
 
@@ -166,13 +163,42 @@ class LaplacianGraph:
 			self.pub_goTogoal[i].publish(next_pos)
 			#Up the here, endif
 
+	def read_parameters(self):
+		try:
+			self.inter_distance_x = rospy.get_param("/inter_distance_x")
+			self.inter_distance_y = rospy.get_param("/inter_distance_y")
+
+			self.t_local = float(rospy.get_param("~t_local"))
+			return True
+		except rospy.ServiceException as e:
+			print("Parameters not set: "+str(e))
+			return False
+
 if __name__ == '__main__':
-    num_robots=4
-    links=[[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]]
-    is_undirected=True
+    sysargv = rospy.myargv(argv=sys.argv)  # to avoid problems with __name:= elements.
+    num_args = len(sysargv)
+
+    print(sysargv)
+
+    if num_args >= 1:
+        num_robots = int(sysargv[1])
+    else:
+        num_robots = 4
+
+    if num_args > 2:
+        links = ast.literal_eval(sysargv[2])     
+        print(links)
+    else:
+        links = [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]]
+
+    if num_args > 3:
+        is_undirected = bool(sysargv[3])
+    else:
+        is_undirected = True
+
     try:
         rospy.init_node('deployment_Laplacian', anonymous=False)
-        my_naive_robot=LaplacianGraph(num_robots, links, is_undirected)
+        my_naive_robot = LaplacianGraph(num_robots, links, is_undirected)
         print('Finished!')
     except rospy.ROSInterruptException:
         pass
