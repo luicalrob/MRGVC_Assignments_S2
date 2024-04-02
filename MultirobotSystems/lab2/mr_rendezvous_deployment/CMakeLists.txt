@@ -10,16 +10,9 @@ project(mr_rendezvous_deployment)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
-  actionlib
   std_msgs
-  actionlib_msgs
   message_generation
-  interactive_markers
-  sensor_msgs
-  geometry_msgs
-  nav_msgs
-  visualization_msgs
-  actionlib_msgs
+  #message_runtime
 )
 
 ## System dependencies are found with CMake's conventions
@@ -59,13 +52,12 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   queue_position_plot.msg
-  GoToGoal_goal.msg
 )
 
 ## Generate services in the 'srv' folder
 add_service_files(
   FILES
-  gossip.srv
+  gossip_update.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -77,10 +69,8 @@ add_service_files(
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
-  DEPENDENCIES
+  DEPENDENCIES 
   std_msgs
-  geometry_msgs
-  actionlib_msgs
 )
 
 ################################################
@@ -113,21 +103,9 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES lab1_deploy_gazebo_students
- CATKIN_DEPENDS
-	roscpp
-    rospy
-    actionlib
-    interactive_markers
-    std_msgs
-    sensor_msgs
-    geometry_msgs
-    nav_msgs
-    visualization_msgs
-    actionlib_msgs
-    turtlebot3_msgs
-    message_runtime
+  # INCLUDE_DIRS include
+  # LIBRARIES ex2_rendezvous
+   CATKIN_DEPENDS message_runtime roscpp rospy std_msgs
 #  DEPENDS system_lib
 )
 
@@ -182,9 +160,8 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-   src/deployment_Laplacian.py
    src/visualization_node.py
-   src/rendezvous_node.py
+   src/naive_robot.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
