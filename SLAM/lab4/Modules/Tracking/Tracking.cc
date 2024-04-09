@@ -66,7 +66,7 @@ Tracking::Tracking(Settings& settings, std::shared_ptr<FrameVisualizer>& visuali
     settings_ = settings;
 }
 
-bool Tracking::doTracking(const cv::Mat &im, Sophus::SE3f &Tcw) {
+bool Tracking::doTracking(const cv::Mat &im, Sophus::SE3f &Tcw, int &nKF, clock_t &timer) {
     currIm_ = im.clone();
 
     //Update previous frame
@@ -102,7 +102,7 @@ bool Tracking::doTracking(const cv::Mat &im, Sophus::SE3f &Tcw) {
         if(cameraTracking()){
             if(trackLocalMap()){
                 //Check if we need to insert a new KeyFrame into the system
-                if(needNewKeyFrame()){
+                if(needNewKeyFrame(nKF)){
                     promoteCurrentFrameToKeyFrame();
                 }
 
@@ -117,11 +117,17 @@ bool Tracking::doTracking(const cv::Mat &im, Sophus::SE3f &Tcw) {
             }
             else{
                 status_ = LOST;
+                timer = clock() - timer;
+	            cout << "[LOST] Seconds: " << fixed << setprecision(4) << ((float)timer)/CLOCKS_PER_SEC << endl;
+                cout << "[LOST] Number of Keyframes: " << nKF << endl;
                 return false;
             }
         }
         else{
             status_ = LOST;
+            timer = clock() - timer;
+	        cout << "[LOST] Seconds: " << fixed << setprecision(4) << ((float)timer)/CLOCKS_PER_SEC << endl;
+            cout << "[LOST] Number of Keyframes: " << nKF << endl;
             return false;
         }
     }
@@ -352,13 +358,16 @@ bool Tracking::trackLocalMap() {
     return nFeatTracked_ >= 20;
 }
 
-bool Tracking::needNewKeyFrame() {
+bool Tracking::needNewKeyFrame(int &nKF) {
     /*
      * Your code for Lab 4 - Task 1 here!
      */
-    int minTrackedFeat = 70;
-    int maxFramesBtwKF = 1;
+    int minTrackedFeat = 50;
+    int maxFramesBtwKF = 15;
     if(nFramesFromLastKF_ >= maxFramesBtwKF || nFeatTracked_ <= minTrackedFeat || status_ == LOST) {
+        if(status_ != LOST) {
+            nKF++;
+        }
         nFramesFromLastKF_ = 0;
         return true;
     }

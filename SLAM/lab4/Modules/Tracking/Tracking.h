@@ -57,7 +57,7 @@ public:
     /*
      * Performs the tracking for an image. Returns true on success
      */
-    bool doTracking(const cv::Mat& im, Sophus::SE3f& Tcw);
+    bool doTracking(const cv::Mat& im, Sophus::SE3f& Tcw, int &nKF, clock_t &timer);
 
     /*
      * Gets the last KeyFrame inserted into the map
@@ -77,7 +77,7 @@ private:
     bool cameraTracking();
 
     //Checks if we need to insert a new KeyFrame into the map
-    bool needNewKeyFrame();
+    bool needNewKeyFrame(int &nKF);
 
     //Promotes the current frame to a new KeyFrame and inserts it to the map
     void promoteCurrentFrameToKeyFrame();

@@ -44,12 +44,12 @@ MiniSLAM::MiniSLAM(const std::string &settingsFile) {
     mapper_ = LocalMapping(settings_,pMap_);
 }
 
-bool MiniSLAM::processImage(const cv::Mat &im, Sophus::SE3f& Tcw) {
+bool MiniSLAM::processImage(const cv::Mat &im, Sophus::SE3f& Tcw, int &nKF, clock_t &timer) {
     //Convert image to grayscale if needed
     cv::Mat grayIm = convertImageToGrayScale(im);
 
     //Predic camera pose
-    bool goodTracked = tracker_.doTracking(grayIm, Tcw);
+    bool goodTracked = tracker_.doTracking(grayIm, Tcw, nKF, timer);
 
     //Do mapping
     shared_ptr<KeyFrame> lastKeyFrame = tracker_.getLastKeyFrame();
