@@ -59,8 +59,8 @@ class MyRobot:
         self.position[1] = res.y_resp
         
         position_update = queue_position_plot()
-        position_update.x = self.position[0] + self.inter_distance_x * self.robot_id
-        position_update.y = self.position[1] + self.inter_distance_y * self.robot_id
+        position_update.x = self.position[0] 
+        position_update.y = self.position[1]
         position_update.robot_id = self.robot_id
         self.position_publisher.publish(position_update)
         return res
@@ -76,8 +76,8 @@ class MyRobot:
             
         position_update = queue_position_plot()
             
-        position_update.x = self.position[0] + self.inter_distance_x * self.robot_id
-        position_update.y = self.position[1] + self.inter_distance_y * self.robot_id
+        position_update.x = self.position[0] 
+        position_update.y = self.position[1]
         position_update.robot_id = self.robot_id
         
         self.position_publisher.publish(position_update)
