@@ -21,14 +21,13 @@ class Plotter():
         # and that here we index them in the array with 0..n-1 respectively.
         self.v_robot_x = np.zeros([n_robots])
         self.v_robot_y = np.zeros([n_robots])
-        self.sub = rospy.Subscriber('queue_position_plot', queue_position_plot,
-        self.callback_position_received)
-        self.act_drawing()
+        self.sub = rospy.Subscriber('mr_rendezvous_deployment/queue_position_plot', queue_position_plot,
+        self.position_cb)
+        self.draw_robot()
 
-    def act_drawing(self):
+    def draw_robot(self):
         #rospy.sleep(0.01) # give some time to receive at least a set of robot positions.
         while not rospy.is_shutdown():
-            print('go')
             plt.clf()
             plt.xlim(-100,100)
             plt.ylim(-100,100)
@@ -40,7 +39,8 @@ class Plotter():
                     plt.pause(0.01)
             
             rospy.sleep(0.25) # twice per second. You can increase this rate
-    def callback_position_received(self, new_position):
+    
+    def position_cb(self, new_position):
         #print(rospy.get_caller_id() + "I heard:")
         #print('robot_id: ', new_position.robot_id)
         #print('x: ', new_position.x)
@@ -61,7 +61,6 @@ if __name__ == '__main__':
     try:
         rospy.init_node('position_plotter', anonymous=False)
         my_plotter=Plotter(n_robots)
-        print('Hello World!')
         print('Printing the positions of ', my_plotter.n_robots)
     except rospy.ROSInterruptException:
         pass
