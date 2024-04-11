@@ -192,7 +192,8 @@ void Map::fuseMapPoints(ID mp1, ID mp2) {
     shared_ptr<MapPoint> dMP = mMapPoints_[mpToDelete];
 
     // replace the map point
-    pMP->increaseFound(dMP->getFound());
+    //pMP->increaseFound(dMP->getFound());
+    mMapPoints_[mpToKeep]->increaseFound(mMapPoints_[mpToDelete]->getFound());
 
     for(pair<ID,size_t> pair : mMPObsToDelete){
         ID kfId = pair.first;

@@ -54,44 +54,49 @@ void LocalMapping::mapPointCulling() {
     /*
      * Your code for Lab 4 - Task 4 here!
      */
-    int max_old = 10;
-    int min_obs = 6;
 
     int currentKF_id = currKeyFrame_->getId();
-
     if (currentKF_id < 2) {
         return;
     }
 
-    auto prev_2_KF = getKeyFrame(currentKF_id-2);
-    auto mapPoints = prev_2_KF->getMapPoints();
+    shared_ptr<KeyFrame> prev2KF = pMap_->getKeyFrame(currentKF_id-2);
+    vector<shared_ptr<MapPoint>> prev2KFmapPoints = prev2KF->getMapPoints();
 
-    for(auto mapPoint : mapPoints) {
-        // cout << "mappoint id: " << (int)mapPoint.second->getId() << endl;
-        // cout << "currKeyFrame_ id: " << (int)currKeyFrame_->getId() << endl;
-        // cout << "number of observations: " << pMap_->getNumberOfObservations(mapPoint.first) << endl;
+    for(size_t i = 0; i < prev2KFmapPoints.size(); i++) {
+        
+        shared_ptr<MapPoint> mapPoint = prev2KFmapPoints[i];
 
-        int mp_id = (int)mapPoint.second->getId();
-        if (getNumberOfObservations(mp_id) <= 2) {
-            if(!(isMapPointInKeyFrame(mp_id, currentKF_id)) && !(isMapPointInKeyFrame(mp_id, currentKF_id-1))) {
-                pMap_->removeMapPoint(mp_id);
-                return;
+        if(!mapPoint)
+            continue;
+
+        int mpID = (int)mapPoint->getId();
+        if (pMap_->getNumberOfObservations(mpID) <= 2) {
+            if(!(pMap_->isMapPointInKeyFrame(mpID, currentKF_id)) && !(pMap_->isMapPointInKeyFrame(mpID, currentKF_id-1))) {
+                pMap_->removeMapPoint(mpID);
+                continue;
             }
         }
 
-        int numberOfFBtwKF = 15;
+        int maxFramesBtwKF = 5;
 
         //print
-        auto num_cov_keyframes = getCovisibleKeyFrames(prev_2_KF);
+        auto numCovisibleKF = pMap_->getCovisibleKeyFrames(prev2KF->getId()).size();
 
-        int num_of_visibles = numberOfFBtwKF * num_cov_keyframes;
-        int mnfound = pMap_->getFound();
+        int nVisibleMPs = maxFramesBtwKF * numCovisibleKF;
+        int mnfound = mapPoint->getFound();
 
-        float ratio = mnfound/num_of_visibles;
+        float foundRatio = static_cast<float>(mnfound)/nVisibleMPs;
 
-        if(ratio < 0.25){
-            pMap_->removeMapPoint(mp_id);
-        }
+        cout << "MP ID: " << mpID << endl;
+        cout << "nVisibleMPs: " << nVisibleMPs << endl;
+        cout << "mnfound: " << mnfound << endl;
+        cout << "foundRatio: " << foundRatio << endl;
+
+        // if(foundRatio < 0.2){
+        //     pMap_->removeMapPoint(mpID);
+        // }
+    }
 
         // menos de 25% los covisibles no se ve ese mappoint -> comprobar en cada covisible si esta el mappoint
         //isMapPointInKeyFrame(ID mp, ID current)
@@ -114,10 +119,10 @@ void LocalMapping::mapPointCulling() {
         // vemos si han pasado dos
         // comprobamos si se ha visto en alguno de esos dos
 
-        if (((int)currKeyFrame_->getId() - (int)mapPoint.second->getId()) >= max_old && pMap_->getNumberOfObservations(mapPoint.first) <= min_obs){
-            pMap_->removeMapPoint(mapPoint.second->getId());
-        }
-    }
+        // if (((int)currKeyFrame_->getId() - (int)mapPoint.second->getId()) >= max_old && pMap_->getNumberOfObservations(mapPoint.first) <= min_obs){
+        //     pMap_->removeMapPoint(mapPoint.second->getId());
+        // }
+
 }
 
 void LocalMapping::triangulateNewMapPoints() {

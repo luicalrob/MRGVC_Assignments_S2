@@ -362,8 +362,8 @@ bool Tracking::needNewKeyFrame(int &nKF) {
     /*
      * Your code for Lab 4 - Task 1 here!
      */
-    int minTrackedFeat = 50;
-    int maxFramesBtwKF = 15;
+    int minTrackedFeat = 70;
+    int maxFramesBtwKF = 3;
     if(nFramesFromLastKF_ >= maxFramesBtwKF || nFeatTracked_ <= minTrackedFeat || status_ == LOST) {
         if(status_ != LOST) {
             nKF++;
