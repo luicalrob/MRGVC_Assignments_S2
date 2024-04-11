@@ -57,15 +57,66 @@ void LocalMapping::mapPointCulling() {
     int max_old = 10;
     int min_obs = 6;
 
-    //auto vKFcovisible = pMap_->getCovisibleKeyFrames(currKeyFrame_->getId());
-    auto mapPoints = pMap_->getMapPoints();
+    int currentKF_id = currKeyFrame_->getId();
 
-    for( auto mapPoint : mapPoints){
+    if (currentKF_id < 2) {
+        return;
+    }
+
+    auto prev_2_KF = getKeyFrame(currentKF_id-2);
+    auto mapPoints = prev_2_KF->getMapPoints();
+
+    for(auto mapPoint : mapPoints) {
+        // cout << "mappoint id: " << (int)mapPoint.second->getId() << endl;
+        // cout << "currKeyFrame_ id: " << (int)currKeyFrame_->getId() << endl;
+        // cout << "number of observations: " << pMap_->getNumberOfObservations(mapPoint.first) << endl;
+
+        int mp_id = (int)mapPoint.second->getId();
+        if (getNumberOfObservations(mp_id) <= 2) {
+            if(!(isMapPointInKeyFrame(mp_id, currentKF_id)) && !(isMapPointInKeyFrame(mp_id, currentKF_id-1))) {
+                pMap_->removeMapPoint(mp_id);
+                return;
+            }
+        }
+
+        int numberOfFBtwKF = 15;
+
+        //print
+        auto num_cov_keyframes = getCovisibleKeyFrames(prev_2_KF);
+
+        int num_of_visibles = numberOfFBtwKF * num_cov_keyframes;
+        int mnfound = pMap_->getFound();
+
+        float ratio = mnfound/num_of_visibles;
+
+        if(ratio < 0.25){
+            pMap_->removeMapPoint(mp_id);
+        }
+
+        // menos de 25% los covisibles no se ve ese mappoint -> comprobar en cada covisible si esta el mappoint
+        //isMapPointInKeyFrame(ID mp, ID current)
+        
+        //isMapPointInKeyFrame(ID mp, ID kf) // por cada covisible
+        
+        // checkear si se ha vuelto a ver despues de 2 frames
+
+        // para ver cuantas veces se ha observado, podemos comparar por si no se ha visto desde hace dos keyframes 
+        // -> el problema es que me falta el id del frame en el que se observo el mappoint, o al menos saber hace cuanto
+        // -> a lo mejor podemos poner esta condicion dentro de si se cumple la otra? creo que casi al 100% no tiene sentido
+        //getNumberOfObservations(ID mp) 
+        //numberOfCommonObservationsBetweenKeyFrames(ID kf1, ID kf2) //? esta no se usa, por que? 
+
+        // si no podemos tener el id del keyframe, podemos simplemente tener unas minimas observaciones igual que en el if de abajo
+
+        // utilizar si se ha visto en el current como condicion
+
+        // si tuviesemos donde se vio por primera vez
+        // vemos si han pasado dos
+        // comprobamos si se ha visto en alguno de esos dos
+
         if (((int)currKeyFrame_->getId() - (int)mapPoint.second->getId()) >= max_old && pMap_->getNumberOfObservations(mapPoint.first) <= min_obs){
             pMap_->removeMapPoint(mapPoint.second->getId());
         }
-
-
     }
 }
 
@@ -138,7 +189,7 @@ void LocalMapping::triangulateNewMapPoints() {
                 auto ray2 = (T2w.inverse().rotationMatrix() * xn2).normalized();
                 auto parallax = cosRayParallax(ray1, ray2);
 
-                if(parallax < settings_.getMinCos()) continue;
+                if(parallax > settings_.getMinCos()) continue;
 
                 //Check reprojection error
 

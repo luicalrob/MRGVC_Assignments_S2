@@ -23,7 +23,7 @@ long unsigned int MapPoint::nNextId_=0;
 
 MapPoint::MapPoint(Eigen::Vector3f &p3d) {
     position3D_ = p3d;
-
+    mnfound_ = 1;
     nId_ = nNextId_++;
 }
 
@@ -69,4 +69,12 @@ float MapPoint::getMinDistanceInvariance(){
 
 float MapPoint::getMaxDistanceInvariance(){
     return 1.2 * fMaxDistance_;
+}
+
+int MapPoint::getFound(){
+    return mnfound_;
+}
+
+void MapPoint::increaseFound(int n){
+    mnfound_ += n;
 }
