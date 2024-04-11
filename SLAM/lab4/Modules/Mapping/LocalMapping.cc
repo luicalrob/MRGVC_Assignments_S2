@@ -62,6 +62,8 @@ void LocalMapping::mapPointCulling() {
 
     shared_ptr<KeyFrame> prev2KF = pMap_->getKeyFrame(currentKF_id-2);
     vector<shared_ptr<MapPoint>> prev2KFmapPoints = prev2KF->getMapPoints();
+    int rejected = 0;
+    int accepted = 0;
 
     for(size_t i = 0; i < prev2KFmapPoints.size(); i++) {
         
@@ -74,29 +76,44 @@ void LocalMapping::mapPointCulling() {
         if (pMap_->getNumberOfObservations(mpID) <= 2) {
             if(!(pMap_->isMapPointInKeyFrame(mpID, currentKF_id)) && !(pMap_->isMapPointInKeyFrame(mpID, currentKF_id-1))) {
                 pMap_->removeMapPoint(mpID);
+                rejected++;
                 continue;
             }
         }
 
-        int maxFramesBtwKF = 5;
-
-        //print
+        int maxFramesBtwKF = 3;
         auto numCovisibleKF = pMap_->getCovisibleKeyFrames(prev2KF->getId()).size();
-
-        int nVisibleMPs = maxFramesBtwKF * numCovisibleKF;
+        int nCovisibleFrames = maxFramesBtwKF * numCovisibleKF;
         int mnfound = mapPoint->getFound();
+        
+        // float foundRatio = static_cast<float>(mnfound)/nCovisibleFrames;
 
-        float foundRatio = static_cast<float>(mnfound)/nVisibleMPs;
+        //the other (easier) method ?
+        vector<pair<ID,int>> vKFcovisible = pMap_->getCovisibleKeyFrames(prev2KF->getId());
+        int nvisible = 0;
+        for(int i = 0; i < vKFcovisible.size(); i++){
+            if(pMap_->isMapPointInKeyFrame(mpID, vKFcovisible[i].first)) nvisible++;
+        }
+        float foundRatio = static_cast<float>(nvisible)/numCovisibleKF;
 
         cout << "MP ID: " << mpID << endl;
-        cout << "nVisibleMPs: " << nVisibleMPs << endl;
+        cout << "nCovisibleFrames: " << nCovisibleFrames << endl;
+        //cout << "nvisible: " << nvisible << endl;
         cout << "mnfound: " << mnfound << endl;
         cout << "foundRatio: " << foundRatio << endl;
 
-        // if(foundRatio < 0.2){
-        //     pMap_->removeMapPoint(mpID);
-        // }
+        if(foundRatio < 0.2){
+            pMap_->removeMapPoint(mpID);
+            rejected++;
+            continue;
+        }
+
+        accepted++;
     }
+
+    cout << "accepted: " << accepted << endl;
+    cout << "rejected: " << rejected << endl;
+
 
         // menos de 25% los covisibles no se ve ese mappoint -> comprobar en cada covisible si esta el mappoint
         //isMapPointInKeyFrame(ID mp, ID current)
