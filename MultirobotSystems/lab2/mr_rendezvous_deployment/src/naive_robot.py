@@ -13,21 +13,21 @@ class NaiveRobot:
 
         # Class attributes 
         self.robot_id = 0
-        self.t_local = 1/2.0
+        self.t_local = 1/2.0 # default
         self.position = [0,0]
         self.neighbors = []
         self.available_neighbors = []
 
-        #Read parameters
+        # Read parameters
         if self.read_params():
             rospy.loginfo("[naive robot] Succesfully launched robot {} with position {} and neighbors {}".format(
                 self.robot_id, self.position, self.neighbors))
 
-        #Create server
+        # Create server
         self.gossip_update_server = rospy.Service(
             'gossip_update_'+str(self.robot_id), gossip_update, self.gossip_update_cb)
         
-        #Create publisher
+        # Create publisher
         self.position_publisher = rospy.Publisher('mr_rendezvous_deployment/queue_position_plot', queue_position_plot, queue_size=10)
 
         #Obtain initial position
@@ -36,12 +36,12 @@ class NaiveRobot:
         position_update.y = self.position[1]
         position_update.robot_id = self.robot_id
         
-        #Publish initial position to neighbours and wait for a bit
+        # Publish initial position to neighbours and wait for a bit
         rospy.sleep(0.5)
         self.position_publisher.publish(position_update)
         rospy.sleep(2.0)
         
-        #Create timer to request gossip update every t_local cycles
+        # Create timer to request gossip update every t_local cycles
         self.timer = rospy.Timer(rospy.Duration(
             self.t_local), self.request_gossip_update)
 
@@ -59,19 +59,12 @@ class NaiveRobot:
 
             self.neighbors = rospy.get_param("~neighbors")
             
-            if type(self.neighbors) is str:
-                self.neighbors = [int(x)
-                                  for x in self.neighbors.split()]
-                self.available_neighbors = []
-                for neighbor in self.neighbors:
-                    if neighbor < self.robot_id:
-                        self.available_neighbors.append(neighbor)
-            else:
-                self.neighbors = [self.neighbors]
-                if self.neighbors[0] < self.robot_id:
-                    self.available_neighbors = self.neighbors
-                else:
-                    self.available_neighbors = None
+            self.neighbors = [int(x)
+                                for x in self.neighbors.split()]
+            self.available_neighbors = []
+            for neighbor in self.neighbors:
+                if neighbor < self.robot_id:
+                    self.available_neighbors.append(neighbor)
 
             self.t_local = float(rospy.get_param("~t_local"))
 

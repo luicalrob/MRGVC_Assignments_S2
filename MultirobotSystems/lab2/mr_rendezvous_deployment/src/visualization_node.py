@@ -17,8 +17,7 @@ class Plotter():
     def __init__(self, n_robots):
         # Class attributes
         self.n_robots = n_robots
-        # Positions of all the robots. To make things easier, we assume that the robot ids are consecutive 1..n
-        # and that here we index them in the array with 0..n-1 respectively.
+        # Positions of all the robots. Assume consecutive ids 1..n, here indexed as 0..n-1 
         self.v_robot_x = np.zeros([n_robots])
         self.v_robot_y = np.zeros([n_robots])
         self.sub = rospy.Subscriber('mr_rendezvous_deployment/queue_position_plot', queue_position_plot,
@@ -26,32 +25,26 @@ class Plotter():
         self.draw_robot()
 
     def draw_robot(self):
-        #rospy.sleep(0.01) # give some time to receive at least a set of robot positions.
         while not rospy.is_shutdown():
             plt.clf()
-            plt.xlim(-100,100)
-            plt.ylim(-100,100)
+            plt.xlim(-10,10)
+            plt.ylim(-10,10)
+            
             if np.any(self.v_robot_x != 0) or np.any(self.v_robot_y != 0):
-                for i in range(0,n_robots):
-                    plt.plot(self.v_robot_x[i],self.v_robot_y[i],'bo')
-                    plt.draw()
-                    plt.show(block=False)
-                    plt.pause(0.01)
+                plt.scatter(self.v_robot_x, self.v_robot_y, c='blue', marker='o')
+                plt.draw()
+                plt.show(block=False)
+                plt.pause(0.01)
             
             rospy.sleep(0.25) # twice per second. You can increase this rate
     
     def position_cb(self, new_position):
-        #print(rospy.get_caller_id() + "I heard:")
-        #print('robot_id: ', new_position.robot_id)
-        #print('x: ', new_position.x)
-        #print('y: ', new_position.y)
         self.v_robot_x[new_position.robot_id-1]=new_position.x
         self.v_robot_y[new_position.robot_id-1]=new_position.y
         print(self.v_robot_x)
         print(self.v_robot_y)
         
 if __name__ == '__main__':
-    #Input arguments (robot id, x0, y0, Tlocal, neig1, neig2... neign)
     sysargv = rospy.myargv(argv=sys.argv) # to avoid problems with __name:= elements.
     num_args=len(sysargv)
     if (num_args >= 1):
