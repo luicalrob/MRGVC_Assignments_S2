@@ -169,8 +169,15 @@ if __name__=="__main__":
     second_xyz_full = numpy.matrix([[float(value)*float(args.scale) for value in second_list[b][0:3]] for b in second_stamps]).transpose()
     second_xyz_full_aligned = scale * rot * second_xyz_full + trans
     
-    first_time_difference = first_stamps[-1] - first_stamps[0]
+    first_time_difference = first_stamps[-1] - (first_stamps[0] + (second_stamps[0]-first_stamps[0]))
     second_time_difference = second_stamps[-1] - second_stamps[0]
+
+    print("first stamp %f s", first_stamps[0])
+    print("second stamp %f s", second_stamps[0])
+
+    print("diferencia de initial timestamp %f s", first_time_difference)
+    print("diferencia de final timestamp %f s", second_time_difference)
+
 
     if args.verbose:
         
@@ -182,7 +189,7 @@ if __name__=="__main__":
         print("absolute_translational_error.std %f m"%numpy.std(trans_error))
         print("absolute_translational_error.min %f m"%numpy.min(trans_error))
         print("absolute_translational_error.max %f m"%numpy.max(trans_error))
-        print("Percentage of trajectory done:", (second_time_difference / first_time_difference)*100, "%")
+        print("Percentage of trajectory done:", ((second_time_difference) / first_time_difference)*100, "%")
         
         """
         print((len(trans_error)), ",",

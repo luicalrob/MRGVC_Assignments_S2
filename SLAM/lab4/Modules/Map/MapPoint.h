@@ -64,16 +64,6 @@ public:
      * Gets the orientation of the MapPoint
      */
     Eigen::Vector3f getNormalOrientation();
-    
-    /*
-     * Gets the number of frames where the map point has been matched
-     */
-    int getFound();
-
-    /*
-     * Increase the number of findings of the map point
-     */
-    void increaseFound(int n);
 
    /*
     * Setters and getter for the Scale invariance distances

@@ -70,11 +70,3 @@ float MapPoint::getMinDistanceInvariance(){
 float MapPoint::getMaxDistanceInvariance(){
     return 1.2 * fMaxDistance_;
 }
-
-int MapPoint::getFound(){
-    return mnfound_;
-}
-
-void MapPoint::increaseFound(int n){
-    mnfound_ += n;
-}
