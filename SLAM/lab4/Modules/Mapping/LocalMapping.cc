@@ -74,7 +74,7 @@ void LocalMapping::mapPointCulling() {
 
         int mpID = (int)mapPoint->getId();
         if (pMap_->getNumberOfObservations(mpID) <= 2) {
-            if(!(pMap_->isMapPointInKeyFrame(mpID, currentKF_id)) && !(pMap_->isMapPointInKeyFrame(mpID, currentKF_id-1))) {
+            if((pMap_->isMapPointInKeyFrame(mpID, currentKF_id)==-1) && (pMap_->isMapPointInKeyFrame(mpID, currentKF_id-1)==-1)) {
                 pMap_->removeMapPoint(mpID);
                 rejected++;
                 continue;
@@ -84,15 +84,14 @@ void LocalMapping::mapPointCulling() {
         int maxFramesBtwKF = 3;
         auto numCovisibleKF = pMap_->getCovisibleKeyFrames(prev2KF->getId()).size();
         int nCovisibleFrames = maxFramesBtwKF * numCovisibleKF;
-        int mnfound = mapPoint->getFound();
-        
-        // float foundRatio = static_cast<float>(mnfound)/nCovisibleFrames;
+        int mnfound = mapPoint->getFound(); 
+        //float foundRatio = static_cast<float>(mnfound)/numCovisibleKF;
 
         //the other (easier) method ?
         vector<pair<ID,int>> vKFcovisible = pMap_->getCovisibleKeyFrames(prev2KF->getId());
         int nvisible = 0;
         for(int i = 0; i < vKFcovisible.size(); i++){
-            if(pMap_->isMapPointInKeyFrame(mpID, vKFcovisible[i].first)) nvisible++;
+            if(pMap_->isMapPointInKeyFrame(mpID, vKFcovisible[i].first)!=-1) nvisible++;
         }
         float foundRatio = static_cast<float>(nvisible)/numCovisibleKF;
 
