@@ -76,8 +76,8 @@ for it=1:tamTiempo,
     %
     % FILL IN
     %
-%     F=funcionCalcularF([Puntos2Dt Puntos2D]);
-    F=diag([0 1 1]); %Remove this when you have the function implemented
+    F=funcionCalcularF(Puntos2Dt, Puntos2D);
+    % F=diag([0 1 1]); %Remove this when you have the function implemented
 
 
     F=F/F(3,3);
@@ -89,16 +89,16 @@ for it=1:tamTiempo,
     % FILL IN
     %--------------------------------------------------------------------
     
-    
-    %Just to put something:
-    R1=eye(3);
-    R2=R1;
-    t1=[0 0 0]';
+    [R1, R2, t1, e0, e1] = decomposeF(k, F);
+
+    % %Just to put something:
+    % R1=eye(3);
+    % R2=R1;
+    % t1=[0 0 0]';
     %--------------------------------------------------------------------
  
     %The correct motion solution is chosen:
-    [R_est, c_est]=seleccionaSolucionF(R1,R2,t1,R_est,c_est);
-    
+    [R_est, c_est]=seleccionaSolucionF(R1,R2,t1,R_est,c_est);   
     
     %CONTROL LAW
     %
@@ -106,11 +106,43 @@ for it=1:tamTiempo,
     %
     %From Ri and ti compute the linear velocities v=(vx, vy, vz)
     %and angular velocities w=(wx, wy, wz)
-    v= [0 0 0];%At the moment we are not moving; Just to put something
-    w= [0 0 0];%At the moment we are not moving; Just to put something
        
+    r11 = R_est(1,1);
+    r21 = R_est(2,1);
+    r31 = R_est(3,1);
+    r32 = R_est(3,2);
+    r33 = R_est(3,3);
 
+    % Calculate yaw (heading)
+    yaw = atan2(r21, r11);
+    
+    % Calculate pitch (attitude)
+    pitch = asin(-r31);
+    
+    % Calculate roll (bank)
+    roll = atan2(r32, r33);
 
+    K_v = 0.15;
+    K_w = 5.0;
+    w = -K_w * [roll pitch yaw];
+
+    % Compute epipole coordinates in target camera
+    % epipole in current frame: optical centre of target camera in current
+    % image
+    
+    % epipole in target frame: optical centre of current camera in target
+    % image
+    % Apply stop condition if necessary
+    if norm(c_est) < 0.2
+        % Stop condition reached, exit loop
+        v= [0 0 0];
+    else
+        v = K_v * e1;
+        v = v';
+    end
+
+    %v= [0 0 0];%At the moment we are not moving; Just to put something
+    % w= [0 0 0];%At the moment we are not moving; Just to put something
 
     v_correccionesvw(it,:)=[v w]; %save simulation data for plots
     
