@@ -2,7 +2,7 @@
 <launch>
 
     <!-- Desired interrobot distance -->
-    <param name = "inter_distance_x" value="10"/>
+    <param name = "inter_distance_x" value="1.0"/>
     <param name = "inter_distance_y" value="0"/>
 
     <param name = "formation" value="line"/>
