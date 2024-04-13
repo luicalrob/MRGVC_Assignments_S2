@@ -4,7 +4,7 @@ import random
 import rospy
 from mr_rendezvous_deployment.msg import queue_position_plot
 from mr_rendezvous_deployment.srv import gossip_update, gossip_updateResponse
-
+from geometry_msgs.msg import PointStamped
 
 class NaiveRobot:
 
@@ -29,16 +29,23 @@ class NaiveRobot:
         
         # Create publisher
         self.position_publisher = rospy.Publisher('mr_rendezvous_deployment/queue_position_plot', queue_position_plot, queue_size=10)
+        self.position_publisher_unique = rospy.Publisher("mr_rendezvous_deployment/robot_" + str(self.robot_id) + "/queue_position_plot", PointStamped, queue_size=10)
 
         #Obtain initial position
         position_update = queue_position_plot()
         position_update.x = self.position[0]
         position_update.y = self.position[1]
         position_update.robot_id = self.robot_id
+
+        position_update_unique = PointStamped()
+        position_update_unique.header.stamp = rospy.Time.now()
+        position_update_unique.point.x = self.position[0]
+        position_update_unique.point.y = self.position[1]
         
         # Publish initial position to neighbours and wait for a bit
         rospy.sleep(0.5)
         self.position_publisher.publish(position_update)
+        self.position_publisher_unique.publish(position_update_unique)
         rospy.sleep(2.0)
         
         # Create timer to request gossip update every t_local cycles
@@ -91,6 +98,7 @@ class NaiveRobot:
                 self.robot_id, self.position))
         
         position_update = queue_position_plot()
+        position_update_unique = PointStamped()
         
         if self.formation == 'rendezvous':
             position_update.x = self.position[0] 
@@ -101,9 +109,14 @@ class NaiveRobot:
             position_update.y = self.position[1] + self.inter_distance_y * self.robot_id
         
         position_update.robot_id = self.robot_id
+
+        position_update_unique.header.stamp = rospy.Time.now()
+        position_update_unique.point.x = position_update.x
+        position_update_unique.point.y = position_update.y
         
         self.position_publisher.publish(position_update)
-        
+        self.position_publisher_unique.publish(position_update_unique)
+
         return res
 
     def request_gossip_update(self, event): #timer callback
@@ -130,6 +143,7 @@ class NaiveRobot:
                 self.robot_id, self.position))
             
             position_update = queue_position_plot()
+            position_update_unique = PointStamped()
 
             if self.formation == 'rendezvous':
                 position_update.x = self.position[0] 
@@ -140,8 +154,13 @@ class NaiveRobot:
                 position_update.y = self.position[1] + self.inter_distance_y * self.robot_id
             
             position_update.robot_id = self.robot_id
+
+            position_update_unique.header.stamp = rospy.Time.now()
+            position_update_unique.point.x = position_update.x
+            position_update_unique.point.y = position_update.y
             
-            self.position_publisher.publish(position_update)
+            self.position_publisher.publish(position_update)  
+            self.position_publisher_unique.publish(position_update_unique)
         
         except rospy.ServiceException as e:
             print("[naive robot] Service call failed: "+str(e))
