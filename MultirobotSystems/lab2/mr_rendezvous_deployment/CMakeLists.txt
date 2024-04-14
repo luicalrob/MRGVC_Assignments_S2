@@ -162,7 +162,7 @@ include_directories(
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
    src/visualization_node.py
-   src/naive_robot.py
+   src/rendezvous_robot.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

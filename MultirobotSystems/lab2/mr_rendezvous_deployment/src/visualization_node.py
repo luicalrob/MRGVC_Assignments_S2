@@ -54,6 +54,6 @@ if __name__ == '__main__':
     try:
         rospy.init_node('position_plotter', anonymous=False)
         my_plotter=Plotter(n_robots)
-        print('Printing the positions of ', my_plotter.n_robots)
+        print('[visualization_node] Printing the positions of ', my_plotter.n_robots)
     except rospy.ROSInterruptException:
         pass
