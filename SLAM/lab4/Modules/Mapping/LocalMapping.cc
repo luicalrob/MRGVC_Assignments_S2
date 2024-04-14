@@ -95,7 +95,7 @@ void LocalMapping::mapPointCulling() {
         // cout << "observations: " << nObservations << endl;
         // cout << "foundRatio: " << foundRatio << endl;
 
-        if(foundRatio < 0.25){
+        if(foundRatio < 0.2){
             pMap_->removeMapPoint(mpID);
             rejected++;
             continue;
