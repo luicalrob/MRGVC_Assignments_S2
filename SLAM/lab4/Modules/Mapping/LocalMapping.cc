@@ -90,10 +90,10 @@ void LocalMapping::mapPointCulling() {
         }
         float foundRatio = static_cast<float>(nObservations)/nvisible;
 
-        cout << "MP ID: " << mpID << endl;
-        cout << "nvisible: " << nvisible << endl;
-        cout << "observations: " << nObservations << endl;
-        cout << "foundRatio: " << foundRatio << endl;
+        // cout << "MP ID: " << mpID << endl;
+        // cout << "nvisible: " << nvisible << endl;
+        // cout << "observations: " << nObservations << endl;
+        // cout << "foundRatio: " << foundRatio << endl;
 
         if(foundRatio < 0.25){
             pMap_->removeMapPoint(mpID);
@@ -104,34 +104,9 @@ void LocalMapping::mapPointCulling() {
         accepted++;
     }
 
-    cout << "accepted: " << accepted << endl;
-    cout << "rejected: " << rejected << endl;
+    // cout << "accepted: " << accepted << endl;
+    // cout << "rejected: " << rejected << endl;
 
-
-        // menos de 25% los covisibles no se ve ese mappoint -> comprobar en cada covisible si esta el mappoint
-        //isMapPointInKeyFrame(ID mp, ID current)
-        
-        //isMapPointInKeyFrame(ID mp, ID kf) // por cada covisible
-        
-        // checkear si se ha vuelto a ver despues de 2 frames
-
-        // para ver cuantas veces se ha observado, podemos comparar por si no se ha visto desde hace dos keyframes 
-        // -> el problema es que me falta el id del frame en el que se observo el mappoint, o al menos saber hace cuanto
-        // -> a lo mejor podemos poner esta condicion dentro de si se cumple la otra? creo que casi al 100% no tiene sentido
-        //getNumberOfObservations(ID mp) 
-        //numberOfCommonObservationsBetweenKeyFrames(ID kf1, ID kf2) //? esta no se usa, por que? 
-
-        // si no podemos tener el id del keyframe, podemos simplemente tener unas minimas observaciones igual que en el if de abajo
-
-        // utilizar si se ha visto en el current como condicion
-
-        // si tuviesemos donde se vio por primera vez
-        // vemos si han pasado dos
-        // comprobamos si se ha visto en alguno de esos dos
-
-        // if (((int)currKeyFrame_->getId() - (int)mapPoint.second->getId()) >= max_old && pMap_->getNumberOfObservations(mapPoint.first) <= min_obs){
-        //     pMap_->removeMapPoint(mapPoint.second->getId());
-        // }
 
 }
 
