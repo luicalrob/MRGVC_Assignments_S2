@@ -88,7 +88,7 @@ void LocalMapping::mapPointCulling() {
         for(int i = 0; i < vKFcovisible.size(); i++){
             if(pMap_->isMapPointInKeyFrame(mpID, vKFcovisible[i].first)!=-1) nvisible++;
         }
-        float foundRatio = static_cast<float>(nObservations)/nvisible;
+        float foundRatio = static_cast<float>(nvisible)/vKFcovisible.size();
 
         // cout << "MP ID: " << mpID << endl;
         // cout << "nvisible: " << nvisible << endl;
