@@ -79,7 +79,9 @@ int main(int argc, char **argv){
     trajectoryFile.close();
 
     timer = clock() - timer;
-	cout << "Seconds: " << fixed << setprecision(4) << ((float)timer)/CLOCKS_PER_SEC << endl;
+	cout << "[END] Seconds: " << fixed << setprecision(4) << ((float)timer)/CLOCKS_PER_SEC << endl;
+    cout << "[END] Number of Keyframes: " << nKF << endl;
+
 
     return 0;
 }
