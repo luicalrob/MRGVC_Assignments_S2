@@ -47,7 +47,7 @@ int main(int argc, char **argv){
     MiniSLAM SLAM("Data/EuRoC.yaml");
 
     //File to store the trajectory
-    string trajectoryFileName = argv[2];
+    string trajectoryFileName = argv[3];
     ofstream trajectoryFile (trajectoryFileName + ".txt");
     if (!trajectoryFile.is_open()){
         cerr << "[Error]: could not open the trajectory file, aborting..." << endl;
@@ -61,7 +61,7 @@ int main(int argc, char **argv){
     //Process the sequence
     cv::Mat currIm;
     double currTs;
-    for(int i = 150; i < sequence.getLenght(); i++){
+    for(int i = 200; i < sequence.getLenght(); i++){ //originally start 150
         sequence.getLeftImage(i,currIm);
         sequence.getTimeStamp(i,currTs);
 
