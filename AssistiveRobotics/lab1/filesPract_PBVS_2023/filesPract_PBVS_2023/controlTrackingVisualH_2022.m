@@ -35,7 +35,7 @@ c= [500 600 -100 -10 15 20]; %[x y z rx ry rz] (units en mm and degrees)
 %d: Approximate estimate of the distance from the plane to the camera position
 
 
-Tciclo= 1;
+Tciclo= 1.0;
 Tmax= 500; %Maximum time
 v_tiempo=[0:Tciclo:Tmax];
 tamTiempo=length(v_tiempo);
@@ -140,7 +140,7 @@ for it=1:tamTiempo,
 
     Kp_v = 0.05;
     Kp_w = 5.0;
-    Ki_v = 2e-3;
+    Ki_v = 5e-3;
     Ki_w = 0.5;
     w = - Kp_w * [roll pitch yaw] - Ki_w * e_w;
     v = - Kp_v * c_est - Ki_v * e_v;
