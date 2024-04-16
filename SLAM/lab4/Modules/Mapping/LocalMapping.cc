@@ -194,7 +194,7 @@ void LocalMapping::triangulateNewMapPoints() {
                 auto e1 = squaredReprojectionError(x1, cv_p1);
                 auto e2 = squaredReprojectionError(x2, cv_p2);
 
-                if(e1 > 5 || e2 > 5) continue;
+                if(e1 > 5.991 || e2 > 5.991) continue;
 
                 std::shared_ptr<MapPoint> map_point(new MapPoint(x3D));
 
