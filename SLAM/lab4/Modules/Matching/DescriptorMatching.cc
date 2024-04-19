@@ -376,7 +376,7 @@ int fuse(std::shared_ptr<KeyFrame> pKF, int th, std::vector<std::shared_ptr<MapP
         int nLastOctave = pKF->getKeyPoint(i).octave;
 
         //Search radius depends on the size of the point in the image
-        float radius = 15 * pKF->getScaleFactor(nLastOctave);
+        float radius = 2.5 * pKF->getScaleFactor(nLastOctave);
 
         //Get candidates whose coordinates are close to the current point
         pKF->getFeaturesInArea(uv.x, uv.y, radius, nLastOctave - 1, nLastOctave + 1, vIndicesToCheck);
@@ -388,7 +388,9 @@ int fuse(std::shared_ptr<KeyFrame> pKF, int th, std::vector<std::shared_ptr<MapP
 
         //Match with the one with the smallest Hamming distance
         int bestDist = 255, secondBestDist = 255;
-        size_t bestIdx = -1;
+        size_t bestIdx = std::numeric_limits<size_t>::max();
+        // cout << "bestIdx: " << bestIdx << endl;
+        // cout << "vIndicesToCheck: " << vIndicesToCheck.size() << endl;
         for(auto j : vIndicesToCheck){
             
             int dist = HammingDistance(pMP->getDescriptor(),descMat.row(j));
@@ -402,25 +404,35 @@ int fuse(std::shared_ptr<KeyFrame> pKF, int th, std::vector<std::shared_ptr<MapP
                 secondBestDist = dist;
             }
         }
+        // cout << "bestIdx: " << bestIdx << endl;
+        //cout << "bestDist: " << bestDist << endl;
+        // cout << "secondBestDist: " << secondBestDist << endl;
+        if(bestIdx == std::numeric_limits<size_t>::max()) {
+            continue;
+        }
+        //cout << "th: " << th << endl;
+
         //Use second best distance also to avoid incorrect pairings
         if(bestDist <= th && (float)bestDist < (float(secondBestDist)*0.9)){
             // No previous match
-            auto added_MapPoint = pKF->getMapPoints()[bestIdx];
-            
+            auto added_MapPoint = vKFMps[bestIdx];
+
             //Fuse
-            if(added_MapPoint){
-                pMap->fuseMapPoints(pMP->getId(), added_MapPoint->getId());
+            if(added_MapPoint){ 
+                pMap->fuseMapPoints(pMP->getId(), vKFMps[bestIdx]->getId());
+                //pMap->fuseMapPoints(pMP->getId(), vKFMps[bestIdx]->getId());
             }      
             //Add observation
             else{
-                pMap->addObservation(pKF->getId(), pMP->getId(), bestIdx);
                 pKF->setMapPoint(bestIdx, pMP);
+                pMap->addObservation(pKF->getId(), pMP->getId(), bestIdx);
             }
             
             nFused++;
         }
 
     }
+    //cout << "nFused: " << nFused << endl;
 
     return nFused;
 }

@@ -19,6 +19,7 @@
 #include "Optimization/g2oBundleAdjustment.h"
 #include "Matching/DescriptorMatching.h"
 #include "Utils/Geometry.h"
+#include <iterator>
 
 using namespace std;
 
@@ -31,7 +32,7 @@ LocalMapping::LocalMapping(Settings& settings, std::shared_ptr<Map> pMap) {
     pMap_ = pMap;
 }
 
-void LocalMapping::doMapping(std::shared_ptr<KeyFrame> &pCurrKeyFrame) {
+void LocalMapping::doMapping(std::shared_ptr<KeyFrame> &pCurrKeyFrame, int &nMPs) {
     //Keep input keyframe
     currKeyFrame_ = pCurrKeyFrame;
 
@@ -48,6 +49,8 @@ void LocalMapping::doMapping(std::shared_ptr<KeyFrame> &pCurrKeyFrame) {
 
     //Run a local Bundle Adjustment
     localBundleAdjustment(pMap_.get(),currKeyFrame_->getId());
+
+    nMPs = pMap_->getMapPoints().size();
 }
 
 void LocalMapping::mapPointCulling() {
@@ -55,58 +58,84 @@ void LocalMapping::mapPointCulling() {
      * Your code for Lab 4 - Task 4 here!
      */
 
-    int currentKF_id = currKeyFrame_->getId();
-    if (currentKF_id < 2) {
-        return;
-    }
+    std::list<std::shared_ptr<MapPoint>>::iterator lit = mlpRecentAddedMapPoints.begin();
 
-    shared_ptr<KeyFrame> prev2KF = pMap_->getKeyFrame(currentKF_id-2);
-    vector<shared_ptr<MapPoint>> prev2KFmapPoints = prev2KF->getMapPoints();
-    int rejected = 0;
+    int currentKF_id = currKeyFrame_->getId();
+    int accepted_0 = 0;
+    int rejected_ratio = 0;
+    int rejected_2 = 0;
     int accepted = 0;
 
-    for(size_t i = 0; i < prev2KFmapPoints.size(); i++) {
+    //int borrar = mlpRecentAddedMapPoints.size();
+
+    while(lit != mlpRecentAddedMapPoints.end()) {
         
-        shared_ptr<MapPoint> mapPoint = prev2KFmapPoints[i];
+        std::shared_ptr<MapPoint> pMP = *lit;
 
-        if(!mapPoint)
-            continue;
+        int mpID = (int)pMP->getId();
 
-        int mpID = (int)mapPoint->getId();
+        size_t mpPosition = std::distance(mlpRecentAddedMapPoints.begin(), lit);
+
+        int firstKeyframeID = pMap_->firstKeyFrameOfMapPoint(mpID);
         int nObservations = pMap_->getNumberOfObservations(mpID);
+        
+        if(firstKeyframeID == -1) {  // pointmap deleted
+            auto nextLit = mlpRecentAddedMapPoints.erase(lit);
+            lit = nextLit; 
+            accepted_0++;
+        } else {
 
-        if (nObservations <= 2) {
-            if((pMap_->isMapPointInKeyFrame(mpID, currentKF_id)==-1) && (pMap_->isMapPointInKeyFrame(mpID, currentKF_id-1)==-1)) {
+            shared_ptr<KeyFrame> KFToCheck = pMap_->getKeyFrame(firstKeyframeID);
+            int nKFMapPoints = KFToCheck->getNummberOfMapPoints();
+            int KFID = KFToCheck->getId();
+
+            vector<pair<ID,int>> vKFcovisible = pMap_->getCovisibleKeyFrames(KFID);
+            int nvisible = 0;
+            int nsameview = 0;
+
+            float percentageOfSimilar = 0.0;
+
+            for(int i = 0; i < vKFcovisible.size(); i++){
+                float percentageOfSimilar = static_cast<float>(pMap_->numberOfCommonObservationsBetweenKeyFrames(KFID, vKFcovisible[i].first)) / nKFMapPoints;
+                if(pMap_->isMapPointInKeyFrame(mpID, vKFcovisible[i].first)!=-1) {
+                    nsameview++;
+                    nvisible++;
+                }else if(percentageOfSimilar >= 0.7) {
+                    nsameview++;
+                }
+            }
+            float foundRatio = static_cast<float>(nvisible)/nsameview;
+            // cout << "nvisible: " << nvisible << endl;
+            // cout << "nsameview: " << nsameview << endl;
+            // cout << "foundRatio: " << foundRatio << endl;
+
+            if(foundRatio < 0.25){
                 pMap_->removeMapPoint(mpID);
-                rejected++;
-                continue;
+                auto nextLit = mlpRecentAddedMapPoints.erase(lit);
+                lit = nextLit; 
+                rejected_ratio++;
+            }else if((currentKF_id-firstKeyframeID)>=2 && nObservations<=2) {
+                pMap_->removeMapPoint(mpID);
+                auto nextLit = mlpRecentAddedMapPoints.erase(lit);
+                lit = nextLit; 
+                rejected_2++;
+            }else if((currentKF_id-firstKeyframeID)>=3) {
+                auto nextLit = mlpRecentAddedMapPoints.erase(lit);
+                lit = nextLit; 
+                accepted++;
             }
         }
+        lit++;
 
-        vector<pair<ID,int>> vKFcovisible = pMap_->getCovisibleKeyFrames(prev2KF->getId());
-        int nvisible = 0;
-        for(int i = 0; i < vKFcovisible.size(); i++){
-            if(pMap_->isMapPointInKeyFrame(mpID, vKFcovisible[i].first)!=-1) nvisible++;
-        }
-        float foundRatio = static_cast<float>(nvisible)/vKFcovisible.size();
-
-        // cout << "MP ID: " << mpID << endl;
-        // cout << "nvisible: " << nvisible << endl;
-        // cout << "observations: " << nObservations << endl;
-        // cout << "foundRatio: " << foundRatio << endl;
-
-        if(foundRatio < 0.2){
-            pMap_->removeMapPoint(mpID);
-            rejected++;
-            continue;
-        }
-
-        accepted++;
     }
-
+    // cout << "MP ID: " << mpID << endl;
+    // cout << "nvisible: " << nvisible << endl;
+    // cout << "observations: " << nObservations << endl;
+    // cout << "foundRatio: " << foundRatio << endl;
     // cout << "accepted: " << accepted << endl;
-    // cout << "rejected: " << rejected << endl;
-
+    // cout << "accepted_0: " << accepted_0 << endl;
+    // cout << "rejected_ratio: " << rejected_ratio << endl;
+    // cout << "rejected_2: " << rejected_2 << endl;
 
 }
 
@@ -199,6 +228,7 @@ void LocalMapping::triangulateNewMapPoints() {
                 std::shared_ptr<MapPoint> map_point(new MapPoint(x3D));
 
                 pMap_->insertMapPoint(map_point);
+                mlpRecentAddedMapPoints.push_back(map_point);
 
                 pMap_->addObservation(currKeyFrame_->getId(), map_point->getId(), i);
                 pMap_->addObservation(pKF->getId(), map_point->getId(), vMatches[i]);

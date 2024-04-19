@@ -56,7 +56,8 @@ int main(int argc, char **argv){
     clock_t timer;
 	timer = clock();
     int nKF = 0;
-
+    int nMPs = 0;
+    
     //Process the sequence
     cv::Mat currIm;
     double currTs;
@@ -65,7 +66,7 @@ int main(int argc, char **argv){
         sequence.getTimeStamp(i,currTs);
 
         Sophus::SE3f Tcw;
-        if(SLAM.processImage(currIm, Tcw, nKF, timer)){
+        if(SLAM.processImage(currIm, Tcw, nKF, nMPs, timer)){
             Sophus::SE3f Twc = Tcw.inverse();
             //Save predicted pose to the file
             trajectoryFile << setprecision(17) << currTs << "," << setprecision(7) << Twc.translation()(0) << ",";
@@ -80,6 +81,7 @@ int main(int argc, char **argv){
     timer = clock() - timer;
 	cout << "[END] Seconds: " << fixed << setprecision(4) << ((float)timer)/CLOCKS_PER_SEC << endl;
     cout << "[END] Number of Keyframes: " << nKF << endl;
+    cout << "[END] Number of MapPoints: " << nMPs << endl;
 
     return 0;
 }

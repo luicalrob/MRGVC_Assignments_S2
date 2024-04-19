@@ -66,7 +66,7 @@ Tracking::Tracking(Settings& settings, std::shared_ptr<FrameVisualizer>& visuali
     settings_ = settings;
 }
 
-bool Tracking::doTracking(const cv::Mat &im, Sophus::SE3f &Tcw, int &nKF, clock_t &timer) {
+bool Tracking::doTracking(const cv::Mat &im, Sophus::SE3f &Tcw, int &nKF, int &nMPs, clock_t &timer) {
     currIm_ = im.clone();
 
     //Update previous frame
@@ -118,16 +118,20 @@ bool Tracking::doTracking(const cv::Mat &im, Sophus::SE3f &Tcw, int &nKF, clock_
             else{
                 status_ = LOST;
                 timer = clock() - timer;
+                nMPs = pMap_->getMapPoints().size();
 	            cout << "[LOST] Seconds: " << fixed << setprecision(4) << ((float)timer)/CLOCKS_PER_SEC << endl;
                 cout << "[LOST] Number of Keyframes: " << nKF << endl;
+                cout << "[LOST] Number of MapPoints: " << nMPs << endl;
                 return false;
             }
         }
         else{
             status_ = LOST;
             timer = clock() - timer;
+            nMPs = pMap_->getMapPoints().size();
 	        cout << "[LOST] Seconds: " << fixed << setprecision(4) << ((float)timer)/CLOCKS_PER_SEC << endl;
             cout << "[LOST] Number of Keyframes: " << nKF << endl;
+            cout << "[LOST] Number of MapPoints: " << nMPs << endl;
             return false;
         }
     }
@@ -362,7 +366,7 @@ bool Tracking::needNewKeyFrame(int &nKF) {
     /*
      * Your code for Lab 4 - Task 1 here!
      */
-    int minTrackedFeat = 75;
+    int minTrackedFeat = 100;
     int maxFramesBtwKF = 2;  //2, 4, 6
     if(nFramesFromLastKF_ > maxFramesBtwKF || nFeatTracked_ < minTrackedFeat || status_ == LOST) {
         if(status_ != LOST) {

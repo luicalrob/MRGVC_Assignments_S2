@@ -113,6 +113,8 @@ public:
      */
     void fuseMapPoints(ID mp1, ID mp2);
 
+
+    int firstKeyFrameOfMapPoint(ID mp);
     /*
      * Checks if a MapPoint is seen in a KeyFrame
      */

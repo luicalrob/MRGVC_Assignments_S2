@@ -45,7 +45,7 @@ public:
     /*
      * Does the mapping operative: triangulation, duplication remove and Local Bundle Adjustment
      */
-    void doMapping(std::shared_ptr<KeyFrame>& pCurrKeyFrame);
+    void doMapping(std::shared_ptr<KeyFrame>& pCurrKeyFrame, int &nMPs);
 
 private:
     /*
@@ -66,6 +66,8 @@ private:
     std::shared_ptr<Map> pMap_;
 
     std::shared_ptr<KeyFrame> currKeyFrame_;
+
+    std::list<std::shared_ptr<MapPoint>> mlpRecentAddedMapPoints;
 
     Settings settings_;
 };

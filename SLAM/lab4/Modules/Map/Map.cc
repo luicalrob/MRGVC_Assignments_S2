@@ -206,6 +206,24 @@ void Map::fuseMapPoints(ID mp1, ID mp2) {
     removeMapPoint(mpToDelete);
 }
 
+int Map::firstKeyFrameOfMapPoint(ID mp) {
+    int idx = -1;
+    
+    if (mMapPointObs_[mp].size() != 0) {
+        std::unordered_map<ID, size_t>& observations = mMapPointObs_[mp];
+        
+        for (const auto& observation : observations) {
+            
+            ID kfId = observation.first;
+            if (idx == -1 || kfId < idx) {
+                idx = kfId;
+            }
+        }
+    }
+
+    return idx;
+}
+
 int Map::isMapPointInKeyFrame(ID mp, ID kf) {
     int idx = -1;
     if(mKeyFrameObs_[kf].count(mp) != 0){
