@@ -27,14 +27,15 @@ class Plotter():
     def draw_robot(self):
         while not rospy.is_shutdown():
             plt.clf()
-            plt.xlim(-10,10)
-            plt.ylim(-10,10)
-            
-            if np.any(self.v_robot_x != 0) or np.any(self.v_robot_y != 0):
-                plt.scatter(self.v_robot_x, self.v_robot_y, c='blue', marker='o')
-                plt.draw()
-                plt.show(block=False)
-                plt.pause(0.01)
+            plt.xlim(-15,15)
+            plt.ylim(-15,15)
+
+            for i in range(self.n_robots):
+                plt.scatter(self.v_robot_x[i], self.v_robot_y[i], c='blue', marker='o')
+                plt.text(self.v_robot_x[i], self.v_robot_y[i], f'{i+1}', fontsize=12)  # Display robot ID
+            plt.draw()
+            plt.show(block=False)
+            plt.pause(0.01)
             
             rospy.sleep(0.25) # twice per second. You can increase this rate
     

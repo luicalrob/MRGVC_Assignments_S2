@@ -6,7 +6,7 @@ from mr_rendezvous_deployment.msg import queue_position_plot
 from mr_rendezvous_deployment.srv import gossip_update, gossip_updateResponse
 from geometry_msgs.msg import PointStamped
 
-class NaiveRobot:
+class RendezvousRobot:
 
     def __init__(self):
         rospy.init_node("robot")
@@ -168,5 +168,5 @@ class NaiveRobot:
 
 if __name__ == "__main__":
     
-    robot_node = NaiveRobot()
+    robot_node = RendezvousRobot()
     rospy.spin()
