@@ -389,8 +389,7 @@ int fuse(std::shared_ptr<KeyFrame> pKF, int th, std::vector<std::shared_ptr<MapP
         //Match with the one with the smallest Hamming distance
         int bestDist = 255, secondBestDist = 255;
         size_t bestIdx = std::numeric_limits<size_t>::max();
-        // cout << "bestIdx: " << bestIdx << endl;
-        // cout << "vIndicesToCheck: " << vIndicesToCheck.size() << endl;
+        
         for(auto j : vIndicesToCheck){
             
             int dist = HammingDistance(pMP->getDescriptor(),descMat.row(j));
@@ -404,13 +403,10 @@ int fuse(std::shared_ptr<KeyFrame> pKF, int th, std::vector<std::shared_ptr<MapP
                 secondBestDist = dist;
             }
         }
-        // cout << "bestIdx: " << bestIdx << endl;
-        //cout << "bestDist: " << bestDist << endl;
-        // cout << "secondBestDist: " << secondBestDist << endl;
+        
         if(bestIdx == std::numeric_limits<size_t>::max()) {
             continue;
         }
-        //cout << "th: " << th << endl;
 
         //Use second best distance also to avoid incorrect pairings
         if(bestDist <= th && (float)bestDist < (float(secondBestDist)*0.9)){
@@ -420,7 +416,6 @@ int fuse(std::shared_ptr<KeyFrame> pKF, int th, std::vector<std::shared_ptr<MapP
             //Fuse
             if(added_MapPoint){ 
                 pMap->fuseMapPoints(pMP->getId(), vKFMps[bestIdx]->getId());
-                //pMap->fuseMapPoints(pMP->getId(), vKFMps[bestIdx]->getId());
             }      
             //Add observation
             else{
@@ -432,7 +427,6 @@ int fuse(std::shared_ptr<KeyFrame> pKF, int th, std::vector<std::shared_ptr<MapP
         }
 
     }
-    //cout << "nFused: " << nFused << endl;
 
     return nFused;
 }

@@ -105,9 +105,6 @@ void LocalMapping::mapPointCulling() {
                 }
             }
             float foundRatio = static_cast<float>(nvisible)/nsameview;
-            // cout << "nvisible: " << nvisible << endl;
-            // cout << "nsameview: " << nsameview << endl;
-            // cout << "foundRatio: " << foundRatio << endl;
 
             if(foundRatio < 0.25){
                 pMap_->removeMapPoint(mpID);
@@ -128,15 +125,6 @@ void LocalMapping::mapPointCulling() {
         lit++;
 
     }
-    // cout << "MP ID: " << mpID << endl;
-    // cout << "nvisible: " << nvisible << endl;
-    // cout << "observations: " << nObservations << endl;
-    // cout << "foundRatio: " << foundRatio << endl;
-    // cout << "accepted: " << accepted << endl;
-    // cout << "accepted_0: " << accepted_0 << endl;
-    // cout << "rejected_ratio: " << rejected_ratio << endl;
-    // cout << "rejected_2: " << rejected_2 << endl;
-
 }
 
 void LocalMapping::triangulateNewMapPoints() {
