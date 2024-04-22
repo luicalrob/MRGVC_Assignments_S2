@@ -1,5 +1,5 @@
 % Read stack of images with their exposure
-directory = ('../Data/'); % change dir to run a different stack
+directory = ('../Part4/Fotos_luis/'); % change dir to run a different stack
 
 [file_names, exposures] = parse_files(directory);
 
