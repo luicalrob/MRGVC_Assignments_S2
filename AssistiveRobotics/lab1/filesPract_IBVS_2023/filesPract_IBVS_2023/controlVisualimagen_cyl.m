@@ -44,6 +44,17 @@ v_posiciones=zeros(tamTiempo,6); %Save the camera motion
 v_correccionesvw=zeros(tamTiempo,6); %Save control velocities
 v_pts=zeros(tamTiempo,2*n); %Saves trajectories of image points
 
+n = size(Puntos2Dkt, 1);
+Puntos2Dkt_cyl = zeros(2*n);
+for i=1:n
+    xt = Puntos2Dkt(i, 1);
+    yt = Puntos2Dkt(i, 2);
+    rhokt = sqrt(xt.^2 + yt.^2);
+    thetakt = atan2(yt,xt);
+    Puntos2Dkt_cyl(2*i-1) = rhokt;
+    Puntos2Dkt_cyl(2*i) = thetakt;
+end
+
 %MAIN LOOP
 for it=1:tamTiempo,
     
@@ -77,14 +88,21 @@ for it=1:tamTiempo,
     
     % Construct the matrix A
     J = zeros(2 * n, 6);
+    
+    Puntos2Dk_cyl = zeros(2*n);
+
     for i = 1:n
         x = Puntos2Dk(i, 1);
         y = Puntos2Dk(i, 2);
         z = z_real(i);
-        rho = sqrt(x.^2 + y.^2);
-        theta = atan2(y,x);
-        J(2*i-1, :) = [-cos(theta)/z, -sin(theta)/z, rho/z, (1+rho.^2)*sin(theta), -(1+rho.^2)*cos(theta), 0.];
-        J(2*i, :) = [sin(theta)/(rho*z), -cos(theta)/(rho*z), 0., cos(theta)/rho, sin(theta)/rho, -1.];
+        rhok = sqrt(x.^2 + y.^2);
+        thetak = atan2(y,x);
+        J(2*i-1, :) = [-cos(thetak)/z, -sin(thetak)/z, rhok/z, (1+rhok.^2)*sin(thetak), -(1+rhok.^2)*cos(thetak), 0.];
+        J(2*i, :) = [sin(thetak)/(rhok*z), -cos(thetak)/(rhok*z), 0., cos(thetak)/rhok, sin(thetak)/rhok, -1.];
+        
+        Puntos2Dk_cyl(2*i-1) = rhok;
+        Puntos2Dk_cyl(2*i) = thetak;
+
     end
     
     %--------------------------------------------------------------------
@@ -102,12 +120,7 @@ for it=1:tamTiempo,
 
     lambda = 0.1;
 
-    e = Puntos2Dk - Puntos2Dkt;
-
-    rho = sqrt(e(:,1).^2 + e(:,2).^2);
-    theta = atan2(e(:,2),e(:,1));
-
-    e = reshape(e', [2*n 1]);
+    e = Puntos2Dk_cyl - Puntos2Dkt_cyl;
 
     vel = - lambda * Ji * e;
             
