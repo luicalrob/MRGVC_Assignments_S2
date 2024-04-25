@@ -48,19 +48,26 @@ class Environment:
     def run(self, route_x, route_y, end_k):
         self.end_k = end_k
         for self.k in range(self.end_k):
-            self.robot_x = self.robot_x + route_x[self.k]
-            self.robot_y = self.robot_y + route_y[self.k]
+            
             F = np.exp(self.A * self.period)
             G = (self.B/self.A) * (np.exp(self.A * self.period) - 1)
             self.previous_states[:,:,self.k] = self.map
             action_map = np.zeros(self.map.shape)
-            coverage_local = self.map[self.robot_x-self.robot_action_half_size:self.robot_x+self.robot_action_half_size+1,  self.robot_y-self.robot_action_half_size:self.robot_y+self.robot_action_half_size+1]
-            K = self.C*(np.sum(np.sum(self.B * self.sigma * (self.desired-coverage_local))))**(2*self.q-1)
+            #Assume K is a constant
+            #coverage_local = self.map[self.robot_x-self.robot_action_half_size:self.robot_x+self.robot_action_half_size+1,  self.robot_y-self.robot_action_half_size:self.robot_y+self.robot_action_half_size+1]
+            #K = self.C*(np.sum(np.sum(self.B * self.sigma * (self.desired-coverage_local))))**(2*self.q-1)
+            K = 1.0
             alpha = K*self.sigma
+
             action_map[self.robot_x-self.robot_action_half_size:self.robot_x+self.robot_action_half_size+1,  self.robot_y-self.robot_action_half_size:self.robot_y+self.robot_action_half_size+1]= alpha
             self.map = F * self.map + G * action_map
+
             self.draw_map()
             self.draw_error()
+
+            #Update position of the robot
+            self.robot_x = self.robot_x + route_x[self.k]
+            self.robot_y = self.robot_y + route_y[self.k]          
 
     def draw_map(self):
         plt.figure(1)
@@ -84,7 +91,6 @@ if __name__ == '__main__':
 
     # my_environment = Environment([100,100], 1, -1/200, 1/400, 120000, 1)
     my_environment = Environment([100,100], 1, -1/200, 1/100, 120000, 2)
-
 
     end_k = 804
     route_x = []
