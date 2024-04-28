@@ -1,4 +1,5 @@
 import copy
+import time
 import open3d as o3d
 import numpy as np
 import matplotlib.pyplot as plt
@@ -136,11 +137,12 @@ print(evaluation)
 
 #ICP 2000 iterations
 print("Apply point-to-point ICP")
+start = time.time()
 reg_p2p = o3d.pipelines.registration.registration_icp(
     pcd_1, pcd_2, threshold, trans_init,
     o3d.pipelines.registration.TransformationEstimationPointToPoint(), 
     o3d.pipelines.registration.ICPConvergenceCriteria(max_iteration=2000))
-print(reg_p2p)
+print("Point-to-point ICP took %.3f sec.\n" % (time.time() - start))
 print("Transformation That_ts is:")
 print(reg_p2p.transformation)
 draw_registration_result(pcd_1, pcd_2, reg_p2p.transformation)
@@ -150,10 +152,11 @@ pcd_2.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=
 
 # #Point-to-plane ICP
 print("Apply point-to-plane ICP")
+start = time.time()
 reg_p2l = o3d.pipelines.registration.registration_icp(
     pcd_1, pcd_2, threshold, trans_init,
     o3d.pipelines.registration.TransformationEstimationPointToPlane())
-print(reg_p2l)
+print("Point-to-plane ICP took %.3f sec.\n" % (time.time() - start))
 print("Transformation is:")
 print(reg_p2l.transformation)
 draw_registration_result(pcd_1, pcd_2, reg_p2l.transformation)
