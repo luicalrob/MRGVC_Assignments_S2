@@ -40,6 +40,19 @@ def draw_registration_result(source, target, transformation):
     
 
 
+def compute_errors(gt_source, gt_target, That_ts):
+    
+    T_ts = np.linalg.inv(gt_target) @ gt_source
+    # # Example converting a rotation matrix to Euler angles
+    Te = np.linalg.inv(That_ts) @ T_ts
+    Re = R.from_matrix(Te[:3,:3])
+    te = Te[:3,3]
+    dett = np.linalg.norm(te)
+    detR = np.linalg.norm(Re.as_euler('zxy', degrees=True))
+
+    return detR, dett
+
+
 source_path_c = "./datasets/livingroom1-color/00020.jpg"
 source_path_d = "./datasets/livingroom1-depth-clean/00020.png"
 
@@ -49,6 +62,8 @@ target_path_d = "./datasets/livingroom1-depth-clean/00021.png"
 pos_source = 20
 pos_target = 21
 gtposes = read_trajectory('./datasets/livingroom1-traj.txt')
+gt_source = gtposes[pos_source].pose
+gt_target = gtposes[pos_target].pose
 
 #1
 
@@ -126,10 +141,9 @@ reg_p2p = o3d.pipelines.registration.registration_icp(
     o3d.pipelines.registration.TransformationEstimationPointToPoint(), 
     o3d.pipelines.registration.ICPConvergenceCriteria(max_iteration=2000))
 print(reg_p2p)
-print("Transformation is:")
+print("Transformation That_ts is:")
 print(reg_p2p.transformation)
 draw_registration_result(pcd_1, pcd_2, reg_p2p.transformation)
-
 
 pcd_1.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
 pcd_2.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
@@ -144,34 +158,20 @@ print("Transformation is:")
 print(reg_p2l.transformation)
 draw_registration_result(pcd_1, pcd_2, reg_p2l.transformation)
 
-T_ts = np.linalg.inv(gtposes[pos_target].pose) @ gtposes[pos_source].pose
+
 That_ts_point_to_plane = reg_p2l.transformation
 That_ts_point_to_point = reg_p2p.transformation
 
-Te_point_to_plane = np.linalg.inv(That_ts_point_to_plane) @ T_ts
-Te_point_to_point = np.linalg.inv(That_ts_point_to_point) @ T_ts
-
-print("Te: point to plane")
-# # Example converting a rotation matrix to Euler angles
-Te = Te_point_to_plane
-Re = R.from_matrix(Te[:3,:3])
-te = Te[:3,3]
-dett = np.linalg.norm(te)
-detR = np.linalg.norm(Re.as_euler('zxy', degrees=True))
-
+print("Errors: Te point to point")
+detR_p2p, dett_p2p = compute_errors(gt_source, gt_target, That_ts_point_to_point)
 print("rotation error (deg):")
-print(detR)
+print(detR_p2p)
 print("translation error (m):")
-print(dett)
+print(dett_p2p)
 
-print("Te: point to point")
-Te = Te_point_to_point
-Re = R.from_matrix(Te[:3,:3])
-te = Te[:3,3]
-dett = np.linalg.norm(te)
-detR = np.linalg.norm(Re.as_euler('zxy', degrees=True))
-
+print("Errors: Te point to plane")
+detR_p2l, dett_p2l = compute_errors(gt_source, gt_target, That_ts_point_to_plane)
 print("rotation error (deg):")
-print(detR)
+print(detR_p2l)
 print("translation error (m):")
-print(dett)
+print(dett_p2l)
