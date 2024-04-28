@@ -39,12 +39,23 @@ def draw_registration_result(source, target, transformation):
                                       up=[-0.3402, -0.9189, -0.1996])
     
 
+
+source_path_c = "./datasets/livingroom1-color/00020.jpg"
+source_path_d = "./datasets/livingroom1-depth-clean/00020.png"
+
+target_path_c = "./datasets/livingroom1-color/00021.jpg"
+target_path_d = "./datasets/livingroom1-depth-clean/00021.png"
+
+pos_source = 20
+pos_target = 21
+gtposes = read_trajectory('./datasets/livingroom1-traj.txt')
+
 #1
 
 #Read image 1
 print("Read Redwood dataset")
-color_raw = o3d.io.read_image("./datasets/livingroom1-color/00020.jpg")
-depth_raw = o3d.io.read_image("./datasets/livingroom1-depth-clean/00020.png")
+color_raw = o3d.io.read_image(source_path_c)
+depth_raw = o3d.io.read_image(source_path_d)
 rgbd_image_1 = o3d.geometry.RGBDImage.create_from_color_and_depth(
     color_raw, depth_raw)
 print(rgbd_image_1)
@@ -60,8 +71,8 @@ plt.show()
 
 #Read image 2
 print("Read Redwood dataset")
-color_raw = o3d.io.read_image("./datasets/livingroom1-color/00021.jpg")
-depth_raw = o3d.io.read_image("./datasets/livingroom1-depth-clean/00021.png")
+color_raw = o3d.io.read_image(target_path_c)
+depth_raw = o3d.io.read_image(target_path_d)
 rgbd_image_2 = o3d.geometry.RGBDImage.create_from_color_and_depth(
     color_raw, depth_raw)
 print(rgbd_image_2)
@@ -133,10 +144,7 @@ print("Transformation is:")
 print(reg_p2l.transformation)
 draw_registration_result(pcd_1, pcd_2, reg_p2l.transformation)
 
-# Example reading poses from file
-gtposes = read_trajectory('./datasets/livingroom1-traj.txt')
-
-T_ts = np.linalg.inv(gtposes[21].pose) @ gtposes[20].pose
+T_ts = np.linalg.inv(gtposes[pos_target].pose) @ gtposes[pos_source].pose
 That_ts_point_to_plane = reg_p2l.transformation
 That_ts_point_to_point = reg_p2p.transformation
 
