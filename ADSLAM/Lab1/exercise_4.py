@@ -40,7 +40,7 @@ def draw_registration_result(source, target, transformation):
     
 
 
-def compute_errors(gt_source, gt_target, That_ts):
+def compute_transformation_errors(gt_source, gt_target, That_ts):
     
     T_ts = np.linalg.inv(gt_target) @ gt_source
     # # Example converting a rotation matrix to Euler angles
@@ -163,14 +163,14 @@ That_ts_point_to_plane = reg_p2l.transformation
 That_ts_point_to_point = reg_p2p.transformation
 
 print("Errors: Te point to point")
-detR_p2p, dett_p2p = compute_errors(gt_source, gt_target, That_ts_point_to_point)
+detR_p2p, dett_p2p = compute_transformation_errors(gt_source, gt_target, That_ts_point_to_point)
 print("rotation error (deg):")
 print(detR_p2p)
 print("translation error (m):")
 print(dett_p2p)
 
 print("Errors: Te point to plane")
-detR_p2l, dett_p2l = compute_errors(gt_source, gt_target, That_ts_point_to_plane)
+detR_p2l, dett_p2l = compute_transformation_errors(gt_source, gt_target, That_ts_point_to_plane)
 print("rotation error (deg):")
 print(detR_p2l)
 print("translation error (m):")
