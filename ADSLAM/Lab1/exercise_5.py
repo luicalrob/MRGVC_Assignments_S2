@@ -4,6 +4,7 @@ import open3d as o3d
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation as R
+import argparse
 
 class CameraPose:
     def __init__(self, meta, mat):
@@ -122,115 +123,127 @@ def compute_transformation_errors(gt_source, gt_target, That_ts):
 
     return detR, dett
 
-#1
 
-source_path_c = "./datasets/livingroom1-color/00020.jpg"
-source_path_d = "./datasets/livingroom1-depth-clean/00020.png"
+if __name__ == "__main__":
 
-target_path_c = "./datasets/livingroom1-color/00021.jpg"
-target_path_d = "./datasets/livingroom1-depth-clean/00021.png"
+    parser = argparse.ArgumentParser(description="Read source and target frame ids.")
+    parser.add_argument("--source_frame", type=int, default = 20, help="Source frame ID")
+    parser.add_argument("--target_frame", type=int, default = 21, help="Target frame ID")
+    args = parser.parse_args()
 
-pos_source = 20
-pos_target = 21
-gtposes = read_trajectory('./datasets/livingroom1-traj.txt')
-gt_source = gtposes[pos_source].pose
-gt_target = gtposes[pos_target].pose
+    pos_source = args.source_frame
+    pos_target = args.target_frame
 
-#Read image 1
-print("Read Redwood dataset")
-color_raw = o3d.io.read_image(source_path_c)
-depth_raw = o3d.io.read_image(source_path_d)
-source_rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(
-    color_raw, depth_raw)
-print(source_rgbd)
+    print("Source frame:", pos_source)
+    print("Target frame:", pos_target)
 
+    gtposes = read_trajectory('./datasets/livingroom1-traj.txt')
+    gt_source = gtposes[pos_source].pose
+    gt_target = gtposes[pos_target].pose
 
-# plt.subplot(1, 2, 1)
-# plt.title('Redwood grayscale image')
-# plt.imshow(rgbd_image_1.color)
-# plt.subplot(1, 2, 2)
-# plt.title('Redwood depth image')
-# plt.imshow(rgbd_image_1.depth)
-# plt.show()
+    #Select source
+    source_path_c = "./datasets/livingroom1-color/" + "{:05d}".format(pos_source) + ".jpg"
+    source_path_d = "./datasets/livingroom1-depth-clean/" + "{:05d}".format(pos_source) + ".png"
 
-#Read image 2
-print("Read Redwood dataset")
-color_raw = o3d.io.read_image(target_path_c)
-depth_raw = o3d.io.read_image(target_path_d)
-target_rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(
-    color_raw, depth_raw)
-print(target_rgbd)
+    #Select target
+    target_path_c = "./datasets/livingroom1-color/" + "{:05d}".format(pos_target) + ".jpg"
+    target_path_d = "./datasets/livingroom1-depth-clean/" + "{:05d}".format(pos_target) + ".png"
+
+    #Read image 1
+    print("Read Redwood dataset")
+    color_raw = o3d.io.read_image(source_path_c)
+    depth_raw = o3d.io.read_image(source_path_d)
+    source_rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(
+        color_raw, depth_raw)
+    print(source_rgbd)
 
 
-# plt.subplot(1, 2, 1)
-# plt.title('Redwood grayscale image')
-# plt.imshow(rgbd_image_2.color)
-# plt.subplot(1, 2, 2)
-# plt.title('Redwood depth image')
-# plt.imshow(rgbd_image_2.depth)
-# plt.show()
+    # plt.subplot(1, 2, 1)
+    # plt.title('Redwood grayscale image')
+    # plt.imshow(rgbd_image_1.color)
+    # plt.subplot(1, 2, 2)
+    # plt.title('Redwood depth image')
+    # plt.imshow(rgbd_image_1.depth)
+    # plt.show()
+
+    #Read image 2
+    print("Read Redwood dataset")
+    color_raw = o3d.io.read_image(target_path_c)
+    depth_raw = o3d.io.read_image(target_path_d)
+    target_rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(
+        color_raw, depth_raw)
+    print(target_rgbd)
 
 
-#Convert source to pointcloud
-source = o3d.geometry.PointCloud.create_from_rgbd_image(
-    source_rgbd,
-    o3d.camera.PinholeCameraIntrinsic(
-        o3d.camera.PinholeCameraIntrinsicParameters.PrimeSenseDefault))
-# Flip it, otherwise the pointcloud will be upside down
-#pcd_1.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
-#o3d.visualization.draw_geometries([pcd_1])
+    # plt.subplot(1, 2, 1)
+    # plt.title('Redwood grayscale image')
+    # plt.imshow(rgbd_image_2.color)
+    # plt.subplot(1, 2, 2)
+    # plt.title('Redwood depth image')
+    # plt.imshow(rgbd_image_2.depth)
+    # plt.show()
 
 
-#Convert target to pointcloud
-target = o3d.geometry.PointCloud.create_from_rgbd_image(
-    target_rgbd,
-    o3d.camera.PinholeCameraIntrinsic(
-        o3d.camera.PinholeCameraIntrinsicParameters.PrimeSenseDefault))
-# Flip it, otherwise the pointcloud will be upside down
-#pcd_2.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
-#o3d.visualization.draw_geometries([pcd_2])
+    #Convert source to pointcloud
+    source = o3d.geometry.PointCloud.create_from_rgbd_image(
+        source_rgbd,
+        o3d.camera.PinholeCameraIntrinsic(
+            o3d.camera.PinholeCameraIntrinsicParameters.PrimeSenseDefault))
+    # Flip it, otherwise the pointcloud will be upside down
+    #pcd_1.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+    #o3d.visualization.draw_geometries([pcd_1])
 
 
-#Misaligned point clouds with an identity matrix as transformation.
-voxel_size = 0.05  # means 5cm for this dataset
-source, target, source_down, target_down, source_fpfh, target_fpfh = prepare_dataset(voxel_size, source, target)
+    #Convert target to pointcloud
+    target = o3d.geometry.PointCloud.create_from_rgbd_image(
+        target_rgbd,
+        o3d.camera.PinholeCameraIntrinsic(
+            o3d.camera.PinholeCameraIntrinsicParameters.PrimeSenseDefault))
+    # Flip it, otherwise the pointcloud will be upside down
+    #pcd_2.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+    #o3d.visualization.draw_geometries([pcd_2])
 
-#RANSAC
-start = time.time()
-result_ransac = execute_global_registration(source_down, target_down,
-                                            source_fpfh, target_fpfh,
-                                            voxel_size)
-print("Global registration took %.3f sec.\n" % (time.time() - start))
-print(result_ransac)
-draw_registration_result(source_down, target_down, result_ransac.transformation)
 
-print("Errors: RANSAC")
-detR_ransac, dett_ransac = compute_transformation_errors(gt_source, gt_target, result_ransac.transformation)
-print("rotation error (deg):")
-print(detR_ransac)
-print("translation error (m):")
-print(dett_ransac)
+    #Misaligned point clouds with an identity matrix as transformation.
+    voxel_size = 0.05  # means 5cm for this dataset
+    source, target, source_down, target_down, source_fpfh, target_fpfh = prepare_dataset(voxel_size, source, target)
 
-# #Fast flobal registration
-# start = time.time()
-# result_fast = execute_fast_global_registration(source_down, target_down,
-#                                                source_fpfh, target_fpfh,
-#                                                voxel_size)
-# print("Fast global registration took %.3f sec.\n" % (time.time() - start))
-# print(result_fast)
-# draw_registration_result(source_down, target_down, result_fast.transformation)
+    #RANSAC
+    start = time.time()
+    result_ransac = execute_global_registration(source_down, target_down,
+                                                source_fpfh, target_fpfh,
+                                                voxel_size)
+    print("Global registration took %.3f sec.\n" % (time.time() - start))
+    print(result_ransac)
+    draw_registration_result(source_down, target_down, result_ransac.transformation)
 
-#Local refinement
-start = time.time()
-result_icp = refine_registration(source_down, target_down, source_fpfh, target_fpfh,
-                                 voxel_size)
-print("ICP refinement took %.3f sec.\n" % (time.time() - start))
-print(result_icp)
-draw_registration_result(source, target, result_icp.transformation)
+    print("Errors: RANSAC")
+    detR_ransac, dett_ransac = compute_transformation_errors(gt_source, gt_target, result_ransac.transformation)
+    print("rotation error (deg):")
+    print(detR_ransac)
+    print("translation error (m):")
+    print(dett_ransac)
 
-print("Errors: ICP refinement")
-detR_refined, dett_refined = compute_transformation_errors(gt_source, gt_target, result_icp.transformation)
-print("rotation error (deg):")
-print(detR_refined)
-print("translation error (m):")
-print(dett_refined)
+    # #Fast flobal registration
+    # start = time.time()
+    # result_fast = execute_fast_global_registration(source_down, target_down,
+    #                                                source_fpfh, target_fpfh,
+    #                                                voxel_size)
+    # print("Fast global registration took %.3f sec.\n" % (time.time() - start))
+    # print(result_fast)
+    # draw_registration_result(source_down, target_down, result_fast.transformation)
+
+    #Local refinement
+    start = time.time()
+    result_icp = refine_registration(source_down, target_down, source_fpfh, target_fpfh,
+                                    voxel_size)
+    print("ICP refinement took %.3f sec.\n" % (time.time() - start))
+    print(result_icp)
+    draw_registration_result(source, target, result_icp.transformation)
+
+    print("Errors: ICP refinement")
+    detR_refined, dett_refined = compute_transformation_errors(gt_source, gt_target, result_icp.transformation)
+    print("rotation error (deg):")
+    print(detR_refined)
+    print("translation error (m):")
+    print(dett_refined)
