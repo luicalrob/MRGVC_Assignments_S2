@@ -129,13 +129,13 @@ for it=1:tamTiempo,
     % Compute epipole coordinates in target camera
     % epipole in current frame: optical centre of target camera in current
     % image
-    
+    dist_epipoles = norm(e1-e0);
     % epipole in target frame: optical centre of current camera in target
     % image
     % Apply stop condition if necessary
-    if norm(c_est) < 0.2
-        % Stop condition reached, exit loop
-        v= [0 0 0];
+    if dist_epipoles < 0.2
+        % Stop condition reached, exit loop  
+        break;
     else
         v = K_v * e1;
         v = v';
