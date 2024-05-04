@@ -27,20 +27,28 @@ def read_trajectory(filename):
             traj.append(CameraPose(metadata, mat))
             metastr = f.readline()
     return traj
-
+    
 def draw_registration_result(source, target, transformation):
     source_temp = copy.deepcopy(source)
     target_temp = copy.deepcopy(target)
     source_temp.paint_uniform_color([1, 0.706, 0])
     target_temp.paint_uniform_color([0, 0.651, 0.929])
     source_temp.transform(transformation)
-    o3d.visualization.draw_geometries([source_temp, target_temp],
-                                      zoom=0.4459,
-                                      front=[0.9288, -0.2951, -0.2242],
-                                      lookat=[1.6784, 2.0612, 1.4451],
-                                      up=[-0.3402, -0.9189, -0.1996])
     
-
+    # Get the center of mass of the transformed source cloud
+    source_center = source_temp.get_center()
+    
+    # Define camera parameters
+    camera_distance = 1 * source_temp.get_max_bound()[1]
+    front = [0, -1, -3]  # Adjusted front direction
+    lookat = source_center  # Look at the center of the transformed source cloud
+    up = [0, 0, 1]  # Up direction
+    
+    o3d.visualization.draw_geometries([source_temp, target_temp],
+                                      zoom=camera_distance,
+                                      front=front,
+                                      lookat=lookat,
+                                      up=up)
 
 def compute_transformation_errors(gt_source, gt_target, That_ts):
     
@@ -180,16 +188,32 @@ if __name__ == "__main__":
     That_ts_point_to_plane = reg_p2l.transformation
     That_ts_point_to_point = reg_p2p.transformation
 
-    print("Errors: Te point to point")
+    print("\nErrors: Initial transformation")
+    detR_i, dett_i = compute_transformation_errors(gt_source, gt_target, trans_init)
+    print("rotation error (deg):")
+    print(detR_i)
+    print("translation error (m):")
+    print(dett_i)
+    evaluation_i = o3d.pipelines.registration.evaluate_registration(
+        pcd_1, pcd_2, threshold, trans_init)
+    print(evaluation_i)
+
+    print("\nErrors: Te point to point")
     detR_p2p, dett_p2p = compute_transformation_errors(gt_source, gt_target, That_ts_point_to_point)
     print("rotation error (deg):")
     print(detR_p2p)
     print("translation error (m):")
     print(dett_p2p)
+    evaluation_p2p = o3d.pipelines.registration.evaluate_registration(
+        pcd_1, pcd_2, threshold, That_ts_point_to_point)
+    print(evaluation_p2p)
 
-    print("Errors: Te point to plane")
+    print("\nErrors: Te point to plane")
     detR_p2l, dett_p2l = compute_transformation_errors(gt_source, gt_target, That_ts_point_to_plane)
     print("rotation error (deg):")
     print(detR_p2l)
     print("translation error (m):")
     print(dett_p2l)
+    evaluation_p2l = o3d.pipelines.registration.evaluate_registration(
+        pcd_1, pcd_2, threshold, That_ts_point_to_plane)
+    print(evaluation_p2l)

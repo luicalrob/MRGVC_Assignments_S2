@@ -35,11 +35,21 @@ def draw_registration_result(source, target, transformation):
     source_temp.paint_uniform_color([1, 0.706, 0])
     target_temp.paint_uniform_color([0, 0.651, 0.929])
     source_temp.transform(transformation)
+    
+    # Get the center of mass of the transformed source cloud
+    source_center = source_temp.get_center()
+    
+    # Define camera parameters
+    camera_distance = 1 * source_temp.get_max_bound()[1]
+    front = [0, -1, -3]  # Adjusted front direction
+    lookat = source_center  # Look at the center of the transformed source cloud
+    up = [0, 0, 1]  # Up direction
+    
     o3d.visualization.draw_geometries([source_temp, target_temp],
-                                      zoom=0.4459,
-                                      front=[0.9288, -0.2951, -0.2242],
-                                      lookat=[1.6784, 2.0612, 1.4451],
-                                      up=[-0.3402, -0.9189, -0.1996])
+                                      zoom=camera_distance,
+                                      front=front,
+                                      lookat=lookat,
+                                      up=up)
     
 
 
@@ -193,12 +203,19 @@ if __name__ == "__main__":
         pcd_src = pcd_target
         gt_source = gt_target
 
-    print("Errors: Global Te")
+    print("\nErrors: Global Te")
     detR_p2p, dett_p2p = compute_odometry_errors(gt_target, That_wt)
     print("rotation error (deg):")
     print(detR_p2p)
     print("translation error (m):")
     print(dett_p2p)
+    # pcd_ini = o3d.geometry.PointCloud.create_from_rgbd_image(
+    #     rgbd_src,
+    #     o3d.camera.PinholeCameraIntrinsic(
+    #         o3d.camera.PinholeCameraIntrinsicParameters.PrimeSenseDefault))
+    # evaluation_p2p = o3d.pipelines.registration.evaluate_registration(
+    #     pcd_ini, pcd_target, threshold, That_wt)
+    # print(evaluation_p2p)
 
 
     # Convert the trajectories to numpy arrays for easier manipulation

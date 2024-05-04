@@ -34,11 +34,21 @@ def draw_registration_result(source, target, transformation):
     source_temp.paint_uniform_color([1, 0.706, 0])
     target_temp.paint_uniform_color([0, 0.651, 0.929])
     source_temp.transform(transformation)
+    
+    # Get the center of mass of the transformed source cloud
+    source_center = source_temp.get_center()
+    
+    # Define camera parameters
+    camera_distance = 1 * source_temp.get_max_bound()[1]
+    front = [0, -1, -3]  # Adjusted front direction
+    lookat = source_center  # Look at the center of the transformed source cloud
+    up = [0, 0, 1]  # Up direction
+    
     o3d.visualization.draw_geometries([source_temp, target_temp],
-                                      zoom=0.4559,
-                                      front=[0.6452, -0.3036, -0.7011],
-                                      lookat=[1.9892, 2.0208, 1.8945],
-                                      up=[-0.2779, -0.9482, 0.1556])
+                                      zoom=camera_distance,
+                                      front=front,
+                                      lookat=lookat,
+                                      up=up)
 
 def preprocess_point_cloud(pcd, voxel_size):
     print(":: Downsample with a voxel size %.3f." % voxel_size)
@@ -217,12 +227,30 @@ if __name__ == "__main__":
     print(result_ransac)
     draw_registration_result(source_down, target_down, result_ransac.transformation)
 
-    print("Errors: RANSAC")
+
+    trans_init = np.identity(4)
+    
+    print("\nErrors: Initial transformation")
+    detR_i, dett_i = compute_transformation_errors(gt_source, gt_target, trans_init)
+    print("rotation error (deg):")
+    print(detR_i)
+    print("translation error (m):")
+    print(dett_i)
+    evaluation_i = o3d.pipelines.registration.evaluate_registration(
+        source_down, target_down, voxel_size, trans_init)
+    print(evaluation_i)
+
+
+    print("\nErrors: RANSAC")
     detR_ransac, dett_ransac = compute_transformation_errors(gt_source, gt_target, result_ransac.transformation)
     print("rotation error (deg):")
     print(detR_ransac)
     print("translation error (m):")
     print(dett_ransac)
+    evaluation_ransac = o3d.pipelines.registration.evaluate_registration(
+        source_down, target_down, voxel_size, result_ransac.transformation)
+    print(evaluation_ransac)
+
 
     # #Fast flobal registration
     # start = time.time()
@@ -237,8 +265,8 @@ if __name__ == "__main__":
     start = time.time()
     result_icp = refine_registration(source_down, target_down, source_fpfh, target_fpfh,
                                     voxel_size)
-    print("ICP refinement took %.3f sec.\n" % (time.time() - start))
-    print(result_icp)
+    print("\nICP refinement took %.3f sec.\n" % (time.time() - start))
+    #print(result_icp)
     draw_registration_result(source, target, result_icp.transformation)
 
     print("Errors: ICP refinement")
@@ -247,3 +275,6 @@ if __name__ == "__main__":
     print(detR_refined)
     print("translation error (m):")
     print(dett_refined)
+    evaluation_p2l = o3d.pipelines.registration.evaluate_registration(
+        source_down, target_down, voxel_size, result_icp.transformation)
+    print(evaluation_p2l)
