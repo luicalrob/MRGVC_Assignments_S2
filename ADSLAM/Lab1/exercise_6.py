@@ -116,8 +116,7 @@ if __name__ == "__main__":
     odometry_error_transl = []
     odometry_error_rot = []
 
-    #For debug
-    trajectory_length = int(trajectory_length*0.1)
+    start = time.time()
 
     for i in range(1,trajectory_length):
 
@@ -202,6 +201,8 @@ if __name__ == "__main__":
         pos_source = i
         pcd_src = pcd_target
         gt_source = gt_target
+
+    print("\n Trajectory took %.3f sec.\n" % (time.time() - start))
 
     print("\nErrors: Global Te")
     detR_p2p, dett_p2p = compute_odometry_errors(gt_target, That_wt)
