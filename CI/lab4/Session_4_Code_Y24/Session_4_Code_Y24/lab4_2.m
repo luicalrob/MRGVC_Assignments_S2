@@ -1,51 +1,48 @@
+clear all;
 %% PARAMETERS
 global params
 global data
 global rec
+
+volSize = 32;
+disp(volSize)
+params.isConfocal = false;
+params.correctAttenuation = true;
+
 params.data.folder = "../data";
-params.data.file = "Z_d=0.5_l=[1x1]_s=[256x256].hdf5";
+params.data.file = "planes_d=0.5_l=[16x16]_s=[16x16].hdf5";
 params.data.path = fullfile(params.data.folder,params.data.file);
-params.rec.disc_env_size = [1,1,1]*16;
+params.rec.disc_env_size = [1,1,1]*volSize;
 params.saveFolder = "../images_comp";
 load("volshow_config.mat");
 mkdir(params.saveFolder);
-files = dir(params.data.folder);
-files = files(3:end)';
-for file = files
-    %% LOAD DATA
-    params.data.path = fullfile(params.data.folder,file.name);
-    data = load_hdf5_dataset(params.data.path);
-    [~,o_filename,~] = fileparts(file.name);
-    disp(o_filename);
-    wxd = [8, 16, 32];
-    for volSize = wxd
-        disp(volSize)
-        params.rec.disc_env_size = [1,1,1]*volSize;
-        
-        %% RECONSTRUCTION
-        tic
-        if data.isConfocal
-            confocal_rec_fast()
-        else
-            normal_rec_fast() 
-        end
-        toc
-        %% Laplacian filter
-        f_lap = fspecial('lap');
-        G_lap = imfilter(rec.G,-f_lap,'symmetric');
-        
-        volshow(rec.G, volshow_config);
-        filename = strcat(o_filename,"_",num2str(volSize),"_nf",".jpg");
-        filename = fullfile(params.saveFolder,filename);
-        imwrite(getframe(gcf).cdata, filename)
-        close all;
-        volshow(G_lap,volshow_config);
-        filename = strcat(o_filename,"_",num2str(volSize),"_f",".jpg");
-        filename = fullfile(params.saveFolder,filename);
-        imwrite(getframe(gcf).cdata, filename)
-        close all;
-    end
+data = load_hdf5_dataset(params.data.path);
+[~,o_filename,~] = fileparts(params.data.path);
+disp(o_filename);
+
+%% RECONSTRUCTION
+tic
+if params.isConfocal
+    confocal_rec_fast()
+else
+    normal_rec_fast() 
 end
+toc
+%% Laplacian filter
+f_lap = fspecial('lap');
+G_lap = imfilter(rec.G,-f_lap,'symmetric');
+
+volumeViewer(rec.G);
+%volshow(rec.G, volshow_config);
+filename = strcat(o_filename,"_",num2str(volSize),"_nf",".jpg");
+filename = fullfile(params.saveFolder,filename);
+imwrite(getframe(gcf).cdata, filename)
+close all;
+volumeViewer(G_lap);
+filename = strcat(o_filename,"_",num2str(volSize),"_f",".jpg");
+filename = fullfile(params.saveFolder,filename);
+imwrite(getframe(gcf).cdata, filename)
+close all;
 
 %% Functions
 
@@ -121,8 +118,9 @@ for i_v = 1:params.rec.disc_env_size(1) % loop over x
             access_index = uint32(1:(nlp*nsp)); % creating absolute indexes to access the data in the data array.
             access_index = access_index + uint32(t-1) * (nlp*nsp);
             h_info = data.data(access_index); % raw data from the dataset
-            
-            h_info = h_info .* d2s_.*d3s_ ./ cos1s_./cos3s_; % apply corrections
+            if(params.correctAttenuation)
+                h_info = h_info .* d2s_.*d3s_ ./ cos1s_./cos3s_; % apply corrections
+            end
             
             rec.G(i_v,j_v,k_v) = sum(h_info,'all'); % generate value for the pixel
         end
@@ -172,7 +170,9 @@ for i_v = 1:params.rec.disc_env_size(1) % loop over x
             access_index = uint32(1:(nsp));
             access_index = access_index + uint32(t-1) * (nsp);
             h_info=data.data(access_index);
-            h_info = h_info .* d2s.*d3s./ cos1s./cos3s;
+            if(params.correctAttenuation)
+                h_info = h_info .* d2s.*d3s./ cos1s./cos3s;
+            end
             
             rec.G(i_v,j_v,k_v) = sum(h_info,'all');
 
