@@ -86,15 +86,24 @@ if __name__ == "__main__":
     source_path_d = "./datasets/livingroom1-depth-clean/00000.png"
 
     parser = argparse.ArgumentParser(description="Read source and target frame ids.")
-    parser.add_argument("--point_to_plane", type=bool, default = True, help="Source frame ID")
+    parser.add_argument("--point_to_plane", type=str, default="True", help="Source frame ID")
+    parser.add_argument("--source_frame", type=int, default = 0, help="Source frame ID")
+    parser.add_argument("--final_frame", type=int, default = 2870, help="Final frame ID")
     args = parser.parse_args()
-    is_point_to_plane = args.point_to_plane
+    pos_source = args.source_frame
+    pos_final = args.final_frame
+    is_point_to_plane = args.point_to_plane.lower() in ['true', '1', 'yes', 'y']
 
-    pos_source = 0
+    print("Source frame:", pos_source)
+    print("Final frame:", pos_final)
+    print("Point to plane:", is_point_to_plane)
+
     gtposes = read_trajectory('./datasets/livingroom1-traj.txt')
-    trajectory_length = len(gtposes)
+    
+    gt_source = gtposes[pos_source].pose
+
+    trajectory_length = (pos_final-pos_source)
     print(trajectory_length)
-    gt_source = gtposes[0].pose
 
     #Read first
     color_raw = o3d.io.read_image(source_path_c)
@@ -108,7 +117,7 @@ if __name__ == "__main__":
         o3d.camera.PinholeCameraIntrinsic(
             o3d.camera.PinholeCameraIntrinsicParameters.PrimeSenseDefault))
     
-    That_wt = gtposes[0].pose
+    That_wt = gtposes[pos_source].pose
 
     trajectory = []
     trajectory_gt = []
@@ -118,9 +127,10 @@ if __name__ == "__main__":
 
     start = time.time()
 
-    for i in range(1,trajectory_length):
-
-        print(f"iteration {i}/{trajectory_length}: source frame={pos_source}, target frame={i}")
+    iteration = 0
+    for i in range(pos_source+1, pos_source+trajectory_length):
+        iteration = iteration + 1
+        print(f"iteration {iteration}/{trajectory_length}: source frame={pos_source}, target frame={i}")
         #Select target
         gt_target = gtposes[i].pose
         target_path_c = "./datasets/livingroom1-color/" + "{:05d}".format(i) + ".jpg"
