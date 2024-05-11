@@ -177,8 +177,7 @@ if __name__ == "__main__":
             #Point-to-point ICP 2000 iterations
             reg_p2p = o3d.pipelines.registration.registration_icp(
                 pcd_src, pcd_target, threshold, trans_init,
-                o3d.pipelines.registration.TransformationEstimationPointToPoint(), 
-                o3d.pipelines.registration.ICPConvergenceCriteria(max_iteration=2000))
+                o3d.pipelines.registration.TransformationEstimationPointToPoint())
             # print("Point-to-point ICP took %.3f sec.\n" % (time.time() - start))
             # print("Transformation That_ts is:")
             # print(reg_p2p.transformation)
