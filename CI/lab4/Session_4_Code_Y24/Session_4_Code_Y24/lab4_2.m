@@ -23,13 +23,15 @@ disp(o_filename);
 %% RECONSTRUCTION
 tic
 if params.isConfocal
+    fprintf("Confocal reconstruction");
     confocal_rec_fast()
 else
+    fprintf("Normal reconstruction");
     normal_rec_fast() 
 end
 toc
 %% Laplacian filter
-f_lap = fspecial('lap');
+f_lap = fspecial3('lap');
 G_lap = imfilter(rec.G,-f_lap,'symmetric');
 
 volumeViewer(rec.G);
@@ -119,6 +121,7 @@ for i_v = 1:params.rec.disc_env_size(1) % loop over x
             access_index = access_index + uint32(t-1) * (nlp*nsp);
             h_info = data.data(access_index); % raw data from the dataset
             if(params.correctAttenuation)
+                %fprintf("Attenuation compensation");
                 h_info = h_info .* d2s_.*d3s_ ./ cos1s_./cos3s_; % apply corrections
             end
             
@@ -171,6 +174,7 @@ for i_v = 1:params.rec.disc_env_size(1) % loop over x
             access_index = access_index + uint32(t-1) * (nsp);
             h_info=data.data(access_index);
             if(params.correctAttenuation)
+                %fprintf("Attenuation compensation");
                 h_info = h_info .* d2s.*d3s./ cos1s./cos3s;
             end
             
