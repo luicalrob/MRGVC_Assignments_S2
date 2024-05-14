@@ -20,7 +20,7 @@ class Enclosing:
 
         # Simulation params
         self.iters = 300
-        self.K_c = 10
+        self.K_c = 5
         self.delta_t = 0.01
         self.random_x = 1
         self.random_y = 1
@@ -31,7 +31,7 @@ class Enclosing:
         self.record_x = np.zeros((self.num_pos, self.iters))
         self.record_y = np.zeros((self.num_pos, self.iters))
 
-        print("Starting de algorithm:\nStarting positions: \n{}\nDesired positions: \n{}\n".format(self.qi.T, self.ci.T))
+        print("Starting positions: \n{}\nDesired positions: \n{}\n".format(self.qi.T, self.ci.T))
         plt.ion()
         self.run()
 
@@ -46,67 +46,51 @@ class Enclosing:
             d = np.sign(np.linalg.det(V_t.T @ U.T))
             D = np.array([[1,0],[0,d]])
             R = V_t.T @ D @ U.T
-            # Notice the - sign!
+            # Compute the positions of the target relative to the robots
             q_Ni = -Q[self.num_pos-1::self.num_pos]
             c_Ni = -C[self.num_pos-1::self.num_pos]
-            #print("Shapes:\nQ: {}\nC: {}\nA: {}\nR: {}\nq_Ni: {}\nc_Ni: {}".format(Q.shape, C.shape, A.shape, R.shape, q_Ni.shape, c_Ni.shape))
-            
-            # Compute control
+            # Compute control input for each robot
             q_dot = np.zeros((self.num_pos, 2))
             for agent in range(self.num_pos):
                 q_dot[agent,:] = self.K_c * (q_Ni[agent,:] - R @ c_Ni[agent,:])
             
-            # Random movement of the prey
-            if np.random.uniform(0,1) > 0.95:
-                self.random_x = np.random.uniform(-5,5)
-                self.random_y = np.random.uniform(-5,5)
-            q_dot[self.num_pos-1, :] += [self.random_x, self.random_y]
+            # Random movement of the target
+            if np.random.uniform(0,1) > 0.80:
+                q_dot[self.num_pos-1, :] += [np.random.uniform(-8,8), np.random.uniform(-8,8)]
 
             # Apply control
             self.qi += q_dot * self.delta_t
             
+            # Record positions for plotting
             self.record_x[:,iteration] = self.qi[:,0]
             self.record_y[:,iteration] = self.qi[:,1]
 
             self.plot_robots()
 
         if self.plot_results:
-            x_axis = np.arange(self.iters)
-
-            plt.figure()
-            plt.ioff()
-            for iter_record in range(self.num_pos):
-                plt.plot(x_axis, self.record_x[iter_record,:])
-            plt.legend(['Robot 1', 'Robot 2', 'Robot 3', 'Robot 4', 'Target'])
-            plt.draw()
-
-            plt.figure()
-            plt.ioff()
-            for iter_record in range(self.num_pos):
-                plt.plot(x_axis, self.record_y[iter_record,:])
-            plt.legend(['Robot 1', 'Robot 2', 'Robot 3', 'Robot 4', 'Target'])
-
-            plt.draw()
-            print("Close windows to finish...")
-            plt.show(block=True)
+            self.plot_results_over_time()
 
 
        
-    def compute_inter_positions(self, positions):
+    # def compute_inter_positions(self, positions):
     
-        rel_pos = np.zeros((self.num_pos*self.num_pos, 2))
-        # Compute inter-robot relative positions
-        for i in range(self.num_pos):
-            for j in range(self.num_pos):
-                #print("Position {} with {}".format(i,j))
-                rel_pos[i + self.num_pos*j, 0] = positions[j,0] - positions[i,0]
-                rel_pos[i + self.num_pos*j, 1] = positions[j,1] - positions[i,1]
-        return rel_pos
+    #     rel_pos = np.zeros((self.num_pos*self.num_pos, 2))
+    #     # Compute inter-robot relative positions
+    #     for i in range(self.num_pos):
+    #         for j in range(self.num_pos):
+    #             #print("Position {} with {}".format(i,j))
+    #             rel_pos[i + self.num_pos*j, 0] = positions[j,0] - positions[i,0]
+    #             rel_pos[i + self.num_pos*j, 1] = positions[j,1] - positions[i,1]
+    #     return rel_pos
+    
+    def compute_inter_positions(self, positions):
+        diff = positions[:, np.newaxis, :] - positions[np.newaxis, :, :]
+        return diff.reshape(-1, 2)
 
     def plot_robots(self):
         plt.clf()
-        plt.xlim(-10,10)
-        plt.ylim(-10,10)
+        plt.xlim(-5,5)
+        plt.ylim(-5,5)
         for i in range(self.num_pos-1):
                 plt.plot(self.qi[i,0],self.qi[i,1],'bo')
 
@@ -115,12 +99,40 @@ class Enclosing:
         plt.draw()
         plt.pause(0.01)
 
+    def plot_results_over_time(self):
+        x_axis = np.arange(self.iters)
+
+        plt.figure()
+        plt.ioff()
+        plt.plot(x_axis, self.record_x[-1, :],'r', label=f'Target')
+        for i in range(self.num_pos-1):
+            plt.plot(x_axis, self.record_x[i, :], label=f'Robot {i+1}') 
+        plt.xlabel('Iteration')
+        plt.ylabel('X-Coordinate')   
+        plt.legend()
+        plt.draw()
+
+        plt.figure()
+        plt.ioff()
+        plt.plot(x_axis, self.record_y[-1, :],'r', label=f'Target')
+        for i in range(self.num_pos-1):
+            plt.plot(x_axis, self.record_y[i, :], label=f'Robot {i+1}')
+        plt.xlabel('Iteration')
+        plt.ylabel('Y-Coordinate')
+        plt.legend()
+        plt.draw()
+        
+        print("Close windows to finish...")
+        plt.show(block=True)
+
 if __name__ == "__main__":
 
-    qx = [-6.1,8.7,-4.7, 3.9, 1]
-    qy = [-4,-4.4,4.2, 4.5, 1]
-    #cx = [2,-2,0,0,0]
-    #cy = [0,0,2,-2,0]
-    cx = [0,2,-2,0,0]
-    cy = [2,-2,-2,-2,0]
+    qx = [2.0, -3.0, -2.0, 3.0, 0]
+    qy = [0.5, 1.0, -0.5, -1.0, 0]
+    
+    # Desired positions for a square formation
+    side_length = 1.5
+    cx = [side_length, -side_length, -side_length, side_length, 0]
+    cy = [side_length, side_length, -side_length, -side_length, 0]
+    
     enc = Enclosing(qx,qy,cx,cy, True)
