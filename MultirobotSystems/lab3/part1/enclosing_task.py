@@ -1,10 +1,7 @@
 import threading
 
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib.offsetbox import OffsetImage, AnnotationBbox
-from numpy.core.shape_base import block
 
 class Enclosing:
     def __init__(self, qi_x, qi_y, ci_x, ci_y, plot_results=False):
