@@ -6,19 +6,6 @@ import matplotlib.pyplot as plt
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 from numpy.core.shape_base import block
 
-def imscatter(x, y, image, ax=None, zoom=1):
-    if ax is None:
-        ax = plt.gca()
-    plt.xlim(-10,10)
-    plt.ylim(-10,10)
-    im = OffsetImage(image, zoom=zoom)
-    x, y = np.atleast_1d(x, y)
-    artists = []
-    for x0, y0 in zip(x, y):
-        ab = AnnotationBbox(im, (x0, y0), xycoords='data', frameon=False)
-        artists.append(ax.add_artist(ab))
-    return artists
-
 class Enclosing:
     def __init__(self, qi_x, qi_y, ci_x, ci_y, plot_results=False):
         self.lock = threading.Lock()
@@ -27,10 +14,6 @@ class Enclosing:
         self.qi = np.array([qi_x,qi_y]).T
 
         self.num_pos = self.qi.shape[0]
-
-        # Useless things for fancyness
-        self.dog = plt.imread('./dog.png')
-        self.sheep = plt.imread('./sheep.png')
 
         # Desired robot location
         self.ci = np.array([ci_x,ci_y]).T
@@ -94,14 +77,14 @@ class Enclosing:
             plt.ioff()
             for iter_record in range(self.num_pos):
                 plt.plot(x_axis, self.record_x[iter_record,:])
-            plt.legend(['Hunter 1', 'Hunter 2', 'Hunter 3', 'Hunter 4', 'Prey'])
+            plt.legend(['Robot 1', 'Robot 2', 'Robot 3', 'Robot 4', 'Target'])
             plt.draw()
 
             plt.figure()
             plt.ioff()
             for iter_record in range(self.num_pos):
                 plt.plot(x_axis, self.record_y[iter_record,:])
-            plt.legend(['Hunter 1', 'Hunter 2', 'Hunter 3', 'Hunter 4', 'Prey'])
+            plt.legend(['Robot 1', 'Robot 2', 'Robot 3', 'Robot 4', 'Target'])
 
             plt.draw()
             print("Close windows to finish...")
@@ -125,11 +108,9 @@ class Enclosing:
         plt.xlim(-10,10)
         plt.ylim(-10,10)
         for i in range(self.num_pos-1):
-                #plt.plot(self.qi[i,0],self.qi[i,1],'bo')
-                imscatter(self.qi[i,0],self.qi[i,1],self.dog,zoom=0.05)
+                plt.plot(self.qi[i,0],self.qi[i,1],'bo')
 
-        #plt.plot(self.qi[self.num_pos-1,0],self.qi[self.num_pos-1,1],'ro')
-        imscatter(self.qi[self.num_pos-1,0],self.qi[self.num_pos-1,1],self.sheep,zoom=0.025)
+        plt.plot(self.qi[self.num_pos-1,0],self.qi[self.num_pos-1,1],'ro')
 
         plt.draw()
         plt.pause(0.01)
