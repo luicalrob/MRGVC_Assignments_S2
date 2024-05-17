@@ -8,7 +8,7 @@
 
 const float HRVO_TWO_PI = 6.283185307179586f;
 
-class graphicsHandler
+class plotter
 {
 private:
 	cv::Scalar background_;
@@ -18,8 +18,8 @@ private:
 	float scale_factor_;
 
 public:
-	graphicsHandler(size_t height, size_t width, double scale_fator, size_t botSize_);
-	~graphicsHandler();
+	plotter(size_t height, size_t width, double scale_fator, size_t botSize_);
+	~plotter();
 	void resetImage(void);
 	void drawRobot(double x, double y, cv::Scalar color);
 	void showAndClearImage();

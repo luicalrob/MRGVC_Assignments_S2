@@ -35,7 +35,7 @@
  * \brief  Example simulation of agents navigating through a circular environment.
  */
 #define _USE_MATH_DEFINES
-#include <graphics_handler.hpp>
+#include <plotter.hpp>
 #include <cmath>
 #include <HRVO.h>
 #include <iostream>
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 
 
 	std::vector <cv::Scalar> botColors = generateColors(numBots);
-	graphicsHandler display(windowWidth, windowWidth, scaleFactor, botSize);
+	plotter display(windowWidth, windowWidth, scaleFactor, botSize);
 
 	// Define Environment
 	Simulator sim;

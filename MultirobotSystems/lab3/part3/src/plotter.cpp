@@ -1,8 +1,8 @@
-#include <graphics_handler.hpp>
+#include <plotter.hpp>
 
 
 
-graphicsHandler::graphicsHandler(size_t height, size_t width, double scale_factor, size_t botSize_): 
+plotter::plotter(size_t height, size_t width, double scale_factor, size_t botSize_): 
     background_(20,20,20),
     image_(height, width, CV_8UC3, background_),
     height_(height),
@@ -14,12 +14,12 @@ graphicsHandler::graphicsHandler(size_t height, size_t width, double scale_facto
      
 }
 
-graphicsHandler::~graphicsHandler()
+plotter::~plotter()
 {
     cv::destroyAllWindows();
 }
 
-void graphicsHandler::drawRobot(double x, double y, cv::Scalar color)
+void plotter::drawRobot(double x, double y, cv::Scalar color)
 {
     double x_d, y_d;
     x_d = x*scale_factor_ + ((double)width_)/2;
@@ -29,14 +29,14 @@ void graphicsHandler::drawRobot(double x, double y, cv::Scalar color)
     
 }
 
-void graphicsHandler::showAndClearImage(void)
+void plotter::showAndClearImage(void)
 {
     cv::imshow(windowName_,image_);
     cv::waitKey(0);
     image_ = cv::Mat(height_, width_, CV_8UC3, background_);
 }
 
-std::string graphicsHandler::get_window_name(void)
+std::string plotter::get_window_name(void)
 {
     return windowName_;
 }

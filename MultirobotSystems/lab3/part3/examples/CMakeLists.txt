@@ -35,8 +35,8 @@
 
 if(BUILD_TESTING)
   add_executable(Circle Circle.cpp)
-  add_executable(Circle_graphic Circle_graphic.cpp ../src/graphics_handler.cpp)
-  add_executable(Circle_name_letter Circle_name_letter.cpp ../src/graphics_handler.cpp)
+  add_executable(Circle_graphic Circle_graphic.cpp ../src/plotter.cpp)
+  add_executable(Name_letter Name_letter.cpp ../src/plotter.cpp)
 
   find_package(OpenCV)
   include_directories( ${OpenCV_INCLUDE_DIRS}, src )

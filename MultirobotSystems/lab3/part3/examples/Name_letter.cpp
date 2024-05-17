@@ -35,7 +35,7 @@
  * \brief  Simulation with 30 agents navigating a square and an 'L' shape environment.
  */
 #define _USE_MATH_DEFINES
-#include <graphics_handler.hpp>
+#include <plotter.hpp>
 #include <cmath>
 #include <HRVO.h>
 #include <iostream>
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 	size_t botSize = 5;
 	double sideLength = 60.0f;
 	std::vector <cv::Scalar> botColors = generateRandomColors(numBots);
-	graphicsHandler display(windowSize, windowSize, scaleFactor, botSize);
+	plotter display(windowSize, windowSize, scaleFactor, botSize);
 
 	std::vector <Vector2> squarePositions = generateSquarePositions(numBots, sideLength);
 	std::vector <Vector2> lShapePositions = generateLShapePositions(numBots, sideLength);
