@@ -1,0 +1,3 @@
+<launch>
+	<node name="bb_alg" pkg="mr_shape_formation" type="bb" output="screen"/>
+</launch>
