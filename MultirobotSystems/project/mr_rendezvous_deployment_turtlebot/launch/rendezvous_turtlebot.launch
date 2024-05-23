@@ -13,39 +13,39 @@
     <arg name="first_tb3_x_pos" default="2.7"/>
     <arg name="first_tb3_y_pos" default="7.5"/>
     <arg name="first_tb3_z_pos" default=" 0.0"/>
-    <arg name="first_tb3_yaw"   default=" 1.57"/>
+    <arg name="first_tb3_yaw"   default=" 0.0"/>
 
     <arg name="second_tb3_x_pos" default=" 0.0"/>
     <arg name="second_tb3_y_pos" default="0.0"/>
     <arg name="second_tb3_z_pos" default=" 0.0"/>
-    <arg name="second_tb3_yaw"   default=" 1.57"/>
+    <arg name="second_tb3_yaw"   default=" 0.0"/>
 
     <arg name="third_tb3_x_pos" default=" -2.5"/>
     <arg name="third_tb3_y_pos" default=" -5.0"/>
     <arg name="third_tb3_z_pos" default=" 0.0"/>
-    <arg name="third_tb3_yaw"   default=" 1.57"/>
+    <arg name="third_tb3_yaw"   default=" 0.0"/>
 
     <arg name="fourth_tb3_x_pos" default=" -7.5"/>
     <arg name="fourth_tb3_y_pos" default=" -5.0"/>
     <arg name="fourth_tb3_z_pos" default=" 0.0"/>
-    <arg name="fourth_tb3_yaw"   default=" 1.57"/>
+    <arg name="fourth_tb3_yaw"   default=" 0.0"/>
 
     <arg name="fifth_tb3_x_pos" default=" -5.0"/>
     <arg name="fifth_tb3_y_pos" default=" 1.0"/>
     <arg name="fifth_tb3_z_pos" default=" 0.0"/>
-    <arg name="fifth_tb3_yaw"   default=" 1.57"/>
+    <arg name="fifth_tb3_yaw"   default=" 0.0"/>
 
     <arg name="sixth_tb3_x_pos" default=" 0.0"/>
     <arg name="sixth_tb3_y_pos" default=" -7.5"/>
     <arg name="sixth_tb3_z_pos" default=" 0.0"/>
-    <arg name="sixth_tb3_yaw"   default=" 1.57"/>
+    <arg name="sixth_tb3_yaw"   default=" 0.0"/>
 
 
     <!-- Desired interrobot distance -->
     <param name = "inter_distance_x" value="2"/>
     <param name = "inter_distance_y" value="2"/>
 
-    <param name = "formation" value="rendezvous"/>
+    <param name = "formation" value="line"/>
 
     <!-- Launch simulation -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">

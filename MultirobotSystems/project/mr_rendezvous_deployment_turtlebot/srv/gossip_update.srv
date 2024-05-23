@@ -4,3 +4,4 @@ float64 y_req
 ---
 float64 x_resp
 float64 y_resp
+bool success
