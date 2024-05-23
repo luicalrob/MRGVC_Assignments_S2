@@ -1,0 +1,45 @@
+<launch>
+    <!-- Parameters for the formation points and neighbor relationships -->
+    <!-- Adjust these values based on your specific formation requirements -->
+    
+    <!-- starting the interface -->
+    <node name="interface" pkg="mr_formation" type="interfaz.py"/>
+    
+    <!-- Add more robots as needed -->
+
+    <!-- Robot Nodes -->
+    <node pkg="mr_formation" type="robot.py" name="robot_1" output="screen">
+        <param name="~robot_id" value="1" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_2" output="screen">
+        <param name="~robot_id" value="2" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_3" output="screen">
+        <param name="~robot_id" value="3" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_4" output="screen">
+        <param name="~robot_id" value="4" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_5" output="screen">
+        <param name="~robot_id" value="5" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_6" output="screen">
+        <param name="~robot_id" value="6" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_7" output="screen">
+        <param name="~robot_id" value="7" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_8" output="screen">
+        <param name="~robot_id" value="8" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_9" output="screen">
+        <param name="~robot_id" value="9" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_110" output="screen">
+        <param name="~robot_id" value="10" />
+    </node>
+    <!-- Add more robot nodes as needed -->
+
+    <!-- Visualization Node -->
+    <node name="position_plotter" pkg="mr_shape_formation" type="visualization_node.py" output="screen" args="10"/>
+</launch>
