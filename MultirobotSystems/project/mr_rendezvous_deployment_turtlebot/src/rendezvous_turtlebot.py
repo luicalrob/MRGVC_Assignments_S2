@@ -2,8 +2,9 @@
 import random
 import math
 import rospy
-from mr_rendezvous_deployment_turtlebot.msg import queue_position_plot
+from mr_rendezvous_deployment_turtlebot.msg import queue_position_plot, range_bearing
 from mr_rendezvous_deployment_turtlebot.srv import gossip_update, gossip_updateResponse
+from mr_rendezvous_deployment_turtlebot.srv import sensor_measurement
 from geometry_msgs.msg import PoseStamped, Pose, Twist
 from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion
@@ -19,6 +20,9 @@ class RendezvousTurtlebot:
         self.rho = 0.0
         self.alpha = 0.0
         self.beta = 0.0
+
+        #Max sensor range in a radius
+        self.max_range = 3.5
 
         self.pose = Pose()
         self.target_pose = Pose()
@@ -60,12 +64,16 @@ class RendezvousTurtlebot:
         try:
             self.inter_distance_x = rospy.get_param("/inter_distance_x")
             self.inter_distance_y = rospy.get_param("/inter_distance_y")
+            self.dynamic_neighbors = rospy.get_param("/dynamic_neighbors")
+
             self.formation = rospy.get_param("/formation")
             self.robot_id = int(rospy.get_param("~robot_id"))
             self.neighbors = rospy.get_param("~neighbors")            
             self.neighbors = [int(x)
                                 for x in self.neighbors.split()]
+            
             self.available_neighbors = []
+            
             for neighbor in self.neighbors:
                 if neighbor < self.robot_id:
                     self.available_neighbors.append(neighbor)
@@ -119,9 +127,35 @@ class RendezvousTurtlebot:
     #Low-frequency callback to request gossip updates periodically and change target positions for each robot
     def request_gossip_update(self, event): 
                 
-        if self.available_neighbors is not None:
+        #request measurements and find neighbors in sensor range
+        if(self.dynamic_neighbors):
+            
+            rospy.wait_for_service("/sensor_measurements_server")
+
+            try:
+
+                service_neighbors_update = rospy.ServiceProxy(
+                "/sensor_measurements_server", sensor_measurement)
+                
+                res = service_neighbors_update(self.robot_id, self.max_range)
+                self.available_neighbors = []
+
+                for measurement in res.measurements:
+                    neighbor = measurement.robot_id
+                    distance = measurement.range
+                    bearing = measurement.bearing
+                    rospy.loginfo("[Robot {}] found neighbor {} at distance {}, angle {}".format(self.robot_id, neighbor, distance, bearing))
+                    self.available_neighbors.append(neighbor)
+
+            except rospy.ServiceException as e:
+                print("[rendezvous robot] Service call failed: "+str(e))  
+        
+            
+        #select one of the neighbors
+        if self.available_neighbors:
             target_id = random.choice(self.available_neighbors)
         else:
+            rospy.loginfo("[Robot {}] Could not find any neighbors".format(self.robot_id))
             return
 
         rospy.wait_for_service("/gossip_update_"+str(target_id))
