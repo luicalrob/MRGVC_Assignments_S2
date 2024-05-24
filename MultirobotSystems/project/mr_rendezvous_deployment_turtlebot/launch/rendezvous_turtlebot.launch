@@ -10,8 +10,8 @@
     <arg name="fifth_tb3"  default="robot_5"/>
     <arg name="sixth_tb3"  default="robot_6"/>
 
-    <arg name="first_tb3_x_pos" default="2.7"/>
-    <arg name="first_tb3_y_pos" default="7.5"/>
+    <arg name="first_tb3_x_pos" default="3.0"/>
+    <arg name="first_tb3_y_pos" default="3.0"/>
     <arg name="first_tb3_z_pos" default=" 0.0"/>
     <arg name="first_tb3_yaw"   default=" 0.0"/>
 
@@ -20,32 +20,38 @@
     <arg name="second_tb3_z_pos" default=" 0.0"/>
     <arg name="second_tb3_yaw"   default=" 0.0"/>
 
-    <arg name="third_tb3_x_pos" default=" -2.5"/>
-    <arg name="third_tb3_y_pos" default=" -5.0"/>
+    <arg name="third_tb3_x_pos" default=" -3.0"/>
+    <arg name="third_tb3_y_pos" default=" -3.0"/>
     <arg name="third_tb3_z_pos" default=" 0.0"/>
     <arg name="third_tb3_yaw"   default=" 0.0"/>
 
-    <arg name="fourth_tb3_x_pos" default=" -7.5"/>
-    <arg name="fourth_tb3_y_pos" default=" -5.0"/>
+    <arg name="fourth_tb3_x_pos" default=" -3.0"/>
+    <arg name="fourth_tb3_y_pos" default=" 3.0"/>
     <arg name="fourth_tb3_z_pos" default=" 0.0"/>
     <arg name="fourth_tb3_yaw"   default=" 0.0"/>
 
-    <arg name="fifth_tb3_x_pos" default=" -5.0"/>
-    <arg name="fifth_tb3_y_pos" default=" 1.0"/>
+    <arg name="fifth_tb3_x_pos" default=" 3.0"/>
+    <arg name="fifth_tb3_y_pos" default=" -3.0"/>
     <arg name="fifth_tb3_z_pos" default=" 0.0"/>
     <arg name="fifth_tb3_yaw"   default=" 0.0"/>
 
-    <arg name="sixth_tb3_x_pos" default=" 0.0"/>
-    <arg name="sixth_tb3_y_pos" default=" -7.5"/>
+    <arg name="sixth_tb3_x_pos" default=" -1.5"/>
+    <arg name="sixth_tb3_y_pos" default=" 1.5"/>
     <arg name="sixth_tb3_z_pos" default=" 0.0"/>
     <arg name="sixth_tb3_yaw"   default=" 0.0"/>
 
+
+    <!-- Specify number of robots -->
+    <param name="n_robots"  value="6"/>
+
+    <!-- Set to true to calculate neighbors dynamically based on sensor range -->
+    <param name="dynamic_neighbors" value="True"/>
 
     <!-- Desired interrobot distance -->
     <param name = "inter_distance_x" value="2"/>
     <param name = "inter_distance_y" value="2"/>
 
-    <param name = "formation" value="line"/>
+    <param name = "formation" value="rendezvous"/>
 
     <!-- Launch simulation -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -56,6 +62,10 @@
     <arg name="headless" value="false"/>
     <arg name="debug" value="false"/>
     </include>
+
+
+    <!-- Launch sensor simulation -->
+    <node name="sensors_simulation" pkg="mr_rendezvous_deployment_turtlebot" type="sensor_simulator.py" output="screen"/>
 
 
     <!-- robot 1 -->
