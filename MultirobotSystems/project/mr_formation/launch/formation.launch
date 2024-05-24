@@ -3,9 +3,11 @@
     <!-- Adjust these values based on your specific formation requirements -->
     
     <!-- starting the interface -->
-    <node name="interface" pkg="mr_formation" type="interfaz.py"/>
+    <node name="interface" pkg="mr_formation" type="interfaz.py" output="screen">
+        <param name="n_robots" value="10"/>
+    </node>
     
-    <!-- Add more robots as needed -->
+    <node name="sensors_simulator" pkg="mr_formation" type="sensors_simulator.py" output="screen" args="10"/>
 
     <!-- Robot Nodes -->
     <node pkg="mr_formation" type="robot.py" name="robot_1" output="screen">
@@ -41,5 +43,5 @@
     <!-- Add more robot nodes as needed -->
 
     <!-- Visualization Node -->
-    <node name="position_plotter" pkg="mr_shape_formation" type="visualization_node.py" output="screen" args="10"/>
+    <node name="position_plotter" pkg="mr_formation" type="visualization_node.py" output="screen" args="10"/>
 </launch>

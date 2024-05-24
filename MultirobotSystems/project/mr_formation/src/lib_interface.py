@@ -57,7 +57,7 @@ sol             = []
 
 dic             = {}
 
-info_text       = ["Información de uso:", 
+info_text       = ["Informacion de uso:", 
                     "Pulse click izquierdo para dibujar",  
                     "Pulse click derecho para borrar", 
                     "Pulse dibujar para generar los puntos representativos del dibujo", 

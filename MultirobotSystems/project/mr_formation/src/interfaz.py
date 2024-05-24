@@ -4,13 +4,19 @@ from lib_interface import *
 
 from geometry_msgs.msg import Polygon, Point32
 import rospy
-
+import numpy as np 
 import pygame, sys
 
 # Initializing ros node
 rospy.init_node("interface_node")
 
+#read number of robots
+n_robots = int(rospy.get_param("~n_robots"))
+rospy.loginfo("[Interface] Launching pattern drawing interface for {} robots".format(n_robots))
+
 sol_pub = rospy.Publisher('/goal_points', Polygon, queue_size=5)
+rel_pub = rospy.Publisher('/relative_positions', Polygon, queue_size=5)
+
 
 # Initializing pygame
 pygame.init()
@@ -71,10 +77,10 @@ def print_path():
 
     # print(len(path))
     sol = []
-    if len(keys) <= NUM_ROBOTS:
+    if len(keys) <= n_robots:
         sol = keys.copy() 
     else:
-        i = aux = (len(keys) - (len(keys) / NUM_ROBOTS)) / (NUM_ROBOTS - 2)
+        i = aux = (len(keys) - (len(keys) / n_robots)) / (n_robots - 2)
         sol.append(keys[0])
         while(i <= len(keys)):
             aux2 = int(i)
@@ -93,8 +99,21 @@ def send_sol():
     for s in sol:
         poly.points.append(Point32(s.y*2/10,s.x*2/10,0))
         
-   
     sol_pub.publish(poly)
+
+    # Calculate relative positions
+    num_points = len(sol)
+    rel_pos_matrix = np.zeros((num_points, num_points, 2))
+    rel_pos_poly = Polygon()
+    for i in range(num_points):
+        for j in range(num_points):
+            if i != j:
+                rel_pos_matrix[i, j, 0] = (sol[j].x - sol[i].x) * 2 / 10
+                rel_pos_matrix[i, j, 1] = (sol[j].y - sol[i].y) * 2 / 10
+                rel_pos_poly.points.append(Point32(rel_pos_matrix[i, j, 0], rel_pos_matrix[i, j, 1], 0))
+                
+    rel_pub.publish(rel_pos_poly)
+
 # Initializing the solution grid
 fill_super_grid()
 

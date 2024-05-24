@@ -166,6 +166,7 @@ include_directories(
 catkin_install_python(PROGRAMS
    src/visualization_node.py
    src/robot.py
+   src/sensors_simulator.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
