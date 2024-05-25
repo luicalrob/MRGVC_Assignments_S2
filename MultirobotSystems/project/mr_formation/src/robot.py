@@ -14,19 +14,17 @@ class RobotNode:
         self.goal_point = Point32()
         self.goal_point.x = 0
         self.goal_point.y = 0
-        self.positions = {}  # Positions of neighbors
-        self.relative_positions = np.zeros((10, 2))
-        self.weight = 0.1 
+        self.neighbor_positions = {}  # Positions of neighbors
+        self.ri = np.zeros((1, 2))
+        self.weight = 0.025
 
         # Publishers
-        self.position_pub = rospy.Publisher(f'/robot_{self.robot_id}/position', Point32, queue_size=10)
-
         self.position_pub = rospy.Publisher(f'/robot_{self.robot_id}/position', Point32, queue_size=10)
         self.plot_pub = rospy.Publisher('mr_formation/queue_position_plot', queue_position_plot, queue_size=10)
 
         # Subscribers
         rospy.Subscriber('/goal_points', Polygon, self.goal_points_callback)
-        rospy.Subscriber('/relative_positions', Polygon, self.relative_positions_callback)
+        rospy.Subscriber(f'/robot_{self.robot_id}/desired_r', Point32, self.relative_positions_callback)
         rospy.Subscriber(f'/robot_{self.robot_id}/neighbors_positions', Polygon, self.neighbors_positions_callback)
 
         self.rate = rospy.Rate(10)  # 10 Hz
@@ -36,37 +34,33 @@ class RobotNode:
         if 0 < self.robot_id <= len(msg.points):
             point = msg.points[self.robot_id - 1]  # Convert to 0-based index
             rospy.loginfo(f"Robot ID {self.robot_id}: x={point.x}, y={point.y}, z={point.z}")
-            self.goal_point.x = point.y
-            self.goal_point.y = -point.x
+            self.goal_point.x = point.x
+            self.goal_point.y = point.y
         else:
             rospy.logwarn(f"Robot ID {self.robot_id} is out of range. Total points available: {len(msg.points)}")
 
-    def relative_positions_callback(self, msg):
-        self.relative_positions = np.zeros((len(msg.points), 2))
-        for i, point in enumerate(msg.points):
-            self.relative_positions[i, 0] = point.x
-            self.relative_positions[i, 1] = point.y
+    def relative_positions_callback(self, msg):        
+        self.ri[0,0] = msg.x
+        self.ri[0,1] = msg.y
 
     def neighbors_positions_callback(self, msg):
-        self.positions = {}
+
         for i, point in enumerate(msg.points):
-            self.positions[i] = (point.x, point.y)
+            self.neighbor_positions[i] = (point.x, point.y)
 
     def compute_new_position(self):
-        if not self.positions:
+        if not self.neighbor_positions:
             return  # If no neighbors' positions are available, do nothing
 
         # Consensus algorithm with weights
-        new_x = self.position.x
-        new_y = self.position.y
-        for i, (x, y) in self.positions.items():
-            rel_x = self.relative_positions[i, 0]
-            rel_y = self.relative_positions[i, 1]
-            new_x += self.weight * (x - self.position.x - rel_x)
-            new_y += self.weight * (y - self.position.y - rel_y)
 
-        self.position.x = new_x
-        self.position.y = new_y
+        for i, (x, y) in self.neighbor_positions.items():
+            
+            self.position.x += self.weight * (x - self.position.x)
+            self.position.y += self.weight * (y - self.position.y)
+
+        self.position.x += self.weight * self.ri[0,0]
+        self.position.y += self.weight * self.ri[0,1]
 
     def publish_position(self):
         pos_msg = queue_position_plot()

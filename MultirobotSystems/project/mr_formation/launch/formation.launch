@@ -2,12 +2,15 @@
     <!-- Parameters for the formation points and neighbor relationships -->
     <!-- Adjust these values based on your specific formation requirements -->
     
+     <!-- Specify number of robots -->
+    <arg name="n_robots" default="10"/>
+ 
     <!-- starting the interface -->
     <node name="interface" pkg="mr_formation" type="interfaz.py" output="screen">
-        <param name="n_robots" value="10"/>
+        <param name="n_robots" value="$(arg n_robots)"/>
     </node>
     
-    <node name="sensors_simulator" pkg="mr_formation" type="sensors_simulator.py" output="screen" args="10"/>
+    <node name="sensors_simulator" pkg="mr_formation" type="sensors_simulator.py" output="screen" args="$(arg n_robots)"/>
 
     <!-- Robot Nodes -->
     <node pkg="mr_formation" type="robot.py" name="robot_1" output="screen">
@@ -43,5 +46,5 @@
     <!-- Add more robot nodes as needed -->
 
     <!-- Visualization Node -->
-    <node name="position_plotter" pkg="mr_formation" type="visualization_node.py" output="screen" args="10"/>
+    <node name="position_plotter" pkg="mr_formation" type="visualization_node.py" output="screen" args="$(arg n_robots)"/>
 </launch>

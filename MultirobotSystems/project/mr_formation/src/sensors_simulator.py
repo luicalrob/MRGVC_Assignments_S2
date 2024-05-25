@@ -10,8 +10,8 @@ class SensorsSimulatorNode:
 
         self.n_robots = n_robots
         self.positions = {i: Point32(0, 0, 0) for i in range(n_robots)}
-        self.position_subs = [rospy.Subscriber(f'/robot_{i}/position', Point32, self.position_callback, i) for i in range(n_robots)]
-        self.neighbors_pubs = [rospy.Publisher(f'/robot_{i}/neighbors_positions', Polygon, queue_size=10) for i in range(n_robots)]
+        self.position_subs = [rospy.Subscriber(f'/robot_{i}/position', Point32, self.position_callback, i) for i in range(1, n_robots + 1)]
+        self.neighbors_pubs = [rospy.Publisher(f'/robot_{i}/neighbors_positions', Polygon, queue_size=10) for i in range(1, n_robots + 1)]
 
         self.rate = rospy.Rate(2)  # 2 Hz
 
@@ -23,9 +23,8 @@ class SensorsSimulatorNode:
             neighbors_poly = Polygon()
             for j in range(self.n_robots):
                 if i != j:
-                    rel_x = self.positions[j].x - self.positions[i].x
-                    rel_y = self.positions[j].y - self.positions[i].y
-                    neighbors_poly.points.append(Point32(rel_x, rel_y, 0))
+                    neighbors_poly.points.append(Point32(self.positions[j].x, self.positions[j].y, 0))
+            
             self.neighbors_pubs[i].publish(neighbors_poly)
 
     def run(self):
