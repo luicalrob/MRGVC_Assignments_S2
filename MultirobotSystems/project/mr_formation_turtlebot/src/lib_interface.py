@@ -33,10 +33,10 @@ GRID_H              = 480
 SUPER_GRID_WIDTH    = 50
 SUPER_GRID_HEIGHT   = 40
 
-NUM_ROBOTS  = 6
+NUM_ROBOTS  = 3
 
 config_loc      = current_file_path + "/config/icons/"
-config_caption  = "Pattern shaping - Turtlebot3"
+config_caption  = "Pattern shaping w Turtlebot2"
 config_icon     = config_loc + "shapingpattern_icon.png"
 config_title    = config_loc + "title.png"
 config_pt_rbt   = config_loc + "points_and_robots.png"

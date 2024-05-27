@@ -4,17 +4,18 @@ from lib_interface import *
 
 from geometry_msgs.msg import Polygon, Point32
 import rospy
-
+import numpy as np 
 import pygame, sys
 
 # Initializing ros node
 rospy.init_node("interface_node")
 
 #read number of robots
-n_robots = int(rospy.get_param("~n_robots"))
+n_robots = int(rospy.get_param("/n_robots"))
 rospy.loginfo("[Interface] Launching pattern drawing interface for {} robots".format(n_robots))
-#create publisher for goals
+
 sol_pub = rospy.Publisher('/goal_points', Polygon, queue_size=5)
+desired_r_pubs = [rospy.Publisher(f'/robot_{i}/desired_r', Point32, queue_size=10) for i in range(1, n_robots+1)]
 
 # Initializing pygame
 pygame.init()
@@ -97,8 +98,26 @@ def send_sol():
     for s in sol:
         poly.points.append(Point32(s.y*2/10,s.x*2/10,0))
         
-   
     sol_pub.publish(poly)
+
+    # Calculate relative positions
+    num_goals = len(sol)
+    desired_r = np.zeros((num_goals,2))
+    rel_pos_matrix = np.zeros((num_goals, num_goals, 2))
+    
+    for i in range(num_goals):
+        for j in range(num_goals):
+            if i != j:
+                rel_pos_matrix[i, j, 0] = (sol[j].x - sol[i].x) * 2/10
+                rel_pos_matrix[i, j, 1] = (sol[j].y - sol[i].y) * 2/10
+        
+        desired_r[i,0] = -np.sum(rel_pos_matrix[i,:,0])
+        desired_r[i,1] = -np.sum(rel_pos_matrix[i,:,1])
+        desired_r_pubs[i].publish(Point32(desired_r[i,0], desired_r[i,1], 0))
+                
+    rospy.loginfo("Desired relative positions in x: {}".format(rel_pos_matrix[:,:,0]))
+    rospy.loginfo("Desired relative positions in y: {}".format(rel_pos_matrix[:,:,1]))
+
 # Initializing the solution grid
 fill_super_grid()
 
