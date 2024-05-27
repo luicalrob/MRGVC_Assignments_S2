@@ -64,7 +64,7 @@ def print_path():
 
     # Preprocessing of the dic list
     k = list(dic.keys())
-    print(k)
+    # print(k)
     keys = []
     for i in k:
         x = int(i/100)

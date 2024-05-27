@@ -4,13 +4,14 @@
     
      <!-- Specify number of robots -->
     <arg name="n_robots" default="10"/>
+    <arg name="range_distance" default="2.5"/>
  
     <!-- starting the interface -->
     <node name="interface" pkg="mr_formation" type="interfaz.py" output="screen">
         <param name="n_robots" value="$(arg n_robots)"/>
     </node>
     
-    <node name="sensors_simulator" pkg="mr_formation" type="sensors_simulator.py" output="screen" args="$(arg n_robots)"/>
+    <node name="sensors_simulator" pkg="mr_formation" type="sensors_simulator.py" output="screen" args="$(arg n_robots) $(arg range_distance)"/>
 
     <!-- Robot Nodes -->
     <node pkg="mr_formation" type="robot.py" name="robot_1" output="screen">
