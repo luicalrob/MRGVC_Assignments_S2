@@ -42,7 +42,7 @@
 
 
     <!-- Specify number of robots -->
-    <param name="n_robots"  value="6"/>
+    <arg name="n_robots" default="6"/>
 
     <!-- Specify max sensor range for sensor simulation -->
     <param name="sensor_range"  value="3.0"/>
@@ -59,10 +59,14 @@
 
 
      <!-- starting the interface -->
-    <node name="interface" pkg="mr_formation_turtlebot" type="interfaz.py" output="screen"/>
+     <node name="interface" pkg="mr_formation" type="interfaz.py" output="screen">
+        <param name="n_robots" value="$(arg n_robots)"/>
+    </node>
 
     <!-- Launch sensor simulation -->
-    <node name="sensors_simulation" pkg="mr_formation_turtlebot" type="sensor_simulator.py" output="screen"/>
+    <node name="sensors_simulation" pkg="mr_formation_turtlebot" type="sensor_simulator.py" output="screen">
+        <param name="n_robots" value="$(arg n_robots)"/>
+    </node>
 
 
     <!-- robot 1 -->

@@ -14,7 +14,7 @@ num_robots = int(rospy.get_param("~n_robots"))
 goal_publisher = rospy.Publisher('/goal_points', Polygon, queue_size=5)
 
 # Publishers for sending desired positions to each turtle
-desired_pos_publishers = [rospy.Publisher(f'/robot_{i}/desired_r', Point32, queue_size=10) for i in range(1, n_robots+1)]
+desired_pos_publishers = [rospy.Publisher(f'/robot_{i}/desired_r', Point32, queue_size=10) for i in range(1, num_robots+1)]
 
 # Initializing pygame
 pygame.init()
@@ -92,7 +92,7 @@ def draw_solution():
 def send_solution():
     poly = Polygon()
     for s in solution:
-        poly.points.append(Point32(s.y*2/10,s.x*2/10,0))
+        poly.points.append(Point32(s.x*2/10,s.y*2/10,0))
         
     goal_publisher.publish(poly)
 
@@ -125,7 +125,7 @@ while True:
         if event.type == pygame.QUIT: sys.exit()
 
     # Fill screen with background color, panel for buttons and border
-    screen.fill(superlightgrey)
+    screen.fill(black)
     pygame.draw.rect(screen,lightgrey,panel, PANEL_BORDER_WIDTH)
     pygame.draw.rect(screen,lightgrey,border,BORDER_BORDER_WIDTH)
 
@@ -134,10 +134,10 @@ while True:
     robot_title_rect.x, robot_title_rect.y    =   70, 55
     info_rect.x,  info_rect.y     =   20, 465
     coordinate_rect.x, coordinate_rect.y    =   -2, -2
-    screen.blit(pygame.image.load(interface_title), title_rect)
-    screen.blit(pygame.image.load(interface_robot_title),robot_title_rect)
-    screen.blit(pygame.image.load(interface_info),  info_rect)
+
     screen.blit(pygame.image.load(interface_axes),coordinate_rect)
+    screen.blit(pygame.image.load(interface_title), title_rect)
+    screen.blit(pygame.image.load(interface_info),  info_rect)
     
     # Fill the screen with the widgets and configuration
     btn_delete.draw(screen, clear_grid)
@@ -191,7 +191,7 @@ while True:
         pygame.draw.polygon(screen, light_white, triangle_points, 0)
 
         for t in range(len(info_text)):
-            font = pygame.font.Font(current_file_path + "/fonts/ARCADE_R.TTF",8)
+            font = pygame.font.Font(current_file_path + "/fonts/mytype.ttf",12)
             if t == 0:
 
                 font.set_underline(True)

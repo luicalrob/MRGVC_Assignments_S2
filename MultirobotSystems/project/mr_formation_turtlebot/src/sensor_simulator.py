@@ -17,7 +17,7 @@ class SensorSimulator:
         rospy.sleep(3.0)        
         
         #State subscribers
-        self.n_robots = rospy.get_param("/n_robots")
+        self.n_robots = rospy.get_param("~n_robots")
         self.robot_positions = {i: None for i in range(self.n_robots)}
         self.odom_subs = []
         for i in range(1, self.n_robots+1):

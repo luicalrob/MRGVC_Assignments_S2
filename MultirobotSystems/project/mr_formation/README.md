@@ -58,10 +58,4 @@ Now everything is installed you have two options to run the project. There´s a 
 `roslaunch multirobot-pattern-shaping decentralized.launch`
 
 ## Errors that can appear
-It's possible that in the you need to change the name of the icons of the interface. It may happen that names are changed during cloning. So please, go to the directory '/config/icons' and check that the filenames are: 
-- coordinate_system.png
-- info.png
-- points_and_robots.png
-- shapingpattern_icon.png
-- title.png
-
+It's possible that in the you need to change the name of the icons of the interface. It may happen that names are changed during cloning. So please, go to the directory '/icons' and check that the filenames
