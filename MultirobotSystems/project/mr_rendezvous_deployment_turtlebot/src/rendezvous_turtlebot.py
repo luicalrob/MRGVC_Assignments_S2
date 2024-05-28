@@ -21,9 +21,6 @@ class RendezvousTurtlebot:
         self.alpha = 0.0
         self.beta = 0.0
 
-        #Max sensor range in a radius
-        self.max_range = 3.5
-
         self.pose = Pose()
         self.target_pose = Pose()
         self.error = PoseStamped()
@@ -65,6 +62,7 @@ class RendezvousTurtlebot:
             self.inter_distance_x = rospy.get_param("/inter_distance_x")
             self.inter_distance_y = rospy.get_param("/inter_distance_y")
             self.dynamic_neighbors = rospy.get_param("/dynamic_neighbors")
+            self.max_range = rospy.get_param("/sensor_range")          
 
             self.formation = rospy.get_param("/formation")
             self.robot_id = int(rospy.get_param("~robot_id"))
