@@ -9,43 +9,52 @@
     <arg name="fourth_tb3"  default="robot_4"/>
     <arg name="fifth_tb3"  default="robot_5"/>
     <arg name="sixth_tb3"  default="robot_6"/>
+    <arg name="seventh_tb3"  default="robot_7"/>
 
-    <arg name="first_tb3_x_pos" default="3.0"/>
-    <arg name="first_tb3_y_pos" default="3.0"/>
+    <arg name="first_tb3_x_pos" default="0.0"/>
+    <arg name="first_tb3_y_pos" default="0.0"/>
     <arg name="first_tb3_z_pos" default=" 0.0"/>
     <arg name="first_tb3_yaw"   default=" 0.0"/>
 
-    <arg name="second_tb3_x_pos" default=" 0.0"/>
-    <arg name="second_tb3_y_pos" default="0.0"/>
+    <arg name="second_tb3_x_pos" default=" 3.0"/>
+    <arg name="second_tb3_y_pos" default="2.0"/>
     <arg name="second_tb3_z_pos" default=" 0.0"/>
     <arg name="second_tb3_yaw"   default=" 0.0"/>
 
     <arg name="third_tb3_x_pos" default=" -3.0"/>
-    <arg name="third_tb3_y_pos" default=" -3.0"/>
+    <arg name="third_tb3_y_pos" default=" 2.0"/>
     <arg name="third_tb3_z_pos" default=" 0.0"/>
     <arg name="third_tb3_yaw"   default=" 0.0"/>
 
-    <arg name="fourth_tb3_x_pos" default=" -3.0"/>
+    <arg name="fourth_tb3_x_pos" default=" 0.0"/>
     <arg name="fourth_tb3_y_pos" default=" 3.0"/>
     <arg name="fourth_tb3_z_pos" default=" 0.0"/>
     <arg name="fourth_tb3_yaw"   default=" 0.0"/>
 
-    <arg name="fifth_tb3_x_pos" default=" 3.0"/>
-    <arg name="fifth_tb3_y_pos" default=" -3.0"/>
+    <arg name="fifth_tb3_x_pos" default=" -3.0"/>
+    <arg name="fifth_tb3_y_pos" default=" -2.0"/>
     <arg name="fifth_tb3_z_pos" default=" 0.0"/>
     <arg name="fifth_tb3_yaw"   default=" 0.0"/>
 
-    <arg name="sixth_tb3_x_pos" default=" -1.5"/>
-    <arg name="sixth_tb3_y_pos" default=" 1.5"/>
+    <arg name="sixth_tb3_x_pos" default=" 3.0"/>
+    <arg name="sixth_tb3_y_pos" default=" -2.0"/>
     <arg name="sixth_tb3_z_pos" default=" 0.0"/>
     <arg name="sixth_tb3_yaw"   default=" 0.0"/>
 
 
+    <arg name="seventh_tb3_x_pos" default=" 0.0"/>
+    <arg name="seventh_tb3_y_pos" default=" -3.0"/>
+    <arg name="seventh_tb3_z_pos" default=" 0.0"/>
+    <arg name="seventh_tb3_yaw"   default=" 0.0"/>
+
+
     <!-- Specify number of robots -->
-    <param name="n_robots"  value="6"/>
+    <param name="n_robots"  value="7"/>
 
     <!-- Set to true to calculate neighbors dynamically based on sensor range -->
-    <param name="dynamic_neighbors" value="True"/>
+    <param name="dynamic_neighbors" value="true"/>
+    <!-- Specify max sensor range for sensor simulation -->
+    <param name="sensor_range"  value="3.5"/>
 
     <!-- Desired interrobot distance -->
     <param name = "inter_distance_x" value="2"/>
@@ -82,8 +91,8 @@
         
         <node name="formation_control" pkg="mr_rendezvous_deployment_turtlebot" type="rendezvous_turtlebot.py" output="screen">
             <param name = "robot_id" value = "1" />
-            <param name = "neighbors" value = "2 5" type="string"/>
-            <param name = "t_local" value = "0.5"/>
+            <param name = "neighbors" value = "2 3 5 6" type="string"/>
+            <param name = "t_local" value = "0.25"/>
         </node>
     
     </group>
@@ -102,7 +111,7 @@
         
         <node name="formation_control" pkg="mr_rendezvous_deployment_turtlebot" type="rendezvous_turtlebot.py" output="screen">
             <param name = "robot_id" value = "2" />
-            <param name = "neighbors" value = "1 3 5" type="string"/>
+            <param name = "neighbors" value = "1 4 6" type="string"/>
             <param name = "t_local" value = "0.5"/>
         </node>
     
@@ -123,7 +132,7 @@
 
         <node name="formation_control" pkg="mr_rendezvous_deployment_turtlebot" type="rendezvous_turtlebot.py" output="screen">
             <param name = "robot_id" value = "3" />
-            <param name = "neighbors" value = "2 4 6" type="string"/>
+            <param name = "neighbors" value = "1 4 5" type="string"/>
             <param name = "t_local" value = "0.5"/>
         </node>
     
@@ -143,7 +152,7 @@
         
         <node name="formation_control" pkg="mr_rendezvous_deployment_turtlebot" type="rendezvous_turtlebot.py" output="screen">
                 <param name = "robot_id" value = "4" />
-                <param name = "neighbors" value = "3" type="string"/>
+                <param name = "neighbors" value = "3 2" type="string"/>
                 <param name = "t_local" value = "0.5"/>
         </node>  
     </group>
@@ -162,7 +171,7 @@
     
         <node name="formation_control" pkg="mr_rendezvous_deployment_turtlebot" type="rendezvous_turtlebot.py" output="screen">
                 <param name = "robot_id" value = "5" />
-                <param name = "neighbors" value = "1 2" type="string"/>
+                <param name = "neighbors" value = "1 3 7" type="string"/>
                 <param name = "t_local" value = "0.5"/>
         </node>  
     </group>
@@ -181,7 +190,28 @@
     
         <node name="formation_control" pkg="mr_rendezvous_deployment_turtlebot" type="rendezvous_turtlebot.py" output="screen">
                     <param name = "robot_id" value = "6" />
-                    <param name = "neighbors" value = "3" type="string"/>
+                    <param name = "neighbors" value = "1 2 7" type="string"/>
+                    <param name = "t_local" value = "0.5"/>
+        </node>  
+    
+    </group>
+
+
+    <!-- robot 7 -->
+
+    <group ns = "$(arg seventh_tb3)">
+        <param name="robot_description" command="$(find xacro)/xacro $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+            <param name="publish_frequency" type="double" value="50.0" />
+            <param name="tf_prefix" value="$(arg sixth_tb3)" />
+        </node>
+
+        <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg seventh_tb3) -x $(arg seventh_tb3_x_pos) -y $(arg seventh_tb3_y_pos) -z $(arg seventh_tb3_z_pos) -Y $(arg seventh_tb3_yaw) -param robot_description" />
+    
+        <node name="formation_control" pkg="mr_rendezvous_deployment_turtlebot" type="rendezvous_turtlebot.py" output="screen">
+                    <param name = "robot_id" value = "7" />
+                    <param name = "neighbors" value = "5 6" type="string"/>
                     <param name = "t_local" value = "0.5"/>
         </node>  
     
