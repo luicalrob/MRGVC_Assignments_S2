@@ -182,7 +182,7 @@ plot3([0 0], [1.5 -1.5], [5 5], 'k-', 'LineWidth', 2);
 hold off;
 
 %% Movements definition
-sample_time = 30;
+sample_time = 5;
 
 vel_left_leg = [];
 vel_right_leg = [];
@@ -494,48 +494,84 @@ vel_left_arm = [vel_left_arm; [0,0,0,0,0,0,0]];
 vel_right_arm = [vel_right_arm; [0,0,0,0,0,0,0]];
 
 
-%% Animation plot
-% len_leg = size(q_left_leg_interpolation);
-% len_arm = size(q_left_arm_interpolation);
-% anim1 = Animate('golf.mp4');
-% for i = 1:max(len_leg(1),len_arm(1))
-%     if i <= len_leg(1)
-%         left_leg.animate(q_left_leg_interpolation(i,:));
-%         right_leg.animate(q_right_leg_interpolation(i,:));
-%     end
-%     if i <= len_arm(1)
-%         left_arm.animate(q_left_arm_interpolation(i,:));
-%         right_arm.animate(q_right_arm_interpolation(i,:));
-%     end
-%     anim1.add()
-% end
-% anim1.close()
+% Animation plot
+len_leg = size(q_left_leg_interpolation);
+len_arm = size(q_left_arm_interpolation);
+anim1 = Animate('golf.mp4');
+for i = 1:max(len_leg(1),len_arm(1))
+    if i <= len_leg(1)
+        left_leg.animate(q_left_leg_interpolation(i,:));
+        right_leg.animate(q_right_leg_interpolation(i,:));
+    end
+    if i <= len_arm(1)
+        left_arm.animate(q_left_arm_interpolation(i,:));
+        right_arm.animate(q_right_arm_interpolation(i,:));
+    end
+    anim1.add()
+end
+anim1.close()
 
 
-%% Positions
+%% Cartesian positions FW model
+
+% arms
 id_fig = 2;
 
-pos_left = [];
-pos_right = [];
-for i = 1:length(cartesians_left_arm)
-    pos_left = [pos_left;cartesians_left_arm(i).t'];
-    pos_right = [pos_right;cartesians_right_arm(i).t'];
+% Determine the number of elements
+n = length(cartesians_left_arm);
+
+% Preallocate the arrays
+pos_left_arm = zeros(n, length(cartesians_left_arm(1).t));
+pos_right_arm = zeros(n, length(cartesians_right_arm(1).t));
+
+% Fill the preallocated arrays
+for i = 1:n
+    pos_left_arm(i, :) = cartesians_left_arm(i).t';
+    pos_right_arm(i, :) = cartesians_right_arm(i).t';
 end
 
-pos_left = [pos_left;pos_left(end,:)];
-pos_right = [pos_right;pos_right(end,:)];
-
 
 figure(id_fig);
 id_fig = id_fig +1;
-plot(pos_r,'-');
-title("Position Right Armg")
+plot(pos_right_arm,'-');
+grid;
+title("Position Right Arm")
 legend('X','Y','Z');
 
-figure(id_fig);
+figure(id_fig);grid;
 id_fig = id_fig +1;
-plot(pos_l,'-');
+plot(pos_left_arm,'-');
+grid;
 title("Position Left Arm")
+legend('X','Y','Z');
+
+%Legs
+
+% Determine the number of elements
+n = length(cartesians_left_leg);
+
+% Preallocate the arrays
+pos_left_leg = zeros(n, length(cartesians_left_leg(1).t));
+pos_right_leg = zeros(n, length(cartesians_right_leg(1).t));
+
+% Fill the preallocated arrays
+for i = 1:n
+    pos_left_leg(i, :) = cartesians_left_leg(i).t';
+    pos_right_leg(i, :) = cartesians_right_leg(i).t';
+end
+
+figure(id_fig);grid;
+id_fig = id_fig +1;
+plot(pos_right_leg,'-');
+grid;
+title("Position Right Leg")
+legend('X','Y','Z');
+
+figure(id_fig);grid;
+id_fig = id_fig +1;
+plot(pos_left_leg,'-');
+grid;
+title("Position Left Leg")
 legend('X','Y','Z');
 
 
