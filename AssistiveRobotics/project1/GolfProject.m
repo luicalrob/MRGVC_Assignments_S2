@@ -103,7 +103,7 @@ L3.qlim = [-pi, pi/2];
 % ELBOW
 % DH parameters for 3T4 (Flexion-Extension)
 L4 = Link([0,       0,      0,      pi/2,   0,      pi]);  
-L4.qlim = [-pi/2, pi/2];
+L4.qlim = [0, pi];
 % DH parameters for 4T5 (Pronation-Supination)
 L5 = Link([0,       0,      2,      pi/2,   0,      pi]);  
 L5.qlim = [-pi/2, pi/2];
@@ -117,11 +117,11 @@ L7 = Link([0,       0,      1,      0,      0,      0]);
 L7.qlim = [-pi/2, pi/2];
 
 % Construction of an object belonging to the class robot
-left_arm=SerialLink([L1,L2,L3,L4,L5,L6],'name', 'left_arm');
+left_arm=SerialLink([L1,L2,L3,L4,L5,L6,L7],'name', 'left_arm');
 % Location of the base reference frame
 left_arm.base=transl(0,1.5,5)*trotz(-pi/2);
 % Visualization of the robot in the joint position given by qr
-left_arm_qr=[0, 0, 0, 0, 0, 0];
+left_arm_qr=[0, 0, 0, 0, 0, 0, 0];
 left_arm.plot(left_arm_qr, 'nobase')
 % Visualization of the robot and manual guidance of the different joints, starting from
 % the initial joint position qr
@@ -146,7 +146,7 @@ L3.qlim = [-pi, pi/2];
 % ELBOW
 % DH parameters for 3T4 (Flexion-Extension)
 L4 = Link([0,       0,      0,      pi/2,   0,      pi]);  
-L4.qlim = [-pi/2, pi/2];
+L4.qlim = [0, pi];
 % DH parameters for 4T5 (Pronation-Supination)
 L5 = Link([0,       0,      2,      pi/2,   0,      pi]);  
 L5.qlim = [-pi/2, pi/2];
@@ -160,11 +160,11 @@ L7 = Link([0,       0,      1,      0,      0,      0]);
 L7.qlim = [-pi/2, pi/2];
 
 % Construction of an object belonging to the class robot
-right_arm=SerialLink([L1,L2,L3,L4,L5,L6],'name', 'right_arm');
+right_arm=SerialLink([L1,L2,L3,L4,L5,L6,L7],'name', 'right_arm');
 % Location of the base reference frame
 right_arm.base=transl(0,0,5)*transl(0,-1.5,0)*trotz(-pi/2);
 % Visualization of the robot in the joint position given by qr
-right_arm_qr=[0, 0, 0, 0, 0, 0];
+right_arm_qr=[0, 0, 0, 0, 0, 0, 0];
 
 right_arm.plot(right_arm_qr, 'nobase');
 % Visualization of the robot and manual guidance of the different joints, starting from
@@ -177,9 +177,3 @@ teach(right_arm, right_arm_qr, 'nobase')
 plot3([0 0], [0 0], [0 5], 'k-', 'LineWidth', 2);
 plot3([0 0], [1 -1], [0 0], 'k-', 'LineWidth', 2);
 plot3([0 0], [1.5 -1.5], [5 5], 'k-', 'LineWidth', 2);
-
-
-%% MOVEMENTS
-
-%% LEFT LEG
-
