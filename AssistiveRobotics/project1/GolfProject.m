@@ -10,13 +10,13 @@ l_2 = 5;
 %       [theta,     D,      A,      alpha,  sigma,  offset]
 
 % HIP
-% DH parameters for 0T1 (Flexion-Extension)
+% DH parameters for 0T1 (Circumduction)
 L1 = Link([0,       0,      0,      pi/2,   0,      0]); 
-L1.qlim = [0, pi/2];
+L1.qlim = [-pi/2, pi/2];
 %  DH parameters for 1T2 (Abduction-Adduction)
 L2 = Link([0,       0,      0,      pi/2,   0,      pi/2]);
 L2.qlim = [-pi/2, pi];
-%  DH parameters for 2T3 (Circumduction)
+%  DH parameters for 2T3 (Flexion-Extension)
 L3 = Link([0,       0,      2,      0,      0,      -pi]);
 L3.qlim = [-pi, pi];
 
@@ -50,13 +50,13 @@ hold on;
 %       [theta,     D,      A,      alpha,  sigma,  offset]
 
 % HIP
-% DH parameters for 0T1 (Flexion-Extension)
+% DH parameters for 0T1 (Circumduction)
 L1 = Link([0,       0,      0,      pi/2,   0,      0]); 
-L1.qlim = [-pi/2, 0];
+L1.qlim = [-pi/2, pi/2];
 %  DH parameters for 1T2 (Abduction-Adduction)
 L2 = Link([0,       0,      0,      pi/2,   0,      pi/2]);
 L2.qlim = [-pi/2, pi];
-%  DH parameters for 2T3 (Circumduction)
+%  DH parameters for 2T3 (Flexion-Extension)
 L3 = Link([0,       0,      2,      0,      0,      -pi]);
 L3.qlim = [-pi, pi];
 
@@ -90,13 +90,13 @@ teach(right_leg, right_leg_qr)
 %       [theta,     D,      A,      alpha,  sigma,  offset]
 
 % SHOULDER
-% DH parameters for 0T1 (Flexion-Extension)
+% DH parameters for 0T1 (Circumduction)
 L1 = Link([0,       0,      0,      pi/2,   0,      pi/2]); 
-L1.qlim = [0, pi];
+L1.qlim = [-pi/2, pi];
 %  DH parameters for 1T2 (Abduction-Adduction)
 L2 = Link([0,       0,      0,      pi/2,   0,      pi/2]);
 L2.qlim = [0, pi];
-%  DH parameters for 2T3 (Circumduction)
+%  DH parameters for 2T3 (Flexion-Extension)
 L3 = Link([0,       0,      2,      pi/2,   0,      pi]);
 L3.qlim = [-pi, pi/2];
 
@@ -135,7 +135,7 @@ teach(left_arm, left_arm_qr, 'nobase')
 % SHOULDER
 % DH parameters for 0T1 (Flexion-Extension)
 L1 = Link([0,       0,      0,      pi/2,   0,      pi/2]); 
-L1.qlim = [0, pi];
+L1.qlim = [-pi/2, pi];
 %  DH parameters for 1T2 (Abduction-Adduction)
 L2 = Link([0,       0,      0,      pi/2,   0,      pi/2]);
 L2.qlim = [0, pi];
@@ -179,5 +179,7 @@ plot3([0 0], [1 -1], [0 0], 'k-', 'LineWidth', 2);
 plot3([0 0], [1.5 -1.5], [5 5], 'k-', 'LineWidth', 2);
 
 
+%% MOVEMENTS
 
+%% LEFT LEG
 
