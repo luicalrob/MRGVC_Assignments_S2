@@ -182,7 +182,7 @@ plot3([0 0], [1.5 -1.5], [5 5], 'k-', 'LineWidth', 2);
 hold off;
 
 %% Movements definition
-sample_time = 5;
+sample_time = 0.4;
 
 vel_left_leg = [];
 vel_right_leg = [];
@@ -195,297 +195,297 @@ cartesians_left_arm = [];
 cartesians_right_arm = [];
 
 %% 1
-t = 15; 
+n_interp = 10; 
 
 % Left leg
 q_left_leg_initial = left_leg_qr;
 q_left_leg_final = [5.4*pi/180, -8.1*pi/180, 25.2*pi/180, 304*pi/180, 24*pi/180, 7.2*pi/180];
-q_left_leg_interpolation = jtraj(q_left_leg_initial, q_left_leg_final, t);  
+q_left_leg_interpolation = jtraj(q_left_leg_initial, q_left_leg_final, n_interp);  
 
-vel_left_leg = [vel_left_leg; repmat((q_left_leg_initial - q_left_leg_final) / t * sample_time, t, 1)];
+vel_left_leg = [vel_left_leg; repmat((q_left_leg_initial - q_left_leg_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_left_leg_initial = fkine(left_leg, q_left_leg_initial);
 T_left_leg_final = fkine(left_leg, q_left_leg_final);
 
-cartesians_left_leg = [cartesians_left_leg, ctraj(T_left_leg_initial, T_left_leg_final, t)];
+cartesians_left_leg = [cartesians_left_leg, ctraj(T_left_leg_initial, T_left_leg_final, n_interp)];
 T_left_leg = [T_left_leg_initial; T_left_leg_final];
 
 
 % Right leg
 q_right_leg_initial = right_leg_qr;
 q_right_leg_final = [5.4*pi/180, 8.1*pi/180, 25.2*pi/180, 304*pi/180, 24*pi/180, 7.2*pi/180];
-q_right_leg_interpolation = jtraj(q_right_leg_initial, q_right_leg_final, t);  
+q_right_leg_interpolation = jtraj(q_right_leg_initial, q_right_leg_final, n_interp);  
 
-vel_right_leg = [vel_right_leg; repmat((q_right_leg_initial - q_right_leg_final) / t * sample_time, t, 1)];
+vel_right_leg = [vel_right_leg; repmat((q_right_leg_initial - q_right_leg_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_right_leg_initial = fkine(right_leg, q_right_leg_initial);
 T_right_leg_final = fkine(right_leg, q_right_leg_final);
 
-cartesians_right_leg = [cartesians_right_leg, ctraj(T_right_leg_initial, T_right_leg_final, t)];
+cartesians_right_leg = [cartesians_right_leg, ctraj(T_right_leg_initial, T_right_leg_final, n_interp)];
 T_right_leg = [T_right_leg_initial; T_right_leg_final];
 
 
 % Left arm
 q_left_arm_initial = left_arm_qr;
 q_left_arm_final = [-21.6*pi/180, 23.4*pi/180, -5.4*pi/180, 25.2*pi/180, -10.8*pi/180, -43.2*pi/180, -25.2*pi/180];
-q_left_arm_interpolation = jtraj(q_left_arm_initial, q_left_arm_final, t);  
+q_left_arm_interpolation = jtraj(q_left_arm_initial, q_left_arm_final, n_interp);  
 
-vel_left_arm = [vel_left_arm; repmat((q_left_arm_initial - q_left_arm_final) / t * sample_time, t, 1)];
+vel_left_arm = [vel_left_arm; repmat((q_left_arm_initial - q_left_arm_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_left_arm_initial = fkine(left_arm, q_left_arm_initial);
 T_left_arm_final = fkine(left_arm, q_left_arm_final);
 
-cartesians_left_arm = [cartesians_left_arm, ctraj(T_left_arm_initial, T_left_arm_final, t)];
+cartesians_left_arm = [cartesians_left_arm, ctraj(T_left_arm_initial, T_left_arm_final, n_interp)];
 T_left_arm = [T_left_arm_initial; T_left_arm_final];
 
 
 % Right arm
 q_right_arm_initial = right_arm_qr;
 q_right_arm_final = [21.6*pi/180, 23.4*pi/180, 5.4*pi/180, 25.2*pi/180, 10.8*pi/180, -43.2*pi/180, 25.2*pi/180];
-q_right_arm_interpolation = jtraj(q_right_arm_initial, q_right_arm_final, t);  
+q_right_arm_interpolation = jtraj(q_right_arm_initial, q_right_arm_final, n_interp);  
 
-vel_right_arm = [vel_right_arm; repmat((q_right_arm_initial - q_right_arm_final) / t * sample_time, t, 1)];
+vel_right_arm = [vel_right_arm; repmat((q_right_arm_initial - q_right_arm_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_right_arm_initial = fkine(right_arm, q_right_arm_initial);
 T_right_arm_final = fkine(right_arm, q_right_arm_final);
 
-cartesians_right_arm = [cartesians_right_arm, ctraj(T_right_arm_initial, T_right_arm_final, t)];
+cartesians_right_arm = [cartesians_right_arm, ctraj(T_right_arm_initial, T_right_arm_final, n_interp)];
 T_right_arm = [T_right_arm_initial; T_right_arm_final];
 
 
 %% 2
-t = 8; 
+n_interp = 8; 
 
 % Left leg
 q_left_leg_initial = q_left_leg_final;
 q_left_leg_final = [-9.0*pi/180, -5.4*pi/180, 18.0*pi/180, 317.0*pi/180, 0.0*pi/180, 10.8*pi/180];
-q_left_leg_interpolation = [q_left_leg_interpolation; jtraj(q_left_leg_initial, q_left_leg_final, t)];  
+q_left_leg_interpolation = [q_left_leg_interpolation; jtraj(q_left_leg_initial, q_left_leg_final, n_interp)];  
 
-vel_left_leg = [vel_left_leg; repmat((q_left_leg_initial - q_left_leg_final) / t * sample_time, t, 1)];
+vel_left_leg = [vel_left_leg; repmat((q_left_leg_initial - q_left_leg_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_left_leg_initial = T_left_leg_final;
 T_left_leg_final = fkine(left_leg, q_left_leg_final);
 
-cartesians_left_leg = [cartesians_left_leg, ctraj(T_left_leg_initial, T_left_leg_final, t)];
+cartesians_left_leg = [cartesians_left_leg, ctraj(T_left_leg_initial, T_left_leg_final, n_interp)];
 T_left_leg = [T_left_leg; T_left_leg_final];
 
 
 % Right leg
 q_right_leg_initial = q_right_leg_final;
 q_right_leg_final = [-10.8*pi/180, 8.1*pi/180, 7.2*pi/180, 347.0*pi/180, 0*pi/180, 10.8*pi/180];
-q_right_leg_interpolation = [q_right_leg_interpolation; jtraj(q_right_leg_initial, q_right_leg_final, t)];  
+q_right_leg_interpolation = [q_right_leg_interpolation; jtraj(q_right_leg_initial, q_right_leg_final, n_interp)];  
 
-vel_right_leg = [vel_right_leg; repmat((q_right_leg_initial - q_right_leg_final) / t * sample_time, t, 1)];
+vel_right_leg = [vel_right_leg; repmat((q_right_leg_initial - q_right_leg_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_right_leg_initial = T_right_leg_final;
 T_right_leg_final = fkine(right_leg, q_right_leg_final);
 
-cartesians_right_leg = [cartesians_right_leg, ctraj(T_right_leg_initial, T_right_leg_final, t)];
+cartesians_right_leg = [cartesians_right_leg, ctraj(T_right_leg_initial, T_right_leg_final, n_interp)];
 T_right_leg = [T_right_leg; T_right_leg_final];
 
 
 % Left arm
 q_left_arm_initial = q_left_arm_final;
 q_left_arm_final = [-90.0*pi/180, 59.4*pi/180, 21.6*pi/180, 10.8*pi/180, 0.0*pi/180, -7.2*pi/180, -23.4*pi/180];
-q_left_arm_interpolation = [q_left_arm_interpolation; jtraj(q_left_arm_initial, q_left_arm_final, t)];  
+q_left_arm_interpolation = [q_left_arm_interpolation; jtraj(q_left_arm_initial, q_left_arm_final, n_interp)];  
 
-vel_left_arm = [vel_left_arm; repmat((q_left_arm_initial - q_left_arm_final) / t * sample_time, t, 1)];
+vel_left_arm = [vel_left_arm; repmat((q_left_arm_initial - q_left_arm_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_left_arm_initial = T_left_arm_final;
 T_left_arm_final = fkine(left_arm, q_left_arm_final);
 
-cartesians_left_arm = [cartesians_left_arm, ctraj(T_left_arm_initial, T_left_arm_final, t)];
+cartesians_left_arm = [cartesians_left_arm, ctraj(T_left_arm_initial, T_left_arm_final, n_interp)];
 T_left_arm = [T_left_arm; T_left_arm_final];
 
 
 % Right arm
 q_right_arm_initial = q_right_arm_final;
 q_right_arm_final = [-35.1*pi/180, -11.7*pi/180, -2.7*pi/180, 113.0*pi/180, 12.6*pi/180, -32.4*pi/180, 3.6*pi/180];
-q_right_arm_interpolation = [q_right_arm_interpolation; jtraj(q_right_arm_initial, q_right_arm_final, t)];  
+q_right_arm_interpolation = [q_right_arm_interpolation; jtraj(q_right_arm_initial, q_right_arm_final, n_interp)];  
 
-vel_right_arm = [vel_right_arm; repmat((q_right_arm_initial - q_right_arm_final) / t * sample_time, t, 1)];
+vel_right_arm = [vel_right_arm; repmat((q_right_arm_initial - q_right_arm_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_right_arm_initial = T_right_arm_final;
 T_right_arm_final = fkine(right_arm, q_right_arm_final);
 
-cartesians_right_arm = [cartesians_right_arm, ctraj(T_right_arm_initial, T_right_arm_final, t)];
+cartesians_right_arm = [cartesians_right_arm, ctraj(T_right_arm_initial, T_right_arm_final, n_interp)];
 T_right_arm = [T_right_arm; T_right_arm_final];
 
 
 %% 3
-t = 5; 
+n_interp = 5; 
 
 % Left leg
 q_left_leg_initial = q_left_leg_final;
 q_left_leg_final = [-3.6*pi/180, -2.7*pi/180, 14.4*pi/180, 324.0*pi/180, 0.0*pi/180, 5.4*pi/180];
-q_left_leg_interpolation = [q_left_leg_interpolation; jtraj(q_left_leg_initial, q_left_leg_final, t)];  
+q_left_leg_interpolation = [q_left_leg_interpolation; jtraj(q_left_leg_initial, q_left_leg_final, n_interp)];  
 
-vel_left_leg = [vel_left_leg; repmat((q_left_leg_initial - q_left_leg_final) / t * sample_time, t, 1)];
+vel_left_leg = [vel_left_leg; repmat((q_left_leg_initial - q_left_leg_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_left_leg_initial = T_left_leg_final;
 T_left_leg_final = fkine(left_leg, q_left_leg_final);
 
-cartesians_left_leg = [cartesians_left_leg, ctraj(T_left_leg_initial, T_left_leg_final, t)];
+cartesians_left_leg = [cartesians_left_leg, ctraj(T_left_leg_initial, T_left_leg_final, n_interp)];
 T_left_leg = [T_left_leg; T_left_leg_final];
 
 
 % Right leg
 q_right_leg_initial = q_right_leg_final;
 q_right_leg_final = [1.8*pi/180, 10.8*pi/180, 7.2*pi/180, 349.0*pi/180, -2.4*pi/180, 7.2*pi/180];
-q_right_leg_interpolation = [q_right_leg_interpolation; jtraj(q_right_leg_initial, q_right_leg_final, t)];  
+q_right_leg_interpolation = [q_right_leg_interpolation; jtraj(q_right_leg_initial, q_right_leg_final, n_interp)];  
 
-vel_right_leg = [vel_right_leg; repmat((q_right_leg_initial - q_right_leg_final) / t * sample_time, t, 1)];
+vel_right_leg = [vel_right_leg; repmat((q_right_leg_initial - q_right_leg_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_right_leg_initial = T_right_leg_final;
 T_right_leg_final = fkine(right_leg, q_right_leg_final);
 
-cartesians_right_leg = [cartesians_right_leg, ctraj(T_right_leg_initial, T_right_leg_final, t)];
+cartesians_right_leg = [cartesians_right_leg, ctraj(T_right_leg_initial, T_right_leg_final, n_interp)];
 T_right_leg = [T_right_leg; T_right_leg_final];
 
 
 % Left arm
 q_left_arm_initial = q_left_arm_final;
 q_left_arm_final = [-90.0*pi/180, 19.8*pi/180, 37.8*pi/180, 5.4*pi/180, -5.4*pi/180, -14.4*pi/180, -25.2*pi/180];
-q_left_arm_interpolation = [q_left_arm_interpolation; jtraj(q_left_arm_initial, q_left_arm_final, t)];  
+q_left_arm_interpolation = [q_left_arm_interpolation; jtraj(q_left_arm_initial, q_left_arm_final, n_interp)];  
 
-vel_left_arm = [vel_left_arm; repmat((q_left_arm_initial - q_left_arm_final) / t * sample_time, t, 1)];
+vel_left_arm = [vel_left_arm; repmat((q_left_arm_initial - q_left_arm_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_left_arm_initial = T_left_arm_final;
 T_left_arm_final = fkine(left_arm, q_left_arm_final);
 
-cartesians_left_arm = [cartesians_left_arm, ctraj(T_left_arm_initial, T_left_arm_final, t)];
+cartesians_left_arm = [cartesians_left_arm, ctraj(T_left_arm_initial, T_left_arm_final, n_interp)];
 T_left_arm = [T_left_arm; T_left_arm_final];
 
 
 % Right arm
 q_right_arm_initial = q_right_arm_final;
 q_right_arm_final = [2.7*pi/180, 10.8*pi/180, 0.0*pi/180, 46.8*pi/180, 16.2*pi/180, -27.0*pi/180, -19.8*pi/180];
-q_right_arm_interpolation = [q_right_arm_interpolation; jtraj(q_right_arm_initial, q_right_arm_final, t)];  
+q_right_arm_interpolation = [q_right_arm_interpolation; jtraj(q_right_arm_initial, q_right_arm_final, n_interp)];  
 
-vel_right_arm = [vel_right_arm; repmat((q_right_arm_initial - q_right_arm_final) / t * sample_time, t, 1)];
+vel_right_arm = [vel_right_arm; repmat((q_right_arm_initial - q_right_arm_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_right_arm_initial = T_right_arm_final;
 T_right_arm_final = fkine(right_arm, q_right_arm_final);
 
-cartesians_right_arm = [cartesians_right_arm, ctraj(T_right_arm_initial, T_right_arm_final, t)];
+cartesians_right_arm = [cartesians_right_arm, ctraj(T_right_arm_initial, T_right_arm_final, n_interp)];
 T_right_arm = [T_right_arm; T_right_arm_final];
 
 
 %% 4
-t = 3; 
+n_interp = 3; 
 
 % Left leg
 q_left_leg_initial = q_left_leg_final;
 q_left_leg_final = [3.6*pi/180, -2.7*pi/180, 10.8*pi/180, 336.6*pi/180, 0.0*pi/180, 1.8*pi/180];
-q_left_leg_interpolation = [q_left_leg_interpolation; jtraj(q_left_leg_initial, q_left_leg_final, t)];  
+q_left_leg_interpolation = [q_left_leg_interpolation; jtraj(q_left_leg_initial, q_left_leg_final, n_interp)];  
 
-vel_left_leg = [vel_left_leg; repmat((q_left_leg_initial - q_left_leg_final) / t * sample_time, t, 1)];
+vel_left_leg = [vel_left_leg; repmat((q_left_leg_initial - q_left_leg_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_left_leg_initial = T_left_leg_final;
 T_left_leg_final = fkine(left_leg, q_left_leg_final);
 
-cartesians_left_leg = [cartesians_left_leg, ctraj(T_left_leg_initial, T_left_leg_final, t)];
+cartesians_left_leg = [cartesians_left_leg, ctraj(T_left_leg_initial, T_left_leg_final, n_interp)];
 T_left_leg = [T_left_leg; T_left_leg_final];
 
 
 % Right leg
 q_right_leg_initial = q_right_leg_final;
 q_right_leg_final = [16.2*pi/180, 10.8*pi/180, 3.6*pi/180, 349.2*pi/180, -4.8*pi/180, 3.6*pi/180];
-q_right_leg_interpolation = [q_right_leg_interpolation; jtraj(q_right_leg_initial, q_right_leg_final, t)];  
+q_right_leg_interpolation = [q_right_leg_interpolation; jtraj(q_right_leg_initial, q_right_leg_final, n_interp)];  
 
-vel_right_leg = [vel_right_leg; repmat((q_right_leg_initial - q_right_leg_final) / t * sample_time, t, 1)];
+vel_right_leg = [vel_right_leg; repmat((q_right_leg_initial - q_right_leg_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_right_leg_initial = T_right_leg_final;
 T_right_leg_final = fkine(right_leg, q_right_leg_final);
 
-cartesians_right_leg = [cartesians_right_leg, ctraj(T_right_leg_initial, T_right_leg_final, t)];
+cartesians_right_leg = [cartesians_right_leg, ctraj(T_right_leg_initial, T_right_leg_final, n_interp)];
 T_right_leg = [T_right_leg; T_right_leg_final];
 
 
 % Left arm
 q_left_arm_initial = q_left_arm_final;
 q_left_arm_final = [-90.0*pi/180, 7.2*pi/180, 35.1*pi/180, 1.8*pi/180, -10.8*pi/180, -14.4*pi/180, -45.0*pi/180];
-q_left_arm_interpolation = [q_left_arm_interpolation; jtraj(q_left_arm_initial, q_left_arm_final, t)];  
+q_left_arm_interpolation = [q_left_arm_interpolation; jtraj(q_left_arm_initial, q_left_arm_final, n_interp)];  
 
-vel_left_arm = [vel_left_arm; repmat((q_left_arm_initial - q_left_arm_final) / t * sample_time, t, 1)];
+vel_left_arm = [vel_left_arm; repmat((q_left_arm_initial - q_left_arm_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_left_arm_initial = T_left_arm_final;
 T_left_arm_final = fkine(left_arm, q_left_arm_final);
 
-cartesians_left_arm = [cartesians_left_arm, ctraj(T_left_arm_initial, T_left_arm_final, t)];
+cartesians_left_arm = [cartesians_left_arm, ctraj(T_left_arm_initial, T_left_arm_final, n_interp)];
 T_left_arm = [T_left_arm; T_left_arm_final];
 
 
 % Right arm
 q_right_arm_initial = q_right_arm_final;
 q_right_arm_final = [29.7*pi/180, 32.4*pi/180, 2.7*pi/180, 5.4*pi/180, 5.4*pi/180, -32.4*pi/180, -0.0*pi/180];
-q_right_arm_interpolation = [q_right_arm_interpolation; jtraj(q_right_arm_initial, q_right_arm_final, t)];  
+q_right_arm_interpolation = [q_right_arm_interpolation; jtraj(q_right_arm_initial, q_right_arm_final, n_interp)];  
 
-vel_right_arm = [vel_right_arm; repmat((q_right_arm_initial - q_right_arm_final) / t * sample_time, t, 1)];
+vel_right_arm = [vel_right_arm; repmat((q_right_arm_initial - q_right_arm_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_right_arm_initial = T_right_arm_final;
 T_right_arm_final = fkine(right_arm, q_right_arm_final);
 
-cartesians_right_arm = [cartesians_right_arm, ctraj(T_right_arm_initial, T_right_arm_final, t)];
+cartesians_right_arm = [cartesians_right_arm, ctraj(T_right_arm_initial, T_right_arm_final, n_interp)];
 T_right_arm = [T_right_arm; T_right_arm_final];
 
 
 %% 5
-t = 5; 
+n_interp = 5; 
 
 % Left leg
 q_left_leg_initial = q_left_leg_final;
 q_left_leg_final = [5.4*pi/180, -5.4*pi/180, 21.6*pi/180, 329.4*pi/180, -1.2*pi/180, -3.6*pi/180];
-q_left_leg_interpolation = [q_left_leg_interpolation; jtraj(q_left_leg_initial, q_left_leg_final, t)];  
+q_left_leg_interpolation = [q_left_leg_interpolation; jtraj(q_left_leg_initial, q_left_leg_final, n_interp)];  
 
-vel_left_leg = [vel_left_leg; repmat((q_left_leg_initial - q_left_leg_final) / t * sample_time, t, 1)];
+vel_left_leg = [vel_left_leg; repmat((q_left_leg_initial - q_left_leg_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_left_leg_initial = T_left_leg_final;
 T_left_leg_final = fkine(left_leg, q_left_leg_final);
 
-cartesians_left_leg = [cartesians_left_leg, ctraj(T_left_leg_initial, T_left_leg_final, t)];
+cartesians_left_leg = [cartesians_left_leg, ctraj(T_left_leg_initial, T_left_leg_final, n_interp)];
 T_left_leg = [T_left_leg; T_left_leg_final];
 
 
 % Right leg
 q_right_leg_initial = q_right_leg_final;
 q_right_leg_final = [57.6*pi/180, 8.1*pi/180, 18.0*pi/180, 334.8*pi/180, -40.8*pi/180, -16.2*pi/180];
-q_right_leg_interpolation = [q_right_leg_interpolation; jtraj(q_right_leg_initial, q_right_leg_final, t)];  
+q_right_leg_interpolation = [q_right_leg_interpolation; jtraj(q_right_leg_initial, q_right_leg_final, n_interp)];  
 
-vel_right_leg = [vel_right_leg; repmat((q_right_leg_initial - q_right_leg_final) / t * sample_time, t, 1)];
+vel_right_leg = [vel_right_leg; repmat((q_right_leg_initial - q_right_leg_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_right_leg_initial = T_right_leg_final;
 T_right_leg_final = fkine(right_leg, q_right_leg_final);
 
-cartesians_right_leg = [cartesians_right_leg, ctraj(T_right_leg_initial, T_right_leg_final, t)];
+cartesians_right_leg = [cartesians_right_leg, ctraj(T_right_leg_initial, T_right_leg_final, n_interp)];
 T_right_leg = [T_right_leg; T_right_leg_final];
 
 
 % Left arm
 q_left_arm_initial = q_left_arm_final;
 q_left_arm_final = [26.1*pi/180, -29.7*pi/180, 21.6*pi/180, 113.0*pi/180, -1.8*pi/180, -50.4*pi/180, -7.2*pi/180];
-q_left_arm_interpolation = [q_left_arm_interpolation; jtraj(q_left_arm_initial, q_left_arm_final, t)];  
+q_left_arm_interpolation = [q_left_arm_interpolation; jtraj(q_left_arm_initial, q_left_arm_final, n_interp)];  
 
-vel_left_arm = [vel_left_arm; repmat((q_left_arm_initial - q_left_arm_final) / t * sample_time, t, 1)];
+vel_left_arm = [vel_left_arm; repmat((q_left_arm_initial - q_left_arm_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_left_arm_initial = T_left_arm_final;
 T_left_arm_final = fkine(left_arm, q_left_arm_final);
 
-cartesians_left_arm = [cartesians_left_arm, ctraj(T_left_arm_initial, T_left_arm_final, t)];
+cartesians_left_arm = [cartesians_left_arm, ctraj(T_left_arm_initial, T_left_arm_final, n_interp)];
 T_left_arm = [T_left_arm; T_left_arm_final];
 
 
 % Right arm
 q_right_arm_initial = q_right_arm_final;
 q_right_arm_final = [48.6*pi/180, 54.9*pi/180, 21.6*pi/180, 9.0*pi/180, -1.8*pi/180, -28.8*pi/180, 12.6*pi/180];
-q_right_arm_interpolation = [q_right_arm_interpolation; jtraj(q_right_arm_initial, q_right_arm_final, t)];  
+q_right_arm_interpolation = [q_right_arm_interpolation; jtraj(q_right_arm_initial, q_right_arm_final, n_interp)];  
 
-vel_right_arm = [vel_right_arm; repmat((q_right_arm_initial - q_right_arm_final) / t * sample_time, t, 1)];
+vel_right_arm = [vel_right_arm; repmat((q_right_arm_initial - q_right_arm_final) / (n_interp * sample_time), n_interp, 1)];
 
 T_right_arm_initial = T_right_arm_final;
 T_right_arm_final = fkine(right_arm, q_right_arm_final);
 
-cartesians_right_arm = [cartesians_right_arm, ctraj(T_right_arm_initial, T_right_arm_final, t)];
+cartesians_right_arm = [cartesians_right_arm, ctraj(T_right_arm_initial, T_right_arm_final, n_interp)];
 T_right_arm = [T_right_arm; T_right_arm_final];
 
 vel_left_leg = [vel_left_leg; [0,0,0,0,0,0]];
