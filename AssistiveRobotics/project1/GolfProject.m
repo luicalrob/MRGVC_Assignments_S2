@@ -254,250 +254,135 @@ T_right_arm = [T_right_arm_initial; T_right_arm_final];
 
 
 %% 2
-n_interp = 8; 
+n_interp = 12; 
 
 % Left leg
 q_left_leg_initial = q_left_leg_final;
 q_left_leg_final = [-9.0*pi/180, -5.4*pi/180, 18.0*pi/180, 317.0*pi/180, 0.0*pi/180, 10.8*pi/180];
-q_left_leg_interpolation = [q_left_leg_interpolation; jtraj(q_left_leg_initial, q_left_leg_final, n_interp)];  
-
-vel_left_leg = [vel_left_leg; repmat((q_left_leg_initial - q_left_leg_final) / (n_interp * sample_time), n_interp, 1)];
-
-T_left_leg_initial = T_left_leg_final;
-T_left_leg_final = fkine(left_leg, q_left_leg_final);
-
-cartesians_left_leg = [cartesians_left_leg, ctraj(T_left_leg_initial, T_left_leg_final, n_interp)];
+[q_left_leg_interpolation, vel_left_leg, T_left_leg_final, cartesians_left_leg] = processLimb(left_leg, q_left_leg_initial, q_left_leg_final, q_left_leg_interpolation, vel_left_leg, cartesians_left_leg, n_interp, sample_time);
 T_left_leg = [T_left_leg; T_left_leg_final];
 
 
 % Right leg
 q_right_leg_initial = q_right_leg_final;
 q_right_leg_final = [-10.8*pi/180, 8.1*pi/180, 7.2*pi/180, 347.0*pi/180, 0*pi/180, 10.8*pi/180];
-q_right_leg_interpolation = [q_right_leg_interpolation; jtraj(q_right_leg_initial, q_right_leg_final, n_interp)];  
-
-vel_right_leg = [vel_right_leg; repmat((q_right_leg_initial - q_right_leg_final) / (n_interp * sample_time), n_interp, 1)];
-
-T_right_leg_initial = T_right_leg_final;
-T_right_leg_final = fkine(right_leg, q_right_leg_final);
-
-cartesians_right_leg = [cartesians_right_leg, ctraj(T_right_leg_initial, T_right_leg_final, n_interp)];
+[q_right_leg_interpolation, vel_right_leg, T_right_leg_final, cartesians_right_leg] = processLimb(right_leg, q_right_leg_initial, q_right_leg_final, q_right_leg_interpolation, vel_right_leg, cartesians_right_leg, n_interp, sample_time);
 T_right_leg = [T_right_leg; T_right_leg_final];
 
 
 % Left arm
 q_left_arm_initial = q_left_arm_final;
 q_left_arm_final = [-90.0*pi/180, 59.4*pi/180, 21.6*pi/180, 10.8*pi/180, 0.0*pi/180, -7.2*pi/180, -23.4*pi/180];
-q_left_arm_interpolation = [q_left_arm_interpolation; jtraj(q_left_arm_initial, q_left_arm_final, n_interp)];  
-
-vel_left_arm = [vel_left_arm; repmat((q_left_arm_initial - q_left_arm_final) / (n_interp * sample_time), n_interp, 1)];
-
-T_left_arm_initial = T_left_arm_final;
-T_left_arm_final = fkine(left_arm, q_left_arm_final);
-
-cartesians_left_arm = [cartesians_left_arm, ctraj(T_left_arm_initial, T_left_arm_final, n_interp)];
+[q_left_arm_interpolation, vel_left_arm, T_left_arm_final, cartesians_left_arm] = processLimb(left_arm, q_left_arm_initial, q_left_arm_final, q_left_arm_interpolation, vel_left_arm, cartesians_left_arm, n_interp, sample_time);
 T_left_arm = [T_left_arm; T_left_arm_final];
 
 
 % Right arm
 q_right_arm_initial = q_right_arm_final;
 q_right_arm_final = [-35.1*pi/180, -11.7*pi/180, -2.7*pi/180, 113.0*pi/180, 12.6*pi/180, -32.4*pi/180, 3.6*pi/180];
-q_right_arm_interpolation = [q_right_arm_interpolation; jtraj(q_right_arm_initial, q_right_arm_final, n_interp)];  
-
-vel_right_arm = [vel_right_arm; repmat((q_right_arm_initial - q_right_arm_final) / (n_interp * sample_time), n_interp, 1)];
-
-T_right_arm_initial = T_right_arm_final;
-T_right_arm_final = fkine(right_arm, q_right_arm_final);
-
-cartesians_right_arm = [cartesians_right_arm, ctraj(T_right_arm_initial, T_right_arm_final, n_interp)];
+[q_right_arm_interpolation, vel_right_arm, T_right_arm_final, cartesians_right_arm] = processLimb(right_arm, q_right_arm_initial, q_right_arm_final, q_right_arm_interpolation, vel_right_arm, cartesians_right_arm, n_interp, sample_time);
 T_right_arm = [T_right_arm; T_right_arm_final];
 
 
 %% 3
-n_interp = 5; 
+n_interp = 6; 
 
 % Left leg
 q_left_leg_initial = q_left_leg_final;
 q_left_leg_final = [-3.6*pi/180, -2.7*pi/180, 14.4*pi/180, 324.0*pi/180, 0.0*pi/180, 5.4*pi/180];
-q_left_leg_interpolation = [q_left_leg_interpolation; jtraj(q_left_leg_initial, q_left_leg_final, n_interp)];  
-
-vel_left_leg = [vel_left_leg; repmat((q_left_leg_initial - q_left_leg_final) / (n_interp * sample_time), n_interp, 1)];
-
-T_left_leg_initial = T_left_leg_final;
-T_left_leg_final = fkine(left_leg, q_left_leg_final);
-
-cartesians_left_leg = [cartesians_left_leg, ctraj(T_left_leg_initial, T_left_leg_final, n_interp)];
+[q_left_leg_interpolation, vel_left_leg, T_left_leg_final, cartesians_left_leg] = processLimb(left_leg, q_left_leg_initial, q_left_leg_final, q_left_leg_interpolation, vel_left_leg, cartesians_left_leg, n_interp, sample_time);
 T_left_leg = [T_left_leg; T_left_leg_final];
 
 
 % Right leg
 q_right_leg_initial = q_right_leg_final;
 q_right_leg_final = [1.8*pi/180, 10.8*pi/180, 7.2*pi/180, 349.0*pi/180, -2.4*pi/180, 7.2*pi/180];
-q_right_leg_interpolation = [q_right_leg_interpolation; jtraj(q_right_leg_initial, q_right_leg_final, n_interp)];  
-
-vel_right_leg = [vel_right_leg; repmat((q_right_leg_initial - q_right_leg_final) / (n_interp * sample_time), n_interp, 1)];
-
-T_right_leg_initial = T_right_leg_final;
-T_right_leg_final = fkine(right_leg, q_right_leg_final);
-
-cartesians_right_leg = [cartesians_right_leg, ctraj(T_right_leg_initial, T_right_leg_final, n_interp)];
+[q_right_leg_interpolation, vel_right_leg, T_right_leg_final, cartesians_right_leg] = processLimb(right_leg, q_right_leg_initial, q_right_leg_final, q_right_leg_interpolation, vel_right_leg, cartesians_right_leg, n_interp, sample_time);
 T_right_leg = [T_right_leg; T_right_leg_final];
 
 
 % Left arm
 q_left_arm_initial = q_left_arm_final;
 q_left_arm_final = [-90.0*pi/180, 19.8*pi/180, 37.8*pi/180, 5.4*pi/180, -5.4*pi/180, -14.4*pi/180, -25.2*pi/180];
-q_left_arm_interpolation = [q_left_arm_interpolation; jtraj(q_left_arm_initial, q_left_arm_final, n_interp)];  
-
-vel_left_arm = [vel_left_arm; repmat((q_left_arm_initial - q_left_arm_final) / (n_interp * sample_time), n_interp, 1)];
-
-T_left_arm_initial = T_left_arm_final;
-T_left_arm_final = fkine(left_arm, q_left_arm_final);
-
-cartesians_left_arm = [cartesians_left_arm, ctraj(T_left_arm_initial, T_left_arm_final, n_interp)];
+[q_left_arm_interpolation, vel_left_arm, T_left_arm_final, cartesians_left_arm] = processLimb(left_arm, q_left_arm_initial, q_left_arm_final, q_left_arm_interpolation, vel_left_arm, cartesians_left_arm, n_interp, sample_time);
 T_left_arm = [T_left_arm; T_left_arm_final];
 
 
 % Right arm
 q_right_arm_initial = q_right_arm_final;
 q_right_arm_final = [2.7*pi/180, 10.8*pi/180, 0.0*pi/180, 46.8*pi/180, 16.2*pi/180, -27.0*pi/180, -19.8*pi/180];
-q_right_arm_interpolation = [q_right_arm_interpolation; jtraj(q_right_arm_initial, q_right_arm_final, n_interp)];  
-
-vel_right_arm = [vel_right_arm; repmat((q_right_arm_initial - q_right_arm_final) / (n_interp * sample_time), n_interp, 1)];
-
-T_right_arm_initial = T_right_arm_final;
-T_right_arm_final = fkine(right_arm, q_right_arm_final);
-
-cartesians_right_arm = [cartesians_right_arm, ctraj(T_right_arm_initial, T_right_arm_final, n_interp)];
+[q_right_arm_interpolation, vel_right_arm, T_right_arm_final, cartesians_right_arm] = processLimb(right_arm, q_right_arm_initial, q_right_arm_final, q_right_arm_interpolation, vel_right_arm, cartesians_right_arm, n_interp, sample_time);
 T_right_arm = [T_right_arm; T_right_arm_final];
 
 
 %% 4
-n_interp = 3; 
+n_interp = 6; 
 
 % Left leg
 q_left_leg_initial = q_left_leg_final;
 q_left_leg_final = [3.6*pi/180, -2.7*pi/180, 10.8*pi/180, 336.6*pi/180, 0.0*pi/180, 1.8*pi/180];
-q_left_leg_interpolation = [q_left_leg_interpolation; jtraj(q_left_leg_initial, q_left_leg_final, n_interp)];  
-
-vel_left_leg = [vel_left_leg; repmat((q_left_leg_initial - q_left_leg_final) / (n_interp * sample_time), n_interp, 1)];
-
-T_left_leg_initial = T_left_leg_final;
-T_left_leg_final = fkine(left_leg, q_left_leg_final);
-
-cartesians_left_leg = [cartesians_left_leg, ctraj(T_left_leg_initial, T_left_leg_final, n_interp)];
+[q_left_leg_interpolation, vel_left_leg, T_left_leg_final, cartesians_left_leg] = processLimb(left_leg, q_left_leg_initial, q_left_leg_final, q_left_leg_interpolation, vel_left_leg, cartesians_left_leg, n_interp, sample_time);
 T_left_leg = [T_left_leg; T_left_leg_final];
 
 
 % Right leg
 q_right_leg_initial = q_right_leg_final;
 q_right_leg_final = [16.2*pi/180, 10.8*pi/180, 3.6*pi/180, 349.2*pi/180, -4.8*pi/180, 3.6*pi/180];
-q_right_leg_interpolation = [q_right_leg_interpolation; jtraj(q_right_leg_initial, q_right_leg_final, n_interp)];  
-
-vel_right_leg = [vel_right_leg; repmat((q_right_leg_initial - q_right_leg_final) / (n_interp * sample_time), n_interp, 1)];
-
-T_right_leg_initial = T_right_leg_final;
-T_right_leg_final = fkine(right_leg, q_right_leg_final);
-
-cartesians_right_leg = [cartesians_right_leg, ctraj(T_right_leg_initial, T_right_leg_final, n_interp)];
+[q_right_leg_interpolation, vel_right_leg, T_right_leg_final, cartesians_right_leg] = processLimb(right_leg, q_right_leg_initial, q_right_leg_final, q_right_leg_interpolation, vel_right_leg, cartesians_right_leg, n_interp, sample_time);
 T_right_leg = [T_right_leg; T_right_leg_final];
 
 
 % Left arm
 q_left_arm_initial = q_left_arm_final;
 q_left_arm_final = [-90.0*pi/180, 7.2*pi/180, 35.1*pi/180, 1.8*pi/180, -10.8*pi/180, -14.4*pi/180, -45.0*pi/180];
-q_left_arm_interpolation = [q_left_arm_interpolation; jtraj(q_left_arm_initial, q_left_arm_final, n_interp)];  
-
-vel_left_arm = [vel_left_arm; repmat((q_left_arm_initial - q_left_arm_final) / (n_interp * sample_time), n_interp, 1)];
-
-T_left_arm_initial = T_left_arm_final;
-T_left_arm_final = fkine(left_arm, q_left_arm_final);
-
-cartesians_left_arm = [cartesians_left_arm, ctraj(T_left_arm_initial, T_left_arm_final, n_interp)];
+[q_left_arm_interpolation, vel_left_arm, T_left_arm_final, cartesians_left_arm] = processLimb(left_arm, q_left_arm_initial, q_left_arm_final, q_left_arm_interpolation, vel_left_arm, cartesians_left_arm, n_interp, sample_time);
 T_left_arm = [T_left_arm; T_left_arm_final];
 
 
 % Right arm
 q_right_arm_initial = q_right_arm_final;
 q_right_arm_final = [29.7*pi/180, 32.4*pi/180, 2.7*pi/180, 5.4*pi/180, 5.4*pi/180, -32.4*pi/180, -0.0*pi/180];
-q_right_arm_interpolation = [q_right_arm_interpolation; jtraj(q_right_arm_initial, q_right_arm_final, n_interp)];  
-
-vel_right_arm = [vel_right_arm; repmat((q_right_arm_initial - q_right_arm_final) / (n_interp * sample_time), n_interp, 1)];
-
-T_right_arm_initial = T_right_arm_final;
-T_right_arm_final = fkine(right_arm, q_right_arm_final);
-
-cartesians_right_arm = [cartesians_right_arm, ctraj(T_right_arm_initial, T_right_arm_final, n_interp)];
+[q_right_arm_interpolation, vel_right_arm, T_right_arm_final, cartesians_right_arm] = processLimb(right_arm, q_right_arm_initial, q_right_arm_final, q_right_arm_interpolation, vel_right_arm, cartesians_right_arm, n_interp, sample_time);
 T_right_arm = [T_right_arm; T_right_arm_final];
 
 
 %% 5
-n_interp = 5; 
+n_interp = 8; 
 
 % Left leg
 q_left_leg_initial = q_left_leg_final;
 q_left_leg_final = [5.4*pi/180, -5.4*pi/180, 21.6*pi/180, 329.4*pi/180, -1.2*pi/180, -3.6*pi/180];
-q_left_leg_interpolation = [q_left_leg_interpolation; jtraj(q_left_leg_initial, q_left_leg_final, n_interp)];  
-
-vel_left_leg = [vel_left_leg; repmat((q_left_leg_initial - q_left_leg_final) / (n_interp * sample_time), n_interp, 1)];
-
-T_left_leg_initial = T_left_leg_final;
-T_left_leg_final = fkine(left_leg, q_left_leg_final);
-
-cartesians_left_leg = [cartesians_left_leg, ctraj(T_left_leg_initial, T_left_leg_final, n_interp)];
+[q_left_leg_interpolation, vel_left_leg, T_left_leg_final, cartesians_left_leg] = processLimb(left_leg, q_left_leg_initial, q_left_leg_final, q_left_leg_interpolation, vel_left_leg, cartesians_left_leg, n_interp, sample_time);
 T_left_leg = [T_left_leg; T_left_leg_final];
 
 
 % Right leg
 q_right_leg_initial = q_right_leg_final;
 q_right_leg_final = [57.6*pi/180, 8.1*pi/180, 18.0*pi/180, 334.8*pi/180, -40.8*pi/180, -16.2*pi/180];
-q_right_leg_interpolation = [q_right_leg_interpolation; jtraj(q_right_leg_initial, q_right_leg_final, n_interp)];  
-
-vel_right_leg = [vel_right_leg; repmat((q_right_leg_initial - q_right_leg_final) / (n_interp * sample_time), n_interp, 1)];
-
-T_right_leg_initial = T_right_leg_final;
-T_right_leg_final = fkine(right_leg, q_right_leg_final);
-
-cartesians_right_leg = [cartesians_right_leg, ctraj(T_right_leg_initial, T_right_leg_final, n_interp)];
+[q_right_leg_interpolation, vel_right_leg, T_right_leg_final, cartesians_right_leg] = processLimb(right_leg, q_right_leg_initial, q_right_leg_final, q_right_leg_interpolation, vel_right_leg, cartesians_right_leg, n_interp, sample_time);
 T_right_leg = [T_right_leg; T_right_leg_final];
 
 
 % Left arm
 q_left_arm_initial = q_left_arm_final;
 q_left_arm_final = [26.1*pi/180, -29.7*pi/180, 21.6*pi/180, 113.0*pi/180, -1.8*pi/180, -50.4*pi/180, -7.2*pi/180];
-q_left_arm_interpolation = [q_left_arm_interpolation; jtraj(q_left_arm_initial, q_left_arm_final, n_interp)];  
-
-vel_left_arm = [vel_left_arm; repmat((q_left_arm_initial - q_left_arm_final) / (n_interp * sample_time), n_interp, 1)];
-
-T_left_arm_initial = T_left_arm_final;
-T_left_arm_final = fkine(left_arm, q_left_arm_final);
-
-cartesians_left_arm = [cartesians_left_arm, ctraj(T_left_arm_initial, T_left_arm_final, n_interp)];
+[q_left_arm_interpolation, vel_left_arm, T_left_arm_final, cartesians_left_arm] = processLimb(left_arm, q_left_arm_initial, q_left_arm_final, q_left_arm_interpolation, vel_left_arm, cartesians_left_arm, n_interp, sample_time);
 T_left_arm = [T_left_arm; T_left_arm_final];
 
 
 % Right arm
 q_right_arm_initial = q_right_arm_final;
 q_right_arm_final = [48.6*pi/180, 54.9*pi/180, 21.6*pi/180, 9.0*pi/180, -1.8*pi/180, -28.8*pi/180, 12.6*pi/180];
-q_right_arm_interpolation = [q_right_arm_interpolation; jtraj(q_right_arm_initial, q_right_arm_final, n_interp)];  
-
-vel_right_arm = [vel_right_arm; repmat((q_right_arm_initial - q_right_arm_final) / (n_interp * sample_time), n_interp, 1)];
-
-T_right_arm_initial = T_right_arm_final;
-T_right_arm_final = fkine(right_arm, q_right_arm_final);
-
-cartesians_right_arm = [cartesians_right_arm, ctraj(T_right_arm_initial, T_right_arm_final, n_interp)];
+[q_right_arm_interpolation, vel_right_arm, T_right_arm_final, cartesians_right_arm] = processLimb(right_arm, q_right_arm_initial, q_right_arm_final, q_right_arm_interpolation, vel_right_arm, cartesians_right_arm, n_interp, sample_time);
 T_right_arm = [T_right_arm; T_right_arm_final];
-
-vel_left_leg = [vel_left_leg; [0,0,0,0,0,0]];
-vel_right_leg = [vel_right_leg; [0,0,0,0,0,0]];
-vel_left_arm = [vel_left_arm; [0,0,0,0,0,0,0]];
-vel_right_arm = [vel_right_arm; [0,0,0,0,0,0,0]];
 
 
 % Animation plot
 len_leg = size(q_left_leg_interpolation);
 len_arm = size(q_left_arm_interpolation);
 anim1 = Animate('golf.mp4');
+
+tic;
 for i = 1:max(len_leg(1),len_arm(1))
     if i <= len_leg(1)
         left_leg.animate(q_left_leg_interpolation(i,:));
@@ -511,6 +396,8 @@ for i = 1:max(len_leg(1),len_arm(1))
 end
 anim1.close()
 
+elapsedTime = toc;
+fprintf('Total execution time: %.2f seconds\n', elapsedTime);
 
 %% Cartesian positions FW model
 
@@ -519,6 +406,7 @@ id_fig = 2;
 
 % Determine the number of elements
 n = length(cartesians_left_arm);
+timeVector = linspace(0, elapsedTime, n);
 
 % Preallocate the arrays
 pos_left_arm = zeros(n, length(cartesians_left_arm(1).t));
@@ -533,14 +421,14 @@ end
 
 figure(id_fig);
 id_fig = id_fig +1;
-plot(pos_right_arm,'-');
+plot(timeVector, pos_right_arm,'-');
 grid;
 title("Position Right Arm")
 legend('X','Y','Z');
 
 figure(id_fig);grid;
 id_fig = id_fig +1;
-plot(pos_left_arm,'-');
+plot(timeVector, pos_left_arm,'-');
 grid;
 title("Position Left Arm")
 legend('X','Y','Z');
@@ -562,14 +450,14 @@ end
 
 figure(id_fig);grid;
 id_fig = id_fig +1;
-plot(pos_right_leg,'-');
+plot(timeVector, pos_right_leg,'-');
 grid;
 title("Position Right Leg")
 legend('X','Y','Z');
 
 figure(id_fig);grid;
 id_fig = id_fig +1;
-plot(pos_left_leg,'-');
+plot(timeVector, pos_left_leg,'-');
 grid;
 title("Position Left Leg")
 legend('X','Y','Z');
@@ -580,7 +468,7 @@ legend('X','Y','Z');
 % Left leg
 figure(id_fig);
 id_fig = id_fig +1;
-plot(vel_left_leg);
+plot(timeVector, vel_left_leg);
 grid;
 title('Radian/s vel left leg joints');
 legend('q1','q2','q3','q4','q5','q6');
@@ -588,7 +476,7 @@ legend('q1','q2','q3','q4','q5','q6');
 % Right leg
 figure(id_fig);
 id_fig = id_fig +1;
-plot(vel_right_leg);
+plot(timeVector, vel_right_leg);
 grid;
 title('Radian/s vel right leg joints');
 legend('q1','q2','q3','q4','q5','q6');
@@ -596,7 +484,7 @@ legend('q1','q2','q3','q4','q5','q6');
 % Left arm
 figure(id_fig);
 id_fig = id_fig +1;
-plot(vel_left_arm);
+plot(timeVector, vel_left_arm);
 grid;
 title('Radian/s vel left arm joints');
 legend('q1','q2','q3','q4','q5','q6','q7');
@@ -604,8 +492,52 @@ legend('q1','q2','q3','q4','q5','q6','q7');
 % Right arm
 figure(id_fig);
 id_fig = id_fig +1;
-plot(vel_right_arm);
+plot(timeVector, vel_right_arm);
 grid;
 title('Radian/s vel right arm joints');
 legend('q1','q2','q3','q4','q5','q6','q7');
 
+
+%% Cartesian movement
+%% Cartesian
+
+len_l = size(cart_leg_l);
+len_a = size(cart_arm_l);
+anim = Animate('movie_c.mp4');
+qil = il_qr;
+qdl = dl_qr;
+qia = ia_qr;
+qda = da_qr;
+
+for i = 1:max(len_l(2),len_a(2))
+    if i <= len_l(2)
+        
+        qil_2 = ikine(izq_leg,cart_leg_l(i),qil);
+        if ~isempty(qil_2)
+            izq_leg.animate(qil_2);
+            qil = qil_2;
+        end
+
+        qdl_2 = ikine(dcha_leg,cart_leg_r(i),qdl);
+        if ~isempty(qdl)
+            dcha_leg.animate(qdl_2);
+            qdl = qdl_2;
+        end
+        
+    end
+    if i <= len_a(2)
+        qia_2 = ikine(izq_arm,cart_arm_l(i),qia);
+        if ~isempty(qia_2)
+        izq_arm.animate(qia_2);
+        qia = qia_2;
+        end
+        
+        qda_2 = ikine(dcha_arm,cart_arm_r(i),qda);
+        if ~isempty(qda_2)
+            dcha_arm.animate(qda_2);
+            qda = qda_2;
+        end
+    end
+    anim.add()
+end
+anim.close()
