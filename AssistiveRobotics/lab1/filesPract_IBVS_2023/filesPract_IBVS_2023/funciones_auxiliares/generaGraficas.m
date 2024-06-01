@@ -82,9 +82,9 @@ if nargin>7
 end
 %%
 figure;
-plot3(v_posiciones(:,1), v_posiciones(:,2), v_posiciones(:,3), '.-');
+plot3(v_posiciones(:,1), v_posiciones(:,2), v_posiciones(:,3), '.');
 hold;
-plot3(Puntos3D(:,1), Puntos3D(:,2), Puntos3D(:,3), '.-','LineWidth',grosor,'Markersize',tamarca); 
+plot3(Puntos3D(:,1), Puntos3D(:,2), Puntos3D(:,3), '.','LineWidth',grosor,'Markersize',tamarca); 
 
 for i=1:length(v_tiempo),
   dibCamara3D(v_posiciones(i,:),'k-', 50);  
@@ -97,11 +97,11 @@ title('trayectoria 3D');
 %%
 
 figure;
-plot(Puntos2Dt(:,1),Puntos2Dt(:,2),'*-r');
+plot(Puntos2Dt(:,1),Puntos2Dt(:,2),'*r');
 hold
 
 paso=2;
-plot(v_pts(1,1:2:2*n),v_pts(1,2:2:2*n),'*-b');
+plot(v_pts(1,1:2:2*n),v_pts(1,2:2:2*n),'*b');
 plot(v_pts(:,1:paso:2*n),v_pts(:,2:paso:2*n),':b');
 axis equal;
 title('Plano imagen. *rojo=deseado, *azul=trayectoria puntos');

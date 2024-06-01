@@ -15,20 +15,33 @@ k=[640     0     320
      0     0     1];
 
 %Target position of the camera (Do not modify):
-ct= [500 -600 200 0 0 0]; %[x y z rx ry rz] (units en mm and degrees)
+ct= [-370 -200 -200 0 0 0]; %[x y z rx ry rz] (units en mm and degrees)
 
 %Initial position of the camera:
-%PosiciÛn inicial de la c·mara:
-c= [700 600 -300 -20 10 -40];
+%Posici√≥n inicial de la c√°mara:
+c= [0 50 -300 -20 10 -40];
 %c= [500 -600 200 -20 0 0];
 
 %Create a set of points as a scenario
-[Puntos3D,n] = generaEscena3D;
+img = imread('./cara.jpg');
+[Puntos3D,n] = generaEscenaCara(img);
 
 %TARGET IMAGE
 %Generate the image from the target position
 [Puntos2Dt, Puntos2Dkt, dt] = generaImagen(k, ct, Puntos3D);
 %d: Approximate estimate of the distance from the plane to the camera position
+figure;
+plot(Puntos2Dt(:,1),Puntos2Dt(:,2),'*r');
+
+% %Create a set of points as a scenario
+% [Puntos3D,n] = generaEscenaPlana;
+% 
+% %TARGET IMAGE
+% %Generate the image from the target position
+% [Puntos2Dt, Puntos2Dkt, dt] = generaImagen(k, ct, Puntos3D);
+% %d: Approximate estimate of the distance from the plane to the camera position
+% figure;
+% plot(Puntos2Dt(:,1),Puntos2Dt(:,2),'*-r');
 
 z_deseado=dt*ones(n,1);
 z_cte=-300*ones(n,1); %We estimate the same depth for all the points with an approximate value
@@ -46,21 +59,22 @@ v_pts=zeros(tamTiempo,2*n); %Saves trajectories of image points
 
 %MAIN LOOP
 for it=1:tamTiempo,
-    
+
     v_posiciones(it,:)=c; %save simulation data for plots
-    
-    
+
+
         R= Rgiros( c(4:6) ); 
-    
+
     %CURRENT IMAGE
     %Generate the image from the current position
     [Puntos2D, Puntos2Dk, d] = generaImagen(k, c, Puntos3D);
     R= Rgiros( c(4:6) );
     z_real=d*ones(n,1);
+
     v_pts(it,:)= reshape(Puntos2D',1, n*2); %save simulation data for plots
-    
-    
-   
+
+
+
     %INTERACTION MATRIX - JACOBIAN
     %Build the interaction matrix J that relates the motion of the
     % points [Puntos2Dk] in the image with the movement of the 3D 
@@ -69,12 +83,12 @@ for it=1:tamTiempo,
     %
     % FILL IN
     %--------------------------------------------------------------------
-    
+
     %J = eye(6); %Just to put something:
 
     % Number of points
     n = size(Puntos2Dk, 1);
-    
+
     % Construct the matrix A
     J = zeros(2 * n, 6);
     for i = 1:n
@@ -84,7 +98,7 @@ for it=1:tamTiempo,
         J(2*i-1, :) = [-1./z, 0, x/z, x*y, -(1+x.^2), y];
         J(2*i, :) = [0, -1./z, y/z, (1+y.^2), -x*y, -x];
     end
-    
+
     %--------------------------------------------------------------------
 
     %CONTROL LAW
@@ -95,7 +109,7 @@ for it=1:tamTiempo,
     %from Ji and the points in the image in calibrated coordinates.
     %
     % FILL IN
-    
+
     Ji = pinv(J);
 
     lambda = 0.1;
@@ -110,21 +124,21 @@ for it=1:tamTiempo,
     % end
 
     vel = - lambda * Ji * e;
-            
+
     v= [vel(1);vel(2);vel(3)];%At the moment we are not moving; Just to put something
     w= [vel(4);vel(5);vel(6)];%At the moment we are not moving; Just to put something
-    
+
     %--------------------------------------------------------------------
     v=[R*v]';
     w=[R*w]'*180/pi;
 
     v_correccionesvw(it,:)=[v w]; %save simulation data for plots
-    
+
     %Perform motion
     %We act directly on the modeled robot with integrators
     c(1:3) = c(1:3) + v*Tciclo;
     c(4:6) = c(4:6) + w*Tciclo;
-    
+
 end
 
 %%PLOTS
