@@ -462,6 +462,16 @@ grid;
 title("Position Left Leg")
 legend('X','Y','Z');
 
+figure(id_fig);
+id_fig = id_fig +1;
+plot3(pos_left_leg(:,1), pos_left_leg(:,2), pos_left_leg(:,3), 'g', ...
+    pos_right_leg(:,1), pos_right_leg(:,2), pos_right_leg(:,3), 'k', ...
+    pos_right_arm(:,1), pos_right_arm(:,2), pos_right_arm(:,3), 'r', ...
+    pos_left_arm(:,1), pos_left_arm(:,2), pos_left_arm(:,3)), 'b';
+grid;
+title("Limb trajectories 3D")
+legend('LL', 'RL', 'RA', 'LA');
+
 
 %% Velocities
 
