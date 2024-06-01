@@ -510,11 +510,6 @@ anim = Animate('golf_c.mp4');
 % q_left_arm_ini = q_left_arm_interpolation;
 % q_right_arm_ini = q_right_arm_interpolation;
 
-q_left_leg_zero = [0 0 0 0 0 0];
-q_right_leg_zero = q_left_leg_zero;
-q_left_arm_zero = [0 0 0 0 0 0 0];
-q_right_arm_zero = q_left_arm_zero;
-
 q_left_leg = [];
 q_right_leg = [];
 q_left_arm = [];
@@ -524,69 +519,74 @@ for i = 1:max(len_leg(2),len_arm(2))
     if i <= len_leg(2)
         
         if i == 1
-            q_left_leg_ini = q_left_leg_zero; % Initial guess for the first pose
-            q_right_leg_ini = q_right_leg_zero;
+            q_left_leg_ini = left_leg_qr; % Initial guess for the first pose
+            q_right_leg_ini = right_leg_qr;
         else
             q_left_leg_ini = q_left_leg_inverse; % Use the previous solution as the initial guess
             q_right_leg_ini = q_right_leg_inverse;
         end
 
         fprintf("Left leg step %d\n", i);
-        %q_left_leg_inverse = ikine(left_leg,cartesians_left_leg(i),q_left_leg_ini,'pinv', 'ilimit', 1000000, 'verbose', 2);
-        q_left_leg_inverse = ikinem(left_leg,cartesians_left_leg(i),q_left_leg_ini, 'ilimit', 1000000, 'qlimits');
+        q_left_leg_inverse = ikine(left_leg,cartesians_left_leg(i),q_left_leg_ini,'pinv', 'ilimit', 1000000, 'verbose', 2);
+        %q_left_leg_inverse = ikinem(left_leg,cartesians_left_leg(i),q_left_leg_ini, 'ilimit', 1000000, 'qlimits');
 
         if ~isempty(q_left_leg_inverse)
             left_leg.animate(q_left_leg_inverse);
-            q_left_leg = [q_left_leg; q_left_leg_inverse];
         else
-            q_left_leg = [q_left_leg; q_left_leg_zero];
+            q_left_leg_inverse = left_leg_qr;
         end
+        
+        q_left_leg = [q_left_leg; q_left_leg_inverse];
 
         fprintf("Right leg step %d\n", i);
         
              
-        %q_right_leg_inverse = ikine(right_leg,cartesians_right_leg(i),q_right_leg_ini, 'pinv', 'ilimit', 1000000, 'verbose', 2);
-        q_right_leg_inverse = ikinem(right_leg,cartesians_right_leg(i),q_right_leg_ini, 'ilimit', 1000000, 'qlimits');
+        q_right_leg_inverse = ikine(right_leg,cartesians_right_leg(i),q_right_leg_ini, 'pinv', 'ilimit', 1000000, 'verbose', 2);
+        %q_right_leg_inverse = ikinem(right_leg,cartesians_right_leg(i),q_right_leg_ini, 'ilimit', 1000000, 'qlimits');
 
         if ~isempty(q_right_leg_inverse)
             right_leg.animate(q_right_leg_inverse);
-            q_right_leg = [q_right_leg; q_right_leg_inverse];
         else
-            q_right_leg = [q_right_leg; q_right_leg_zero];
+            q_right_leg_inverse = right_leg_qr;
         end
         
+        q_right_leg = [q_right_leg; q_right_leg_inverse];
+
     end
     if i <= len_arm(2)
 
         if i == 1
-            q_left_arm_ini = q_left_arm_zero; % Initial guess for the first pose
-            q_right_arm_ini = q_right_arm_zero;
+            q_left_arm_ini = left_arm_qr; % Initial guess for the first pose
+            q_right_arm_ini = right_arm_qr;
         else
             q_left_arm_ini = q_left_arm_inverse; % Use the previous solution as the initial guess
             q_right_arm_ini = q_right_arm_inverse;
         end
 
         fprintf("Left arm step %d\n", i);
-        %q_left_arm_inverse = ikine(left_arm,cartesians_left_arm(i),q_left_arm_ini, 'pinv', 'ilimit', 1000000, 'verbose', 2);          
-        q_left_arm_inverse = ikinem(left_arm,cartesians_left_arm(i),q_left_arm_ini, 'ilimit', 1000000, 'qlimits');
+        q_left_arm_inverse = ikine(left_arm,cartesians_left_arm(i),q_left_arm_ini, 'pinv', 'ilimit', 1000000, 'verbose', 2);          
+        %q_left_arm_inverse = ikinem(left_arm,cartesians_left_arm(i),q_left_arm_ini, 'ilimit', 1000000, 'qlimits');
 
         if ~isempty(q_left_arm_inverse)
             left_arm.animate(q_left_arm_inverse);
-            q_left_arm = [q_left_arm; q_left_arm_inverse];
         else
-            q_left_arm = [q_left_arm; q_left_arm_zero];
+            q_left_arm_inverse = left_arm_qr;
         end
         
+        q_left_arm = [q_left_arm; q_left_arm_inverse];
+
         fprintf("Right arm step %d\n", i);
-        %q_right_arm_inverse = ikine(right_arm,cartesians_right_arm(i),q_right_arm_ini, 'pinv', 'ilimit', 1000000, 'verbose', 2);
-        q_right_arm_inverse = ikinem(right_arm,cartesians_right_arm(i),q_right_arm_ini, 'ilimit', 1000000, 'qlimits');
+        q_right_arm_inverse = ikine(right_arm,cartesians_right_arm(i),q_right_arm_ini, 'pinv', 'ilimit', 1000000, 'verbose', 2);
+        %q_right_arm_inverse = ikinem(right_arm,cartesians_right_arm(i),q_right_arm_ini, 'ilimit', 1000000, 'qlimits');
         
         if ~isempty(q_right_arm_inverse)
             right_arm.animate(q_right_arm_inverse);
-            q_right_arm = [q_right_arm; q_right_arm_inverse];
         else
-            q_right_arm = [q_right_arm; q_right_arm_zero];
+            q_right_arm_inverse = right_arm_qr;
         end
+
+        q_right_arm = [q_right_arm; q_right_arm_inverse];
+
     end
     anim.add()
 end
