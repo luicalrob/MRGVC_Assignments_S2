@@ -1,9 +1,16 @@
 clear all;
 close all;
 
-%%  Structure with 2 joints exercise
-l_1 = 5;
-l_2 = 5;
+l_l1 = 0.6;
+l_l2 = 0.3;
+
+l_a1 = 0.5;
+l_a2 = 0.25;
+
+l_hip = 0.25;
+l_shoulder = 0.37;
+
+l_hip_to_shoulder = 0.8;
 
 %% LEFT LEG
 
@@ -17,12 +24,12 @@ L1.qlim = [-pi/2, pi/2];
 L2 = Link([0,       0,      0,      pi/2,   0,      pi/2]);
 L2.qlim = [-pi/2, pi];
 %  DH parameters for 2T3 (Flexion-Extension)
-L3 = Link([0,       0,      2,      0,      0,      -pi]);
+L3 = Link([0,       0,      l_l1,      0,      0,      -pi]);
 L3.qlim = [-pi, pi];
 
 % KNEE
 % DH parameters for 3T4 (Flexion-Extension)
-L4 = Link([0,       0,      2,      0,      0,      0]);  
+L4 = Link([0,       0,      l_l1,      0,      0,      0]);  
 L4.qlim = [pi, 2*pi];
 
 % ANKLE
@@ -30,13 +37,13 @@ L4.qlim = [pi, 2*pi];
 L5 = Link([0,       0,      0,      -pi/2,  0,      pi/2]);
 L5.qlim = [-pi/2, 30*pi/180];
 %  DH parameters for 5T6 (Abduction-Adduction)
-L6 = Link([0,       0,      1,      0,      0,      0]);
+L6 = Link([0,       0,      l_l2,      0,      0,      0]);
 L6.qlim = [-pi/2, pi/2];
 
 % Construction of an object belonging to the class robot
 left_leg=SerialLink([L1,L2,L3,L4,L5,L6],'name', 'left_leg');
 % Location of the base reference frame
-left_leg.base=transl(0,1,0)*trotz(-pi/2);
+left_leg.base=transl(0,l_hip,0)*trotz(-pi/2);
 % Visualization of the robot in the joint position given by qr
 left_leg_qr=[0, 0, 0, 2*pi, 0, 0];
 left_leg.plot(left_leg_qr)
@@ -58,12 +65,12 @@ L1.qlim = [-pi/2, pi/2];
 L2 = Link([0,       0,      0,      pi/2,   0,      pi/2]);
 L2.qlim = [-pi/2, pi];
 %  DH parameters for 2T3 (Flexion-Extension)
-L3 = Link([0,       0,      2,      0,      0,      -pi]);
+L3 = Link([0,       0,      l_l1,      0,      0,      -pi]);
 L3.qlim = [-pi, pi];
 
 % KNEE
 % DH parameters for 3T4 (Flexion-Extension)
-L4 = Link([0,       0,      2,      0,      0,      0]);  
+L4 = Link([0,       0,      l_l1,      0,      0,      0]);  
 L4.qlim = [pi, 2*pi];
 
 % ANKLE
@@ -71,13 +78,13 @@ L4.qlim = [pi, 2*pi];
 L5 = Link([0,       0,      0,      -pi/2,  0,      pi/2]);
 L5.qlim = [-pi/2, 30*pi/180];
 %  DH parameters for 5T6 (Abduction-Adduction)
-L6 = Link([0,       0,      1,      0,      0,      0]);
+L6 = Link([0,       0,      l_l2,      0,      0,      0]);
 L6.qlim = [-pi/2, pi/2];
 
 % Construction of an object belonging to the class robot
 right_leg=SerialLink([L1,L2,L3,L4,L5,L6],'name', 'right_leg');
 % Location of the base reference frame
-right_leg.base=transl(0,-1,0)*trotz(-pi/2);
+right_leg.base=transl(0,-l_hip,0)*trotz(-pi/2);
 % Visualization of the robot in the joint position given by qr
 right_leg_qr=[0, 0, 0, 2*pi, 0, 0];
 right_leg.plot(right_leg_qr)
@@ -98,7 +105,7 @@ L1.qlim = [-pi/2, pi];
 L2 = Link([0,       0,      0,      pi/2,   0,      pi/2]);
 L2.qlim = [-pi/2, pi];
 %  DH parameters for 2T3 (Flexion-Extension)
-L3 = Link([0,       0,      2,      pi/2,   0,      pi]);
+L3 = Link([0,       0,      l_a1,      pi/2,   0,      pi]);
 L3.qlim = [-pi, pi/2];
 
 % ELBOW
@@ -106,7 +113,7 @@ L3.qlim = [-pi, pi/2];
 L4 = Link([0,       0,      0,      pi/2,   0,      pi]);  
 L4.qlim = [0, pi];
 % DH parameters for 4T5 (Pronation-Supination)
-L5 = Link([0,       0,      2,      pi/2,   0,      pi]);  
+L5 = Link([0,       0,      l_a1,      pi/2,   0,      pi]);  
 L5.qlim = [-pi/2, pi/2];
 
 % WRIST
@@ -114,13 +121,13 @@ L5.qlim = [-pi/2, pi/2];
 L6 = Link([0,       0,      0,      pi/2,   0,      pi/2]);
 L6.qlim = [-pi/2, pi/2];
 %  DH parameters for 6T7 (Abduction-Adduction)
-L7 = Link([0,       0,      1,      0,      0,      0]);
+L7 = Link([0,       0,      l_a2,      0,      0,      0]);
 L7.qlim = [-pi/2, pi/2];
 
 % Construction of an object belonging to the class robot
 left_arm=SerialLink([L1,L2,L3,L4,L5,L6,L7],'name', 'left_arm');
 % Location of the base reference frame
-left_arm.base=transl(0,1.5,5)*trotz(-pi/2);
+left_arm.base=transl(0,l_shoulder,l_hip_to_shoulder)*trotz(-pi/2);
 % Visualization of the robot in the joint position given by qr
 left_arm_qr=[0, 0, 0, 0, 0, 0, 0];
 left_arm.plot(left_arm_qr, 'nobase')
@@ -141,7 +148,7 @@ L1.qlim = [-pi/2, pi];
 L2 = Link([0,       0,      0,      pi/2,   0,      pi/2]);
 L2.qlim = [-pi/2, pi];
 %  DH parameters for 2T3 (Circumduction)
-L3 = Link([0,       0,      2,      pi/2,   0,      pi]);
+L3 = Link([0,       0,      l_a1,      pi/2,   0,      pi]);
 L3.qlim = [-pi, pi/2];
 
 % ELBOW
@@ -149,7 +156,7 @@ L3.qlim = [-pi, pi/2];
 L4 = Link([0,       0,      0,      pi/2,   0,      pi]);  
 L4.qlim = [0, pi];
 % DH parameters for 4T5 (Pronation-Supination)
-L5 = Link([0,       0,      2,      pi/2,   0,      pi]);  
+L5 = Link([0,       0,      l_a1,      pi/2,   0,      pi]);  
 L5.qlim = [-pi/2, pi/2];
 
 % WRIST
@@ -157,13 +164,13 @@ L5.qlim = [-pi/2, pi/2];
 L6 = Link([0,       0,      0,      pi/2,   0,      pi/2]);
 L6.qlim = [-pi/2, pi/2];
 %  DH parameters for 6T7 (Abduction-Adduction)
-L7 = Link([0,       0,      1,      0,      0,      0]);
+L7 = Link([0,       0,      l_a2,      0,      0,      0]);
 L7.qlim = [-pi/2, pi/2];
 
 % Construction of an object belonging to the class robot
 right_arm=SerialLink([L1,L2,L3,L4,L5,L6,L7],'name', 'right_arm');
 % Location of the base reference frame
-right_arm.base=transl(0,0,5)*transl(0,-1.5,0)*trotz(-pi/2);
+right_arm.base=transl(0,0,l_hip_to_shoulder)*transl(0,-l_shoulder,0)*trotz(-pi/2);
 % Visualization of the robot in the joint position given by qr
 right_arm_qr=[0, 0, 0, 0, 0, 0, 0];
 
@@ -175,9 +182,9 @@ teach(right_arm, right_arm_qr, 'nobase')
 
 
 % Plot constant trunk, hip, shoulders and neck
-plot3([0 0], [0 0], [0 5], 'k-', 'LineWidth', 2);
-plot3([0 0], [1 -1], [0 0], 'k-', 'LineWidth', 2);
-plot3([0 0], [1.5 -1.5], [5 5], 'k-', 'LineWidth', 2);
+plot3([0 0], [0 0], [0 l_hip_to_shoulder], 'k-', 'LineWidth', 2);
+plot3([0 0], [l_hip -l_hip], [0 0], 'k-', 'LineWidth', 2);
+plot3([0 0], [l_shoulder -l_shoulder], [l_hip_to_shoulder l_hip_to_shoulder], 'k-', 'LineWidth', 2);
 
 hold off;
 
