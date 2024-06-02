@@ -209,7 +209,9 @@ q_left_leg_initial = left_leg_qr;
 q_left_leg_final = [5.4*pi/180, -8.1*pi/180, 25.2*pi/180, 304*pi/180, 24*pi/180, 7.2*pi/180];
 q_left_leg_interpolation = jtraj(q_left_leg_initial, q_left_leg_final, n_interp);  
 
-vel_left_leg = [vel_left_leg; repmat((q_left_leg_initial - q_left_leg_final) / (n_interp * sample_time), n_interp, 1)];
+position_differences = diff(q_left_leg_interpolation, 1, 1);  % Computes the difference between consecutive rows
+    
+vel_left_leg = [zeros(1,6); position_differences / sample_time];
 
 T_left_leg_initial = fkine(left_leg, q_left_leg_initial);
 T_left_leg_final = fkine(left_leg, q_left_leg_final);
@@ -223,7 +225,9 @@ q_right_leg_initial = right_leg_qr;
 q_right_leg_final = [5.4*pi/180, 8.1*pi/180, 25.2*pi/180, 304*pi/180, 24*pi/180, 7.2*pi/180];
 q_right_leg_interpolation = jtraj(q_right_leg_initial, q_right_leg_final, n_interp);  
 
-vel_right_leg = [vel_right_leg; repmat((q_right_leg_initial - q_right_leg_final) / (n_interp * sample_time), n_interp, 1)];
+position_differences = diff(q_right_leg_interpolation, 1, 1);  % Computes the difference between consecutive rows
+    
+vel_right_leg = [zeros(1,6); position_differences / sample_time];
 
 T_right_leg_initial = fkine(right_leg, q_right_leg_initial);
 T_right_leg_final = fkine(right_leg, q_right_leg_final);
@@ -237,7 +241,9 @@ q_left_arm_initial = left_arm_qr;
 q_left_arm_final = [-21.6*pi/180, 23.4*pi/180, -5.4*pi/180, 25.2*pi/180, -10.8*pi/180, -43.2*pi/180, -25.2*pi/180];
 q_left_arm_interpolation = jtraj(q_left_arm_initial, q_left_arm_final, n_interp);  
 
-vel_left_arm = [vel_left_arm; repmat((q_left_arm_initial - q_left_arm_final) / (n_interp * sample_time), n_interp, 1)];
+position_differences = diff(q_left_arm_interpolation, 1, 1);  % Computes the difference between consecutive rows
+    
+vel_left_arm = [zeros(1,7); position_differences / sample_time];
 
 T_left_arm_initial = fkine(left_arm, q_left_arm_initial);
 T_left_arm_final = fkine(left_arm, q_left_arm_final);
@@ -251,7 +257,9 @@ q_right_arm_initial = right_arm_qr;
 q_right_arm_final = [21.6*pi/180, 23.4*pi/180, 5.4*pi/180, 25.2*pi/180, 10.8*pi/180, -43.2*pi/180, 25.2*pi/180];
 q_right_arm_interpolation = jtraj(q_right_arm_initial, q_right_arm_final, n_interp);  
 
-vel_right_arm = [vel_right_arm; repmat((q_right_arm_initial - q_right_arm_final) / (n_interp * sample_time), n_interp, 1)];
+position_differences = diff(q_right_arm_interpolation, 1, 1);  % Computes the difference between consecutive rows
+    
+vel_right_arm = [zeros(1,7); position_differences / sample_time];
 
 T_right_arm_initial = fkine(right_arm, q_right_arm_initial);
 T_right_arm_final = fkine(right_arm, q_right_arm_final);
@@ -427,18 +435,22 @@ end
 
 
 figure(id_fig);
-id_fig = id_fig +1;
-plot(timeVector, pos_right_arm,'-');
+id_fig = id_fig + 1;
+plot(timeVector, pos_right_arm, '-');
 grid;
-title("Position Right Arm")
-legend('X','Y','Z');
+title("Position Right Arm");
+legend('X', 'Y', 'Z');
+xlabel('Time (s)');
+ylabel('Position (m)');
 
-figure(id_fig);grid;
-id_fig = id_fig +1;
-plot(timeVector, pos_left_arm,'-');
+figure(id_fig);
+id_fig = id_fig + 1;
+plot(timeVector, pos_left_arm, '-');
 grid;
-title("Position Left Arm")
-legend('X','Y','Z');
+title("Position Left Arm");
+legend('X', 'Y', 'Z');
+xlabel('Time (s)');
+ylabel('Position (m)');
 
 %Legs
 
@@ -461,6 +473,8 @@ plot(timeVector, pos_right_leg,'-');
 grid;
 title("Position Right Leg")
 legend('X','Y','Z');
+xlabel('Time (s)');
+ylabel('Position (m)');
 
 figure(id_fig);grid;
 id_fig = id_fig +1;
@@ -468,6 +482,8 @@ plot(timeVector, pos_left_leg,'-');
 grid;
 title("Position Left Leg")
 legend('X','Y','Z');
+xlabel('Time (s)');
+ylabel('Position (m)');
 
 figure(id_fig);
 id_fig = id_fig +1;
@@ -478,7 +494,9 @@ plot3(pos_left_leg(:,1), pos_left_leg(:,2), pos_left_leg(:,3), 'g', ...
 grid;
 title("Limb trajectories 3D")
 legend('LL', 'RL', 'RA', 'LA');
-
+xlabel('X (m)');
+ylabel('Y (m)');
+zlabel('Z (m)');
 
 %% Velocities
 
@@ -489,6 +507,9 @@ plot(timeVector, vel_left_leg);
 grid;
 title('Radian/s vel left leg joints');
 legend('q1','q2','q3','q4','q5','q6');
+xlabel('Time (s)');
+ylabel('Velocity (rad/s)');
+
 
 % Right leg
 figure(id_fig);
@@ -497,6 +518,9 @@ plot(timeVector, vel_right_leg);
 grid;
 title('Radian/s vel right leg joints');
 legend('q1','q2','q3','q4','q5','q6');
+xlabel('Time (s)');
+ylabel('Velocity (rad/s)');
+
 
 % Left arm
 figure(id_fig);
@@ -505,6 +529,9 @@ plot(timeVector, vel_left_arm);
 grid;
 title('Radian/s vel left arm joints');
 legend('q1','q2','q3','q4','q5','q6','q7');
+xlabel('Time (s)');
+ylabel('Velocity (rad/s)');
+
 
 % Right arm
 figure(id_fig);
@@ -513,7 +540,8 @@ plot(timeVector, vel_right_arm);
 grid;
 title('Radian/s vel right arm joints');
 legend('q1','q2','q3','q4','q5','q6','q7');
-
+xlabel('Time (s)');
+ylabel('Velocity (rad/s)');
 
 %% Inverse kinematics
 % Cartesian
@@ -616,6 +644,8 @@ plot(timeVector, q_left_leg);
 grid;
 title('Inverse joint coordinates left leg joints');
 legend('q1','q2','q3','q4','q5','q6');
+xlabel('Time (s)');
+ylabel('Angle (rad)');
 
 figure(id_fig);
 id_fig = id_fig +1;
@@ -623,6 +653,9 @@ plot(timeVector, q_left_leg_interpolation);
 grid;
 title('Interpolated joint coordinates left leg joints');
 legend('q1','q2','q3','q4','q5','q6');
+xlabel('Time (s)');
+ylabel('Angle (rad)');
+
 
 % Left leg
 figure(id_fig);
@@ -631,6 +664,8 @@ plot(timeVector, q_right_leg);
 grid;
 title('Inverse joint coordinates right leg joints');
 legend('q1','q2','q3','q4','q5','q6');
+xlabel('Time (s)');
+ylabel('Angle (rad)');
 
 figure(id_fig);
 id_fig = id_fig +1;
@@ -638,6 +673,9 @@ plot(timeVector, q_right_leg_interpolation);
 grid;
 title('Interpolated joint coordinates right leg joints');
 legend('q1','q2','q3','q4','q5','q6');
+xlabel('Time (s)');
+ylabel('Angle (rad)');
+
 
 % Left arm
 figure(id_fig);
@@ -646,6 +684,8 @@ plot(timeVector, q_left_arm);
 grid;
 title('Inverse joint coordinates left arm joints');
 legend('q1','q2','q3','q4','q5','q6','q7');
+xlabel('Time (s)');
+ylabel('Angle (rad)');
 
 figure(id_fig);
 id_fig = id_fig +1;
@@ -653,6 +693,8 @@ plot(timeVector, q_left_arm_interpolation);
 grid;
 title('Interpolated joint coordinates left arm joints');
 legend('q1','q2','q3','q4','q5','q6','q7');
+xlabel('Time (s)');
+ylabel('Angle (rad)');
 
 
 % Right arm
@@ -662,6 +704,8 @@ plot(timeVector, q_right_arm);
 grid;
 title('Inverse joint coordinates right arm joints');
 legend('q1','q2','q3','q4','q5','q6','q7');
+xlabel('Time (s)');
+ylabel('Angle (rad)');
 
 figure(id_fig);
 id_fig = id_fig +1;
@@ -669,3 +713,5 @@ plot(timeVector, q_right_arm_interpolation);
 grid;
 title('Interpolated joint coordinates right arm joints');
 legend('q1','q2','q3','q4','q5','q6','q7');
+xlabel('Time (s)');
+ylabel('Angle (rad)');
