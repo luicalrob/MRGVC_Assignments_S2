@@ -421,7 +421,7 @@ id_fig = 2;
 
 % Determine the number of elements
 n = length(cartesians_left_arm);
-timeVector = linspace(0, elapsedTime, n);
+timeVector = linspace(0, n*sample_time, n);
 
 % Preallocate the arrays
 pos_left_arm = zeros(n, length(cartesians_left_arm(1).t));
@@ -504,6 +504,7 @@ zlabel('Z (m)');
 figure(id_fig);
 id_fig = id_fig +1;
 plot(timeVector, vel_left_leg);
+axis([0 inf -1.5 1.5]);
 grid;
 title('Radian/s vel left leg joints');
 legend('q1','q2','q3','q4','q5','q6');
@@ -515,6 +516,7 @@ ylabel('Velocity (rad/s)');
 figure(id_fig);
 id_fig = id_fig +1;
 plot(timeVector, vel_right_leg);
+axis([0 inf -1.5 1.5]);
 grid;
 title('Radian/s vel right leg joints');
 legend('q1','q2','q3','q4','q5','q6');
@@ -526,6 +528,7 @@ ylabel('Velocity (rad/s)');
 figure(id_fig);
 id_fig = id_fig +1;
 plot(timeVector, vel_left_arm);
+axis([0 inf -1.5 1.5]);
 grid;
 title('Radian/s vel left arm joints');
 legend('q1','q2','q3','q4','q5','q6','q7');
@@ -537,6 +540,7 @@ ylabel('Velocity (rad/s)');
 figure(id_fig);
 id_fig = id_fig +1;
 plot(timeVector, vel_right_arm);
+axis([0 inf -1.5 1.5]);
 grid;
 title('Radian/s vel right arm joints');
 legend('q1','q2','q3','q4','q5','q6','q7');
@@ -560,12 +564,6 @@ q_right_leg = [];
 q_left_arm = [];
 q_right_arm = [];
 
-tol = 1e-6;
-rlimit = 1e3;
-ilimit = 1e10;
-lambda = 1e-2;
-lambdamin = 1e-4;
-
 for i = 1:max(len_leg(2),len_arm(2))
     if i <= len_leg(2)
         
@@ -578,26 +576,26 @@ for i = 1:max(len_leg(2),len_arm(2))
         end
 
         fprintf("Left leg step %d\n", i);
-        q_left_leg_inverse = ikine(left_leg,cartesians_left_leg(i),'q0',q_left_leg_interpolation(i,:), 'ilimit', ilimit, ...
-            'tol', tol,'rlimit', rlimit, 'lambda', lambda, 'lambdamin', lambdamin, 'verbose');
+
+        %q_left_leg_inverse = inverseKinematics(left_leg, cartesians_left_leg(i), q_left_leg_ini, q_left_leg_interpolation(i,:), left_leg_qr);
+        q_left_leg_inverse = inverseKinematics2(left_leg, cartesians_left_leg(i), q_left_leg_ini, q_left_leg_interpolation(i,:));
 
         if ~isempty(q_left_leg_inverse)
             left_leg.animate(q_left_leg_inverse);
-        else
+        else     
             q_left_leg_inverse = left_leg_qr;
         end
         
         q_left_leg = [q_left_leg; q_left_leg_inverse];
 
         fprintf("Right leg step %d\n", i);
-        
-             
-        q_right_leg_inverse = ikine(right_leg,cartesians_right_leg(i),'q0', q_right_leg_interpolation(i,:), 'ilimit', ilimit, ...
-            'tol', tol','rlimit', rlimit, 'lambda', lambda, 'lambdamin', lambdamin, 'verbose');
+
+        % q_right_leg_inverse = inverseKinematics(right_leg, cartesians_right_leg(i), q_right_leg_ini, q_right_leg_interpolation(i,:), right_leg_qr);
+        q_right_leg_inverse = inverseKinematics2(right_leg, cartesians_right_leg(i), q_right_leg_ini, q_right_leg_interpolation(i,:));
 
         if ~isempty(q_right_leg_inverse)
             right_leg.animate(q_right_leg_inverse);
-        else
+        else      
             q_right_leg_inverse = right_leg_qr;
         end
         
@@ -615,8 +613,9 @@ for i = 1:max(len_leg(2),len_arm(2))
         end
 
         fprintf("Left arm step %d\n", i);
-        q_left_arm_inverse = ikine(left_arm,cartesians_left_arm(i),'q0',q_left_arm_interpolation(i,:), 'ilimit', ilimit, ...
-            'tol', tol, 'rlimit', rlimit,'lambda', lambda, 'lambdamin', lambdamin, 'verbose');          
+       
+        % q_left_arm_inverse = inverseKinematics(left_arm, cartesians_left_arm(i), q_left_arm_ini, q_left_arm_interpolation(i,:),left_arm_qr);
+        q_left_arm_inverse = inverseKinematics2(left_arm, cartesians_left_arm(i), q_left_arm_ini, q_left_arm_interpolation(i,:));
 
         if ~isempty(q_left_arm_inverse)
             left_arm.animate(q_left_arm_inverse);
@@ -627,9 +626,10 @@ for i = 1:max(len_leg(2),len_arm(2))
         q_left_arm = [q_left_arm; q_left_arm_inverse];
 
         fprintf("Right arm step %d\n", i);
-        q_right_arm_inverse = ikine(right_arm,cartesians_right_arm(i),'q0',q_right_arm_interpolation(i,:), 'ilimit', ilimit, ...
-            'tol', tol, 'rlimit', rlimit, 'lambda', lambda, 'lambdamin', lambdamin, 'verbose');
-        
+       
+        % q_right_arm_inverse = inverseKinematics(right_arm, cartesians_right_arm(i), q_right_arm_ini, q_right_arm_interpolation(i,:), right_arm_qr);
+        q_right_arm_inverse = inverseKinematics2(right_arm, cartesians_right_arm(i), q_right_arm_ini, q_right_arm_interpolation(i,:));
+
         if ~isempty(q_right_arm_inverse)
             right_arm.animate(q_right_arm_inverse);
         else
