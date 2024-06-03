@@ -681,10 +681,11 @@ ylabel('Angle (rad)');
 figure(id_fig);
 id_fig = id_fig +1;
 plot(timeVector, q_left_leg_errors);
+axis([0 inf 0 0.00007]);
+set(gca, 'YScale', 'log')
 grid;
 title('Left leg transformation error');
 xlabel('Time (s)');
-ylabel('m');
 
 
 % Right leg
@@ -709,6 +710,8 @@ ylabel('Angle (rad)');
 figure(id_fig);
 id_fig = id_fig +1;
 plot(timeVector, q_right_leg_errors);
+axis([0 inf 0 0.00007]);
+set(gca, 'YScale', 'log')
 grid;
 title('Right leg transformation error');
 xlabel('Time (s)');
@@ -735,6 +738,8 @@ ylabel('Angle (rad)');
 figure(id_fig);
 id_fig = id_fig +1;
 plot(timeVector, q_left_arm_errors);
+axis([0 inf 0 0.3]);
+set(gca, 'YScale', 'log')
 grid;
 title('Left arm transformation error');
 xlabel('Time (s)');
@@ -762,6 +767,8 @@ ylabel('Angle (rad)');
 figure(id_fig);
 id_fig = id_fig +1;
 plot(timeVector, q_right_arm_errors);
+axis([0 inf 0 2.5]);
+set(gca, 'YScale', 'log');
 grid;
 title('Right arm transformation error');
 xlabel('Time (s)');
