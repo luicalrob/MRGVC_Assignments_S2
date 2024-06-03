@@ -568,9 +568,13 @@ anim = Animate('golf_c.mp4');
 % q_right_arm_ini = q_right_arm_interpolation;
 
 q_left_leg = [];
+q_left_leg_errors = [];
 q_right_leg = [];
+q_right_leg_errors = [];
 q_left_arm = [];
+q_left_arm_errors = [];
 q_right_arm = [];
+q_right_arm_errors = [];
 
 for i = 1:max(len_leg(2),len_arm(2))
     if i <= len_leg(2)
@@ -586,7 +590,7 @@ for i = 1:max(len_leg(2),len_arm(2))
         fprintf("Left leg step %d\n", i);
 
         %q_left_leg_inverse = inverseKinematics(left_leg, cartesians_left_leg(i), q_left_leg_ini, q_left_leg_interpolation(i,:), left_leg_qr);
-        q_left_leg_inverse = inverseKinematics2(left_leg, cartesians_left_leg(i), q_left_leg_ini, q_left_leg_interpolation(i,:));
+        [q_left_leg_inverse, q_left_leg_error] = inverseKinematics2(left_leg, cartesians_left_leg(i), q_left_leg_ini, q_left_leg_interpolation(i,:));
 
         if ~isempty(q_left_leg_inverse)
             left_leg.animate(q_left_leg_inverse);
@@ -595,11 +599,12 @@ for i = 1:max(len_leg(2),len_arm(2))
         end
         
         q_left_leg = [q_left_leg; q_left_leg_inverse];
+        q_left_leg_errors = [q_left_leg_errors; q_left_leg_error];
 
         fprintf("Right leg step %d\n", i);
 
         % q_right_leg_inverse = inverseKinematics(right_leg, cartesians_right_leg(i), q_right_leg_ini, q_right_leg_interpolation(i,:), right_leg_qr);
-        q_right_leg_inverse = inverseKinematics2(right_leg, cartesians_right_leg(i), q_right_leg_ini, q_right_leg_interpolation(i,:));
+        [q_right_leg_inverse, q_right_leg_error] = inverseKinematics2(right_leg, cartesians_right_leg(i), q_right_leg_ini, q_right_leg_interpolation(i,:));
 
         if ~isempty(q_right_leg_inverse)
             right_leg.animate(q_right_leg_inverse);
@@ -608,6 +613,7 @@ for i = 1:max(len_leg(2),len_arm(2))
         end
         
         q_right_leg = [q_right_leg; q_right_leg_inverse];
+        q_right_leg_errors = [q_right_leg_errors; q_right_leg_error];
 
     end
     if i <= len_arm(2)
@@ -623,7 +629,7 @@ for i = 1:max(len_leg(2),len_arm(2))
         fprintf("Left arm step %d\n", i);
        
         % q_left_arm_inverse = inverseKinematics(left_arm, cartesians_left_arm(i), q_left_arm_ini, q_left_arm_interpolation(i,:),left_arm_qr);
-        q_left_arm_inverse = inverseKinematics2(left_arm, cartesians_left_arm(i), q_left_arm_ini, q_left_arm_interpolation(i,:));
+        [q_left_arm_inverse, q_left_arm_error] = inverseKinematics2(left_arm, cartesians_left_arm(i), q_left_arm_ini, q_left_arm_interpolation(i,:));
 
         if ~isempty(q_left_arm_inverse)
             left_arm.animate(q_left_arm_inverse);
@@ -632,11 +638,12 @@ for i = 1:max(len_leg(2),len_arm(2))
         end
         
         q_left_arm = [q_left_arm; q_left_arm_inverse];
+        q_left_arm_errors = [q_left_arm_errors; q_left_arm_error];
 
         fprintf("Right arm step %d\n", i);
        
         % q_right_arm_inverse = inverseKinematics(right_arm, cartesians_right_arm(i), q_right_arm_ini, q_right_arm_interpolation(i,:), right_arm_qr);
-        q_right_arm_inverse = inverseKinematics2(right_arm, cartesians_right_arm(i), q_right_arm_ini, q_right_arm_interpolation(i,:));
+        [q_right_arm_inverse, q_right_arm_error] = inverseKinematics2(right_arm, cartesians_right_arm(i), q_right_arm_ini, q_right_arm_interpolation(i,:));
 
         if ~isempty(q_right_arm_inverse)
             right_arm.animate(q_right_arm_inverse);
@@ -645,6 +652,7 @@ for i = 1:max(len_leg(2),len_arm(2))
         end
 
         q_right_arm = [q_right_arm; q_right_arm_inverse];
+        q_right_arm_errors = [q_right_arm_errors; q_right_arm_error];
 
     end
     anim.add()
@@ -670,8 +678,16 @@ legend('q1','q2','q3','q4','q5','q6');
 xlabel('Time (s)');
 ylabel('Angle (rad)');
 
+figure(id_fig);
+id_fig = id_fig +1;
+plot(timeVector, q_left_leg_errors);
+grid;
+title('Left leg transformation error');
+xlabel('Time (s)');
+ylabel('m');
 
-% Left leg
+
+% Right leg
 figure(id_fig);
 id_fig = id_fig +1;
 plot(timeVector, q_right_leg);
@@ -690,6 +706,12 @@ legend('q1','q2','q3','q4','q5','q6');
 xlabel('Time (s)');
 ylabel('Angle (rad)');
 
+figure(id_fig);
+id_fig = id_fig +1;
+plot(timeVector, q_right_leg_errors);
+grid;
+title('Right leg transformation error');
+xlabel('Time (s)');
 
 % Left arm
 figure(id_fig);
@@ -710,6 +732,13 @@ legend('q1','q2','q3','q4','q5','q6','q7');
 xlabel('Time (s)');
 ylabel('Angle (rad)');
 
+figure(id_fig);
+id_fig = id_fig +1;
+plot(timeVector, q_left_arm_errors);
+grid;
+title('Left arm transformation error');
+xlabel('Time (s)');
+
 
 % Right arm
 figure(id_fig);
@@ -729,3 +758,10 @@ title('Interpolated joint coordinates right arm joints');
 legend('q1','q2','q3','q4','q5','q6','q7');
 xlabel('Time (s)');
 ylabel('Angle (rad)');
+
+figure(id_fig);
+id_fig = id_fig +1;
+plot(timeVector, q_right_arm_errors);
+grid;
+title('Right arm transformation error');
+xlabel('Time (s)');

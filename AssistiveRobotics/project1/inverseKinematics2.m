@@ -1,4 +1,4 @@
-function q_inverse = inverseKinematics2(limb, T, q_initial1, q_initial2)
+function [q_inverse,error] = inverseKinematics2(limb, T, q_initial1, q_initial2)
 
 try
     [q_inverse1, error1] = ikcon(limb,T, q_initial1);
@@ -24,6 +24,6 @@ else
     error = error2;
 end
 
-fprintf('Selected solution with error %.6f.\n', error);
+fprintf('Selected solution with error %f.\n', error);
 
 end
