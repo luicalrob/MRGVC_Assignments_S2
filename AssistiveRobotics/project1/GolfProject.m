@@ -422,14 +422,14 @@ id_fig = 2;
 % Determine the number of elements
 n = length(cartesians_left_arm);
 timeVector = linspace(0, n*sample_time, n);
-% 
-% right_curve = getCurveInterpolation('left');
-% left_curve = getCurveInterpolation('left');
-% disp(length(right_curve))
-% for i = 1:length(right_curve)
-%     cartesians_right_arm(i+20) = right_curve(i);
-%     cartesians_left_arm(i+20) = left_curve(i);
-% end
+
+right_curve = getData('right');
+left_curve = getData('left');
+disp(length(right_curve))
+for i = 1:length(right_curve)
+    cartesians_right_arm(i) = right_curve(i);
+    cartesians_left_arm(i) = left_curve(i);
+end
 
 % Preallocate the arrays
 pos_left_arm = zeros(n, length(cartesians_left_arm(1).t));
