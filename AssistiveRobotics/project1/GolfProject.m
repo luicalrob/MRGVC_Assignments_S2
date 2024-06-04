@@ -721,6 +721,7 @@ figure(id_fig);
 id_fig = id_fig +1;
 plot(timeVector, q_left_arm);
 grid;
+axis([0 inf -2 2]);
 title('Inverse joint coordinates left arm joints');
 legend('q1','q2','q3','q4','q5','q6','q7');
 xlabel('Time (s)');
@@ -738,9 +739,9 @@ ylabel('Angle (rad)');
 figure(id_fig);
 id_fig = id_fig +1;
 plot(timeVector, q_left_arm_errors);
-axis([0 inf 0 0.3]);
-set(gca, 'YScale', 'log')
 grid;
+set(gca, 'YScale', 'log')
+axis([0 inf 1e-10 0.3]);
 title('Left arm transformation error');
 xlabel('Time (s)');
 
@@ -750,6 +751,7 @@ figure(id_fig);
 id_fig = id_fig +1;
 plot(timeVector, q_right_arm);
 grid;
+axis([0 inf -2.5 2.5]);
 title('Inverse joint coordinates right arm joints');
 legend('q1','q2','q3','q4','q5','q6','q7');
 xlabel('Time (s)');
@@ -767,8 +769,8 @@ ylabel('Angle (rad)');
 figure(id_fig);
 id_fig = id_fig +1;
 plot(timeVector, q_right_arm_errors);
-axis([0 inf 0 2.5]);
-set(gca, 'YScale', 'log');
 grid;
+set(gca, 'YScale', 'log');
+axis([0 inf 1e-10 2.5]);
 title('Right arm transformation error');
 xlabel('Time (s)');
