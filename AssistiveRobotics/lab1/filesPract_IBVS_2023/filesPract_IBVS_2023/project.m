@@ -26,7 +26,8 @@ c= [-1250 -100 -50 -20 10 -40];
 
 %Create a set of points as a scenario
 img = imread('./cara.jpg');
-[Puntos3D,n] = generaEscenaCara(img);
+[Puntos3D,n] = generaEscenaCara(img); %use feature extractor with filter
+%[Puntos3D,n] = generaEscenaPlanaIMG(img); %manual feature extraction
 
 %TARGET IMAGE
 %Generate the image from the target position
@@ -147,7 +148,7 @@ end
 %Draw plots with the results obtained
 generaGraficas(Puntos3D,ct,Puntos2Dt,v_tiempo,v_posiciones,v_correccionesvw,v_pts);
 
-%TO DISPLAY STEP BY STEP (It is a little slow, use from time to time)
+% %TO DISPLAY STEP BY STEP (It is a little slow, use from time to time)
 % tpausa=0.1;
 % generaAnimacion(Puntos2Dt,v_tiempo,v_pts,tpausa);
 
