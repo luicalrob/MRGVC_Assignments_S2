@@ -19,7 +19,7 @@ ct= [-544 -725 -230 0 0 0]; %[x y z rx ry rz] (units en mm and degrees)
 
 %Initial position of the camera:
 %Posición inicial de la cámara:
-c= [-544 -725 -230 0 0 30];
+c= [-1250 -100 -50 -20 10 -40];
 %c= [500 -600 200 -20 0 0];
 
 %Create a set of points as a scenario
@@ -34,7 +34,7 @@ figure;
 plot(Puntos2Dt(:,1),Puntos2Dt(:,2),'*r');
 
 z_deseado=dt*ones(n,1);
-z_cte=-200*ones(n,1); %We estimate the same depth for all the points with an approximate value
+z_cte=-300*ones(n,1); %We estimate the same depth for all the points with an approximate value
 
 Tciclo= 0.4;
 Tmax= 100; %Maximum time
