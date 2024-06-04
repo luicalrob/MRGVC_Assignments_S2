@@ -32,6 +32,8 @@ plot(v_tiempo, v_qi);
 grid;
 legend('q1','q2','q3','q4','q5','q6');
 title('Evolución de posiciones (radian)');
+xlabel('t (s)');
+ylabel('rad');
 
 sample_time = 0.2;
 
@@ -54,3 +56,6 @@ plot(v_tiempo, v_vel);
 grid;
 legend('q1','q2','q3','q4','q5','q6');
 title('Evolución de velocidades (radian/s)');
+xlabel('t (s)');
+ylabel('rad/s');
+

@@ -1,6 +1,6 @@
 function generaGraficas(Puntos3D,ct,Puntos2Dt,v_tiempo,v_posiciones,v_correccionesvw,v_pts,v_HF)
 % function generaGraficas(Puntos3D,ct,Puntos2Dt,v_tiempo,v_posiciones,v_correccionesvw,v_pts,v_HF)
-%A partir de la simulación genera todo gráficas con los resultados
+%A partir de la simulaciï¿½n genera todo grï¿½ficas con los resultados
 %Gonzalo Lopez Nicolas Agosto 2022
 
 grosor=3;
@@ -14,13 +14,13 @@ subplot(2,3,1);
 plot(v_tiempo, v_posiciones(:,1:3));  
 grid;
 legend('x','y','z');
-title('Evolución de posiciones (x y z)');
+title('Evoluciï¿½n de posiciones (x y z)');
 
 subplot(2,3,4);
 plot(v_tiempo,v_posiciones(:,4:6));  
 grid;
 legend('Rx','Ry','Rz');
-title('Evolución de orientaciones (Rx Ry Rz)');
+title('Evoluciï¿½n de orientaciones (Rx Ry Rz)');
 
 
 subplot(2,3,2);
@@ -33,7 +33,7 @@ subplot(2,3,5);
 plot(v_tiempo, v_correccionesvw(:,4:6)); 
 grid;
 legend('wx','wy','wz');
-title('Velocidades de rotación (wx wy wz)');
+title('Velocidades de rotaciï¿½n (wx wy wz)');
 
 
 unos=ones(length(v_tiempo),1);
@@ -63,32 +63,33 @@ if nargin>7
     if rango==3
         %H
         figure
-        subplot(3,3,1); plot(v_tiempo, v_HF(:,1)); title('H_{11}');title('Evolución homografías');
-        subplot(3,3,2); plot(v_tiempo, v_HF(:,2)); title('H_{12}');
-        subplot(3,3,3); plot(v_tiempo, v_HF(:,3)); title('H_{13}');
-        subplot(3,3,4); plot(v_tiempo, v_HF(:,4)); title('H_{21}');
-        subplot(3,3,5); plot(v_tiempo, v_HF(:,5)); title('H_{22}');
-        subplot(3,3,6); plot(v_tiempo, v_HF(:,6)); title('H_{23}');
-        subplot(3,3,7); plot(v_tiempo, v_HF(:,7)); title('H_{31}');
-        subplot(3,3,8); plot(v_tiempo, v_HF(:,8)); title('H_{32}');
-        subplot(3,3,9); plot(v_tiempo, v_HF(:,9)); title('H_{33}');
+        subplot(3,3,1); plot(v_tiempo, v_HF(:,1)); title('H_{11}');title('Evoluciï¿½n homografï¿½as');grid;
+        subplot(3,3,2); plot(v_tiempo, v_HF(:,2)); title('H_{12}');grid;
+        subplot(3,3,3); plot(v_tiempo, v_HF(:,3)); title('H_{13}');grid;
+        subplot(3,3,4); plot(v_tiempo, v_HF(:,4)); title('H_{21}');grid;
+        subplot(3,3,5); plot(v_tiempo, v_HF(:,5)); title('H_{22}');grid;
+        subplot(3,3,6); plot(v_tiempo, v_HF(:,6)); title('H_{23}');grid;
+        subplot(3,3,7); plot(v_tiempo, v_HF(:,7)); title('H_{31}');grid;
+        subplot(3,3,8); plot(v_tiempo, v_HF(:,8)); title('H_{32}');grid;
+        subplot(3,3,9); plot(v_tiempo, v_HF(:,9)); title('H_{33}');grid;
     else
         %F
         figure
-        subplot(3,3,1); plot(v_HF(:,1)); title('F_{11}');title('Evolución F');
-        subplot(3,3,2); plot(v_HF(:,2)); title('F_{12}');
-        subplot(3,3,3); plot(v_HF(:,3)); title('F_{13}');
-        subplot(3,3,4); plot(v_HF(:,4)); title('F_{21}');
-        subplot(3,3,5); plot(v_HF(:,5)); title('F_{22}');
-        subplot(3,3,6); plot(v_HF(:,6)); title('F_{23}');
-        subplot(3,3,7); plot(v_HF(:,7)); title('F_{31}');
-        subplot(3,3,8); plot(v_HF(:,8)); title('F_{32}');
-        subplot(3,3,9); plot(v_HF(:,9)); title('F_{33}');
+        subplot(3,3,1); plot(v_HF(:,1)); title('F_{11}');title('Evoluciï¿½n F');grid;
+        subplot(3,3,2); plot(v_HF(:,2)); title('F_{12}');grid;
+        subplot(3,3,3); plot(v_HF(:,3)); title('F_{13}');grid;
+        subplot(3,3,4); plot(v_HF(:,4)); title('F_{21}');grid;
+        subplot(3,3,5); plot(v_HF(:,5)); title('F_{22}');grid;
+        subplot(3,3,6); plot(v_HF(:,6)); title('F_{23}');grid;
+        subplot(3,3,7); plot(v_HF(:,7)); title('F_{31}');grid;
+        subplot(3,3,8); plot(v_HF(:,8)); title('F_{32}');grid;
+        subplot(3,3,9); plot(v_HF(:,9)); title('F_{33}');grid;
     end
 end
 %%
 figure;
 plot3(v_posiciones(:,1), v_posiciones(:,2), v_posiciones(:,3), '.');
+grid;
 hold;
 plot3(Puntos3D(:,1), Puntos3D(:,2), Puntos3D(:,3), '.','LineWidth',grosor,'Markersize',tamarca); 
 
@@ -104,10 +105,13 @@ title('trayectoria 3D');
 
 figure;
 plot(Puntos2Dt(:,1),Puntos2Dt(:,2),'*r');
+grid;
 hold
 
 paso=2;
 plot(v_pts(1,1:2:2*n),v_pts(1,2:2:2*n),'*b');
+grid;
 plot(v_pts(:,1:paso:2*n),v_pts(:,2:paso:2*n),':b');
+grid;
 axis equal;
 title('Plano imagen. *rojo=deseado, *azul=trayectoria puntos');
