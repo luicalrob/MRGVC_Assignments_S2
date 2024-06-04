@@ -22,7 +22,7 @@ scaledLogImg = rescale(logImg);
 threshold = 0.25; % More threshold? More features
 binaryImg = abs(scaledLogImg) > threshold;
 
-[puntosX, puntosY] = find(binaryImg); % Find the coordinates of the points
+[puntosY, puntosX] = find(binaryImg); % Find the coordinates of the points
 
 z = profundidad * ones(size(puntosX));  % Todos los puntos están a la misma profundidad
 
