@@ -27,6 +27,6 @@ binaryImg = abs(scaledLogImg) > threshold;
 z = profundidad * ones(size(puntosX));  % Todos los puntos están a la misma profundidad
 
 % Crear los Puntos3D
-Puntos3D = [puntosX - ancho / 2, puntosY - alto / 2, z];  % Centering points in the same step
+Puntos3D = [puntosX - ancho + 200 / 2 , puntosY - alto + 200 / 2, z];  % Centering points in the same step
 n=size(Puntos3D,1);
 end

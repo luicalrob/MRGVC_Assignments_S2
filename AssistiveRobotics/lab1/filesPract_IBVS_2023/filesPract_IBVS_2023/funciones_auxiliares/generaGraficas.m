@@ -12,22 +12,26 @@ n=size(Puntos3D,1);
 figure;
 subplot(2,3,1);
 plot(v_tiempo, v_posiciones(:,1:3));  
+grid;
 legend('x','y','z');
 title('Evolución de posiciones (x y z)');
 
 subplot(2,3,4);
 plot(v_tiempo,v_posiciones(:,4:6));  
+grid;
 legend('Rx','Ry','Rz');
 title('Evolución de orientaciones (Rx Ry Rz)');
 
 
 subplot(2,3,2);
 plot(v_tiempo, v_correccionesvw(:,1:3));
+grid;
 legend('Vx','Vy','Vz');
 title('Velocidades (Vx Vy Vz)');
 
 subplot(2,3,5);
 plot(v_tiempo, v_correccionesvw(:,4:6)); 
+grid;
 legend('wx','wy','wz');
 title('Velocidades de rotación (wx wy wz)');
 
@@ -35,11 +39,13 @@ title('Velocidades de rotación (wx wy wz)');
 unos=ones(length(v_tiempo),1);
 subplot(2,3,3);
 plot(v_tiempo, v_posiciones(:,1:3)-[ct(1)*unos,ct(2)*unos,ct(3)*unos]);
+grid;
 legend('Ex','Ey','Ez');
 title('Error de posiciones (x y z)');
 
 subplot(2,3,6);
 plot(v_tiempo, v_posiciones(:,4:6)-[ct(4)*unos,ct(5)*unos,ct(6)*unos]);
+grid;
 legend('ERx','ERy','ERz');
 title('Error de orientaciones (Rx Ry Rz)');
 
