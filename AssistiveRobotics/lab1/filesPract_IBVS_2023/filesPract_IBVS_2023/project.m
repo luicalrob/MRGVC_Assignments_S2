@@ -16,6 +16,8 @@ k=[640     0     320
 
 %Target position of the camera (Do not modify):
 ct= [-544 -725 -230 0 0 0]; %[x y z rx ry rz] (units en mm and degrees)
+%ct= [-935 477 -330 0 0 0]; %POS2 [x y z rx ry rz] (units en mm and degrees)
+
 
 %Initial position of the camera:
 %Posición inicial de la cámara:

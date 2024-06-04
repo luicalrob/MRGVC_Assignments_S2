@@ -28,5 +28,8 @@ z = profundidad * ones(size(puntosX));  % Todos los puntos están a la misma pro
 
 % Crear los Puntos3D
 Puntos3D = [puntosX - ancho + 200 / 2 , puntosY - alto + 200 / 2, z];  % Centering points in the same step
+%Pos 2
+%Puntos3D = [puntosX - ancho - 400 / 2 , puntosY - alto + 2600 / 2, z - 100];  % Centering points in the same step
+
 n=size(Puntos3D,1);
 end
