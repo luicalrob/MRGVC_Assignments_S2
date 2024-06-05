@@ -15,20 +15,23 @@ k=[640     0     320
      0     0     1];
 
 %Target position of the camera (Do not modify):
-ct= [500 -600 200 0 0 0]; %[x y z rx ry rz] (units en mm and degrees)
+ct= [-544 -725 -230 0 0 0]; %[x y z rx ry rz] (units en mm and degrees)
 
 %Initial position of the camera:
 %Posición inicial de la cámara:
-c= [700 600 -300 -20 10 -40];
+c= [-1250 -100 -50 -20 10 -40];
 %c= [500 -600 200 -20 0 0];
 
 %Create a set of points as a scenario
-[Puntos3D,n] = generaEscena3D;
+img = imread('./cara.jpg');
+[Puntos3D,n] = generaEscenaCara(img);
 
 %TARGET IMAGE
 %Generate the image from the target position
 [Puntos2Dt, Puntos2Dkt, dt] = generaImagen(k, ct, Puntos3D);
 %d: Approximate estimate of the distance from the plane to the camera position
+figure;
+plot(Puntos2Dt(:,1),Puntos2Dt(:,2),'*r');
 
 z_deseado=dt*ones(n,1);
 z_cte=-300*ones(n,1); %We estimate the same depth for all the points with an approximate value
@@ -43,6 +46,17 @@ tamTiempo=length(v_tiempo);
 v_posiciones=zeros(tamTiempo,6); %Save the camera motion
 v_correccionesvw=zeros(tamTiempo,6); %Save control velocities
 v_pts=zeros(tamTiempo,2*n); %Saves trajectories of image points
+
+n = size(Puntos2Dkt, 1);
+Puntos2Dkt_cyl = zeros(2*n);
+for i=1:n
+    xt = Puntos2Dkt(i, 1);
+    yt = Puntos2Dkt(i, 2);
+    rhokt = sqrt(xt.^2 + yt.^2);
+    thetakt = atan2(yt,xt);
+    Puntos2Dkt_cyl(2*i-1) = rhokt;
+    Puntos2Dkt_cyl(2*i) = thetakt;
+end
 
 %MAIN LOOP
 for it=1:tamTiempo,
@@ -77,12 +91,21 @@ for it=1:tamTiempo,
     
     % Construct the matrix A
     J = zeros(2 * n, 6);
+    
+    Puntos2Dk_cyl = zeros(2*n);
+
     for i = 1:n
         x = Puntos2Dk(i, 1);
         y = Puntos2Dk(i, 2);
         z = z_real(i);
-        J(2*i-1, :) = [-1./z, 0, x/z, x*y, -(1+x.^2), y];
-        J(2*i, :) = [0, -1./z, y/z, (1+y.^2), -x*y, -x];
+        rhok = sqrt(x.^2 + y.^2);
+        thetak = atan2(y,x);
+        J(2*i-1, :) = [-cos(thetak)/z, -sin(thetak)/z, rhok/z, (1+rhok.^2)*sin(thetak), -(1+rhok.^2)*cos(thetak), 0.];
+        J(2*i, :) = [sin(thetak)/(rhok*z), -cos(thetak)/(rhok*z), 0., cos(thetak)/rhok, sin(thetak)/rhok, -1.];
+        
+        Puntos2Dk_cyl(2*i-1) = rhok;
+        Puntos2Dk_cyl(2*i) = thetak;
+
     end
     
     %--------------------------------------------------------------------
@@ -100,14 +123,7 @@ for it=1:tamTiempo,
 
     lambda = 0.1;
 
-    e = Puntos2Dk - Puntos2Dkt;
-    e = reshape(e', [2*n 1]);
-
-    % e = zeros(2 * n, 1);
-    % for i = 1:n
-    %     e(2*i-1) = error(i,1);
-    %     e(2*i) = error(i,2);
-    % end
+    e = Puntos2Dk_cyl - Puntos2Dkt_cyl;
 
     vel = - lambda * Ji * e;
             

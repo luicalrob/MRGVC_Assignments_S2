@@ -15,19 +15,22 @@ k=[640     0     320
      0     0     1];
 
 %Target position of the camera (Do not modify):
-ct= [500 -600 200 0 0 0]; %[x y z rx ry rz] (units en mm and degrees)
+ct= [-544 -725 -230 0 0 0]; %[x y z rx ry rz] (units en mm and degrees)
 
 %Initial position of the camera:
 %Posición inicial de la cámara:
-c= [700 600 -300 -20 10 -40];
+c= [-1250 -100 -50 -20 10 -40];
 %c= [500 -600 200 -20 0 0];
 
 %Create a set of points as a scenario
-[Puntos3D,n] = generaEscena3D;
+img = imread('./cara.jpg');
+[Puntos3D,n] = generaEscenaCara(img);
 
 %TARGET IMAGE
 %Generate the image from the target position
 [Puntos2Dt, Puntos2Dkt, dt] = generaImagen(k, ct, Puntos3D);
+figure;
+plot(Puntos2Dt(:,1),Puntos2Dt(:,2),'*r');
 %d: Approximate estimate of the distance from the plane to the camera position
 
 z_deseado=dt*ones(n,1);
@@ -43,6 +46,21 @@ tamTiempo=length(v_tiempo);
 v_posiciones=zeros(tamTiempo,6); %Save the camera motion
 v_correccionesvw=zeros(tamTiempo,6); %Save control velocities
 v_pts=zeros(tamTiempo,2*n); %Saves trajectories of image points
+
+% Number of points
+n = size(Puntos2Dkt, 1);
+
+% Construct the matrix A
+J = zeros(2 * n, 6);
+for i = 1:n
+    x = Puntos2Dkt(i, 1);
+    y = Puntos2Dkt(i, 2);
+    z = z_deseado(i);
+    J(2*i-1, :) = [-1./z, 0, x/z, x*y, -(1+x.^2), y];
+    J(2*i, :) = [0, -1./z, y/z, (1+y.^2), -x*y, -x];
+end
+
+Ji = pinv(J);
 
 %MAIN LOOP
 for it=1:tamTiempo,
@@ -71,19 +89,6 @@ for it=1:tamTiempo,
     %--------------------------------------------------------------------
     
     %J = eye(6); %Just to put something:
-
-    % Number of points
-    n = size(Puntos2Dk, 1);
-    
-    % Construct the matrix A
-    J = zeros(2 * n, 6);
-    for i = 1:n
-        x = Puntos2Dk(i, 1);
-        y = Puntos2Dk(i, 2);
-        z = z_real(i);
-        J(2*i-1, :) = [-1./z, 0, x/z, x*y, -(1+x.^2), y];
-        J(2*i, :) = [0, -1./z, y/z, (1+y.^2), -x*y, -x];
-    end
     
     %--------------------------------------------------------------------
 
@@ -95,19 +100,11 @@ for it=1:tamTiempo,
     %from Ji and the points in the image in calibrated coordinates.
     %
     % FILL IN
-    
-    Ji = pinv(J);
-
+   
     lambda = 0.1;
 
     e = Puntos2Dk - Puntos2Dkt;
     e = reshape(e', [2*n 1]);
-
-    % e = zeros(2 * n, 1);
-    % for i = 1:n
-    %     e(2*i-1) = error(i,1);
-    %     e(2*i) = error(i,2);
-    % end
 
     vel = - lambda * Ji * e;
             
