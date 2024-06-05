@@ -9,7 +9,7 @@ function [Puntos3D,n]=generaEscenaPlanaIMG(paso)
 
     zdepth=-500;
     
-    img = imread('imagen.jpg');
+    img = imread('cara.jpg');
     imshow(img);
     title('Seleccione puntos en la imagen, presione Enter cuando termine');
     
