@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="model" default="waffle" doc="model type [burger, waffle, waffle_pi]"/>
+
+    <arg name="first_tb3"  default="robot_1"/>
+    <arg name="second_tb3" default="robot_2"/>
+    <arg name="third_tb3"  default="robot_3"/>
+    <arg name="fourth_tb3"  default="robot_4"/>
+    <arg name="fifth_tb3"  default="robot_5"/>
+    <arg name="sixth_tb3"  default="robot_6"/>
+
+    <arg name="first_tb3_x_pos" default="2.5"/>
+    <arg name="first_tb3_y_pos" default="1.5"/>
+    <arg name="first_tb3_z_pos" default=" 0.0"/>
+    <arg name="first_tb3_yaw"   default=" 0.0"/>
+
+    <arg name="second_tb3_x_pos" default=" 0.0"/>
+    <arg name="second_tb3_y_pos" default="0.0"/>
+    <arg name="second_tb3_z_pos" default=" 0.0"/>
+    <arg name="second_tb3_yaw"   default=" 0.0"/>
+
+    <arg name="third_tb3_x_pos" default=" 2.5"/>
+    <arg name="third_tb3_y_pos" default=" -1.5"/>
+    <arg name="third_tb3_z_pos" default=" 0.0"/>
+    <arg name="third_tb3_yaw"   default=" 0.0"/>
+
+    <arg name="fourth_tb3_x_pos" default=" -2.5"/>
+    <arg name="fourth_tb3_y_pos" default=" 1.5"/>
+    <arg name="fourth_tb3_z_pos" default=" 0.0"/>
+    <arg name="fourth_tb3_yaw"   default=" 0.0"/>
+
+    <arg name="fifth_tb3_x_pos" default=" -2.5"/>
+    <arg name="fifth_tb3_y_pos" default=" -1.5"/>
+    <arg name="fifth_tb3_z_pos" default=" 0.0"/>
+    <arg name="fifth_tb3_yaw"   default=" 0.0"/>
+
+    <arg name="sixth_tb3_x_pos" default=" 0.0"/>
+    <arg name="sixth_tb3_y_pos" default=" 2.0"/>
+    <arg name="sixth_tb3_z_pos" default=" 0.0"/>
+    <arg name="sixth_tb3_yaw"   default=" 0.0"/>
+
+
+    <!-- Specify number of robots -->
+    <arg name="n_robots" default="6"/>
+
+    <!-- Specify max sensor range for sensor simulation -->
+    <param name="sensor_range"  value="3.0"/>
+
+    <!-- Launch simulation -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/empty.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+    </include>
+
+
+     <!-- starting the interface -->
+     <node name="interface" pkg="mr_formation" type="interfaz.py" output="screen">
+        <param name="n_robots" value="$(arg n_robots)"/>
+    </node>
+
+    <!-- Launch sensor simulation -->
+    <node name="sensors_simulation" pkg="mr_formation_turtlebot" type="sensor_simulator.py" output="screen">
+        <param name="n_robots" value="$(arg n_robots)"/>
+    </node>
+
+
+    <!-- robot 1 -->
+
+    <group ns = "$(arg first_tb3)">
+        <param name="robot_description" command="$(find xacro)/xacro $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+            <param name="publish_frequency" type="double" value="50.0" />
+            <param name="tf_prefix" value="$(arg first_tb3)" />
+        </node>
+
+        <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg first_tb3) -x $(arg first_tb3_x_pos) -y $(arg first_tb3_y_pos) -z $(arg first_tb3_z_pos) -Y $(arg first_tb3_yaw) -param robot_description" />
+        
+        <node name="formation_control" pkg="mr_formation_turtlebot" type="formation_control.py" output="screen">
+            <param name = "robot_id" value = "1" />
+            <param name = "neighbors" value = "2 5" type="string"/>
+        </node>
+    
+    </group>
+
+    <!-- robot 2 -->
+
+    <group ns = "$(arg second_tb3)">
+        <param name="robot_description" command="$(find xacro)/xacro $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+            <param name="publish_frequency" type="double" value="50.0" />
+            <param name="tf_prefix" value="$(arg second_tb3)" />
+        </node>
+
+        <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg second_tb3) -x $(arg second_tb3_x_pos) -y $(arg second_tb3_y_pos) -z $(arg second_tb3_z_pos) -Y $(arg second_tb3_yaw) -param robot_description" />
+        
+        <node name="formation_control" pkg="mr_formation_turtlebot" type="formation_control.py" output="screen">
+            <param name = "robot_id" value = "2" />
+            <param name = "neighbors" value = "1 3 5" type="string"/>
+        </node>
+    
+    </group>
+
+
+    <!-- robot 3 -->
+
+    <group ns = "$(arg third_tb3)">
+        <param name="robot_description" command="$(find xacro)/xacro $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+            <param name="publish_frequency" type="double" value="50.0" />
+            <param name="tf_prefix" value="$(arg third_tb3)" />
+        </node>
+
+        <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg third_tb3) -x $(arg third_tb3_x_pos) -y $(arg third_tb3_y_pos) -z $(arg third_tb3_z_pos) -Y $(arg third_tb3_yaw) -param robot_description" />
+
+        <node name="formation_control" pkg="mr_formation_turtlebot" type="formation_control.py" output="screen">
+            <param name = "robot_id" value = "3" />
+            <param name = "neighbors" value = "2 4 6" type="string"/>
+        </node>
+    
+    </group>
+
+    <!-- robot 4 -->
+
+    <group ns = "$(arg fourth_tb3)">
+        <param name="robot_description" command="$(find xacro)/xacro $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+            <param name="publish_frequency" type="double" value="50.0" />
+            <param name="tf_prefix" value="$(arg fourth_tb3)" />
+        </node>
+
+        <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg fourth_tb3) -x $(arg fourth_tb3_x_pos) -y $(arg fourth_tb3_y_pos) -z $(arg fourth_tb3_z_pos) -Y $(arg fourth_tb3_yaw) -param robot_description" />
+        
+        <node name="formation_control" pkg="mr_formation_turtlebot" type="formation_control.py" output="screen">
+                <param name = "robot_id" value = "4" />
+                <param name = "neighbors" value = "3" type="string"/>
+        </node>  
+    </group>
+
+    <!-- robot 5 -->
+
+    <group ns = "$(arg fifth_tb3)">
+        <param name="robot_description" command="$(find xacro)/xacro $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+            <param name="publish_frequency" type="double" value="50.0" />
+            <param name="tf_prefix" value="$(arg fifth_tb3)" />
+        </node>
+
+        <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg fifth_tb3) -x $(arg fifth_tb3_x_pos) -y $(arg fifth_tb3_y_pos) -z $(arg fifth_tb3_z_pos) -Y $(arg fifth_tb3_yaw) -param robot_description" />
+    
+        <node name="formation_control" pkg="mr_formation_turtlebot" type="formation_control.py" output="screen">
+                <param name = "robot_id" value = "5" />
+                <param name = "neighbors" value = "1 2" type="string"/>
+        </node>  
+    </group>
+
+    <!-- robot 6 -->
+
+    <group ns = "$(arg sixth_tb3)">
+        <param name="robot_description" command="$(find xacro)/xacro $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+            <param name="publish_frequency" type="double" value="50.0" />
+            <param name="tf_prefix" value="$(arg sixth_tb3)" />
+        </node>
+
+        <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg sixth_tb3) -x $(arg sixth_tb3_x_pos) -y $(arg sixth_tb3_y_pos) -z $(arg sixth_tb3_z_pos) -Y $(arg sixth_tb3_yaw) -param robot_description" />
+    
+        <node name="formation_control" pkg="mr_formation_turtlebot" type="formation_control.py" output="screen">
+                    <param name = "robot_id" value = "6" />
+                    <param name = "neighbors" value = "3" type="string"/>
+        </node>  
+    
+    </group>
+
+</launch>

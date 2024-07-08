@@ -1,0 +1,4 @@
+uint8 robot_id
+float64 max_range
+---
+range_bearing[] measurements

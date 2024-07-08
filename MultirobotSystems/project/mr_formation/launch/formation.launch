@@ -1,0 +1,111 @@
+<launch>
+    <!-- Parameters for the formation points and neighbor relationships -->
+    <!-- Adjust these values based on your specific formation requirements -->
+    
+     <!-- Specify number of robots -->
+    <arg name="n_robots" default="30"/>
+    <arg name="range_distance" default="3.5"/>
+ 
+    <!-- starting the interface -->
+    <node name="interface" pkg="mr_formation" type="interfaz.py" output="screen">
+        <param name="n_robots" value="$(arg n_robots)"/>
+    </node>
+    
+    <node name="sensors_simulator" pkg="mr_formation" type="sensors_simulator.py" output="screen" args="$(arg n_robots) $(arg range_distance)"/>
+
+    <!-- Robot Nodes -->
+    <node pkg="mr_formation" type="robot.py" name="robot_1" output="screen">
+        <param name="~robot_id" value="1" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_2" output="screen">
+        <param name="~robot_id" value="2" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_3" output="screen">
+        <param name="~robot_id" value="3" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_4" output="screen">
+        <param name="~robot_id" value="4" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_5" output="screen">
+        <param name="~robot_id" value="5" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_6" output="screen">
+        <param name="~robot_id" value="6" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_7" output="screen">
+        <param name="~robot_id" value="7" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_8" output="screen">
+        <param name="~robot_id" value="8" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_9" output="screen">
+        <param name="~robot_id" value="9" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_10" output="screen">
+        <param name="~robot_id" value="10" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_11" output="screen">
+        <param name="~robot_id" value="11" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_12" output="screen">
+        <param name="~robot_id" value="12" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_13" output="screen">
+        <param name="~robot_id" value="13" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_14" output="screen">
+        <param name="~robot_id" value="14" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_15" output="screen">
+        <param name="~robot_id" value="15" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_16" output="screen">
+        <param name="~robot_id" value="16" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_17" output="screen">
+        <param name="~robot_id" value="17" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_18" output="screen">
+        <param name="~robot_id" value="18" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_19" output="screen">
+        <param name="~robot_id" value="19" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_20" output="screen">
+        <param name="~robot_id" value="20" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_21" output="screen">
+        <param name="~robot_id" value="21" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_22" output="screen">
+        <param name="~robot_id" value="22" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_23" output="screen">
+        <param name="~robot_id" value="23" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_24" output="screen">
+        <param name="~robot_id" value="24" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_25" output="screen">
+        <param name="~robot_id" value="25" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_26" output="screen">
+        <param name="~robot_id" value="26" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_27" output="screen">
+        <param name="~robot_id" value="27" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_28" output="screen">
+        <param name="~robot_id" value="28" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_29" output="screen">
+        <param name="~robot_id" value="29" />
+    </node>
+    <node pkg="mr_formation" type="robot.py" name="robot_30" output="screen">
+        <param name="~robot_id" value="30" />
+    </node>
+    <!-- Add more robot nodes as needed -->
+
+    <!-- Visualization Node -->
+    <node name="position_plotter" pkg="mr_formation" type="visualization_node.py" output="screen" args="$(arg n_robots)"/>
+</launch>
