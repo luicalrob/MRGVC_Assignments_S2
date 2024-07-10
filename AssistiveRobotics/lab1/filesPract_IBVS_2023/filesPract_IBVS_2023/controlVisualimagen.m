@@ -23,7 +23,7 @@ c= [700 600 -300 -20 10 -40];
 %c= [500 -600 200 -20 0 0];
 
 %Create a set of points as a scenario
-[Puntos3D,n] = generaEscena3D;
+[Puntos3D,n] = generaEscenaPlana;
 
 %TARGET IMAGE
 %Generate the image from the target position
