@@ -549,7 +549,7 @@ setappdata(0,'Area_data',linkdata.A1);
         %light('Position',[-1 0 0]);
         light                               % add a default light
         daspect([1 1 1])                    % Setting the aspect ratio
-        view(135,25)
+        view(17,28)
         xlabel('X'),ylabel('Y'),zlabel('Z');
         %title('WWU Robotics Lab PUMA 762');
         axis([-1500 1500 -1500 1500 -1120 1500]);
